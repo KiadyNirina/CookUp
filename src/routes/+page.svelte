@@ -3,21 +3,26 @@
 	import ToggleTheme from "$lib/ThemeToggle.svelte";
 </script>
 
-<div class="text-black dark:text-white max-w-7xl ml-auto mr-auto p-5">
-	<div class="flex justify-end">
-		<ToggleTheme />
-	</div>
-	<div class="h-[100vh] flex items-center">
-		<div class="w-1/2">
-			<h1 class="text-8xl font-extrabold">Fini le casse-tête des repas.</h1>
-			<p class="dark:font-thin mt-5">Choisissez un critère, on s’occupe du reste.</p>
-			<button class="mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-full">
-				<Icon icon="mdi:timer-outline" class="mr-1"/>
-				C’est parti !
-			</button>
+<div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
+	<div class="fixed my-2 w-full max-w-7xl flex items-center">
+		<p>CookUp</p>
+		<div class="flex ml-auto">
+			<ToggleTheme/>
 		</div>
-		<div class="w-1/2">
-			
+	</div>
+	<div class="h-[100vh]">
+		<div class="flex h-full items-center">
+			<div class="w-1/2">
+				<h1 class="text-8xl font-extrabold">Fini le casse-tête des repas.</h1>
+				<p class="dark:font-thin mt-5">Choisissez un critère, on s’occupe du reste.</p>
+				<button class="mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-full">
+					<Icon icon="mdi:timer-outline" class="mr-1"/>
+					C’est parti !
+				</button>
+			</div>
+			<div class="w-1/2">
+				<img src="/img/breakfast.svg" alt="">
+			</div>
 		</div>
 	</div>
 	<div class="">
