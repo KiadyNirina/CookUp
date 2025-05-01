@@ -1,11 +1,23 @@
-<div class="">
-	<div class="flex bg-red-500 h-[100vh] items-center">
-		<div class="w-1/3">
-			<h1 class="text-5xl">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde qui commodi cumque, pariatur fugit officia saepe eligendi illum. Possimus, laudantium?</h1>
-			<p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Harum, eos?</p>
+<script>
+	import Icon from "@iconify/svelte";
+	import ToggleTheme from "$lib/ThemeToggle.svelte";
+</script>
+
+<div class="text-black dark:text-white max-w-7xl ml-auto mr-auto p-5">
+	<div class="flex justify-end">
+		<ToggleTheme />
+	</div>
+	<div class="h-[100vh] flex items-center">
+		<div class="w-1/2">
+			<h1 class="text-8xl font-extrabold">Fini le casse-tête des repas.</h1>
+			<p class="dark:font-thin mt-5">Choisissez un critère, on s’occupe du reste.</p>
+			<button class="mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-full">
+				<Icon icon="mdi:timer-outline" class="mr-1"/>
+				C’est parti !
+			</button>
 		</div>
-		<div class="w-1/3">
-			<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos est perferendis corrupti adipisci incidunt nesciunt, ea tenetur quasi magnam ducimus.</p>
+		<div class="w-1/2">
+			
 		</div>
 	</div>
 	<div class="">
@@ -15,4 +27,13 @@
 
 <style>
 	@import "tailwindcss";
+	@custom-variant dark (&:where(.dark, .dark *));
+	@font-face {
+		font-family: 'NunitoSans';
+		src: url('/fonts/NunitoSans.ttf') format('truetype');
+		font-style: normal;
+	}
+	*{
+		font-family: "NunitoSans";
+	}
 </style>
