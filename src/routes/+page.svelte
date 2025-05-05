@@ -1,6 +1,16 @@
 <script>
 	import Icon from "@iconify/svelte";
 	import ToggleTheme from "$lib/ThemeToggle.svelte";
+	import FormPoppup from "$lib/FormPoppup.svelte";
+
+	let poppup = false;
+
+	function togglePoppup() {
+		poppup = !poppup;
+	}
+	function closePoppup() {
+		poppup = false;
+	}
 </script>
 
 <div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
@@ -10,13 +20,19 @@
 			<ToggleTheme/>
 		</div>
 	</div>
+	{#if poppup}
+		<FormPoppup on:close={closePoppup} />
+	{/if}
 	<div class="h-[100vh]">
 		<div class="flex h-full items-center">
 			<div class="w-1/2">
 				<h1 class="text-8xl font-extrabold">Fini le casse-tête des repas.</h1>
 				<p class="dark:font-thin mt-5">Choisissez un critère, on s’occupe du reste.</p>
-				<button class="mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-full transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600">
-					<Icon icon="mdi:timer-outline" class="mr-1"/>
+				<button
+					class="mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-full transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600"
+					on:click={togglePoppup}
+				>
+					<Icon icon="mdi:timer-outline" class="mr-1" />
 					C’est parti !
 				</button>
 			</div>
