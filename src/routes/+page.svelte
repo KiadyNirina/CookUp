@@ -21,7 +21,9 @@
 		</div>
 	</div>
 	{#if poppup}
+	<div class="transition-all duration-300 ease-in-out">
 		<FormPoppup on:close={closePoppup} />
+	</div>
 	{/if}
 	<div class="h-[100vh]">
 		<div class="flex h-full items-center">
