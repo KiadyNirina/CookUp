@@ -104,7 +104,7 @@ function findIdea() {
 
             {:else} 
 
-                <Result/>
+                <Result onBack={() => idea = false}/>
             
             {/if}
         </div>
