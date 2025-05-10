@@ -1,20 +1,36 @@
 <script>
 import Icon from '@iconify/svelte';
 import { createEventDispatcher } from 'svelte';
+import Result from './Result.svelte';
 
 const dispatch = createEventDispatcher();
 
 function handleClose() {
     dispatch('close');
 }
+
+let idea = false;
+
+function findIdea() {
+    idea = true;
+}
 </script>
 
 <div class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50">
         <div class="bg-white dark:bg-black text-black dark:text-white w-11/12 max-w-2xl p-8 rounded-4xl shadow-lg overflow-y-auto max-h-[90vh]">
             <div class="flex items-center">
-                <h1 class="text-3xl font-bold">Personnalisez votre suggestion</h1>
+                <h1 class="text-3xl font-bold">
+                    {#if !idea}
+                        Personnalisez votre suggestion
+                    {:else}
+                        Trouver une idée de repas
+                    {/if}
+                </h1>
                 <p on:click={handleClose} class="ml-auto pr-2 pl-2 border-2 font-bold border-red-500 bg-red-500 hover:bg-transparent transition-all duration-300 ease-in-out hover:cursor-pointer text-white hover:text-red-500 rounded-md">x</p>
             </div>
+
+            {#if !idea}
+
             <div class="mt-5">
                 <p class="text-base">
                     Choisissez vos préférences et laissez-nous vous inspirer.
@@ -73,12 +89,18 @@ function handleClose() {
                         </label>
                     </div>
 
-                    <button class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-2 border-yellow-600 hover:bg-transparent hover:text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-auto">
+                    <button class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-2 border-yellow-600 hover:bg-transparent hover:text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-auto" on:click={findIdea}>
                         <Icon icon="mdi:lightbulb-on" class="mr-1 text-xl"/>
                         Trouver des idées
                     </button>
                 </div>
             </div>
+
+            {:else} 
+
+                <Result/>
+            
+            {/if}
         </div>
   </div>
   
