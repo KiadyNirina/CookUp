@@ -21,9 +21,15 @@ function findIdea() {
             <div class="flex items-center">
                 <h1 class="text-3xl font-bold">
                     {#if !idea}
-                        Personnalisez votre suggestion
+                        <span class="flex items-center">
+                            <Icon icon="mdi:thought-bubble-outline" class="mr-3"/>
+                            Personnalisez votre suggestion
+                        </span>
                     {:else}
-                        Trouver une idée de repas
+                        <span class="flex">
+                            <Icon icon="mdi:food" class="mr-3"/>
+                            Suggestion gourmande
+                        </span>
                     {/if}
                 </h1>
                 <p on:click={handleClose} class="ml-auto pr-2 pl-2 border-2 font-bold border-red-500 bg-red-500 hover:bg-transparent transition-all duration-300 ease-in-out hover:cursor-pointer text-white hover:text-red-500 rounded-md">x</p>
