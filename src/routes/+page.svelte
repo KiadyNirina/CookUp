@@ -2,6 +2,7 @@
 	import Icon from "@iconify/svelte";
 	import ToggleTheme from "$lib/ThemeToggle.svelte";
 	import FormPoppup from "$lib/FormPoppup.svelte";
+	import { fade } from "svelte/transition";
 
 	let poppup = false;
 
@@ -21,7 +22,7 @@
 		</div>
 	</div>
 	{#if poppup}
-	<div class="transition-all duration-300 ease-in-out">
+	<div transition:fade={{ duration: 150 }}>
 		<FormPoppup on:close={closePoppup} />
 	</div>
 	{/if}
