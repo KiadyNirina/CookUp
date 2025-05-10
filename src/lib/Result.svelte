@@ -53,11 +53,11 @@
         </div>
 
         <div class="flex justify-end mt-5">
-            <button class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-2 border-yellow-600 hover:bg-transparent hover:text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex">
+            <button class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex">
                 <Icon icon="mdi:puzzle" class="mr-1 text-xl"/>
                 Une autre idée
             </button>
-            <button class="p-3 rounded-2xl border-2 border-yellow-600 bg-transparent hover:bg-yellow-600 hover:text-white text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-1" on:click={onBack}>
+            <button class="p-3 rounded-2xl border-2 border-yellow-600 hover:border-yellow-700 dark:hover:border-yellow-800 bg-transparent text-yellow-600 hover:text-yellow-700 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-1" on:click={onBack}>
                 <Icon icon="mdi:silverware-fork-knife" class="mr-1 text-xl"/>
                 Modifier mes préférences
             </button>
