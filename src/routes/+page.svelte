@@ -16,7 +16,7 @@
 
 <div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
 	<div class="fixed my-2 w-full max-w-7xl flex items-center">
-		<p>CookUp</p>
+		<p class="text-xl flex items-end">Cook <span class="logo text-yellow-600 text-2xl">Up</span></p>
 		<div class="flex ml-auto">
 			<ToggleTheme/>
 		</div>
@@ -57,7 +57,15 @@
 		src: url('/fonts/NunitoSans.ttf') format('truetype');
 		font-style: normal;
 	}
+	@font-face {
+		font-family: 'Pacifico';
+		src: url('/fonts/Pacifico-Regular.ttf') format('truetype');
+		font-style: normal;
+	}
 	*{
 		font-family: "NunitoSans";
+	}
+	.logo {
+		font-family: "Pacifico";
 	}
 </style>
