@@ -18,6 +18,9 @@
 	<div class="fixed my-2 w-full max-w-7xl flex items-center">
 		<p class="text-xl flex items-end">Cook <span class="logo text-yellow-600 text-2xl">Up</span></p>
 		<div class="flex ml-auto">
+			<a href="https://github.com/KiadyNirina/CookUp" target="_blank" class="p-2 rounded hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 text-xl">
+					<Icon icon="mdi:github" />
+			</a>
 			<ToggleTheme/>
 		</div>
 	</div>
