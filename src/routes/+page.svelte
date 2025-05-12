@@ -15,7 +15,7 @@
 </script>
 
 <div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
-	<div class="fixed my-2 w-full max-w-7xl flex items-center">
+	<div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl flex items-center bg-white dark:bg-black p-2">
 		<p class="text-xl flex items-end">Cook <span class="logo text-yellow-600 text-2xl">Up</span></p>
 		<div class="flex ml-auto">
 			<a href="https://github.com/KiadyNirina/CookUp" target="_blank" class="p-2 rounded hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 text-xl">
