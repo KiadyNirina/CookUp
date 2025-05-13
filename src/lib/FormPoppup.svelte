@@ -10,8 +10,26 @@ function handleClose() {
 }
 
 let idea = false;
+let selectedType = '';
+let moods = []; // tableau pour stocker les humeurs sélectionnées
+let recipeData = null;
 
-function findIdea() {
+function handleMoodChange(mood, e) {
+    if (e.target.checked) {
+        moods = [...moods, mood];
+    } else {
+        moods = moods.filter(m => m !== mood);
+    }
+}
+
+async function findIdea() {
+    const apiKey = '';
+    const tags = moods.join(','); // ex: "vegetarian,healthy"
+
+    const res = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags},${selectedType}`);
+    const data = await res.json();
+    recipeData = data.recipes[0];
+    console.log(recipeData);
     idea = true;
 }
 </script>
@@ -43,53 +61,53 @@ function findIdea() {
                 </p>
                 <div class="mt-3 dark:font-thin">
                     <label for="type" class="text-base">Type de repas :</label>
-                    <select name="" id="type" class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer">
-                        <option value="">Petit-déjeuner</option>
-                        <option value="">Déjeuner</option>
-                        <option value="">Dîner</option>
-                        <option value="">Collation</option>
+                    <select bind:value={selectedType} name="" id="type" class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer">
+                        <option value="breakfast">Petit-déjeuner</option>
+                        <option value="lunch">Déjeuner</option>
+                        <option value="dinner">Dîner</option>
+                        <option value="snack">Collation</option>
                     </select>
 
                     <label for="" class="text-base">Humeur du repas :</label>
                     <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5">
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" />
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('quick', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Rapide</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" />
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('light', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Léger</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" />
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('comfort food', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Gourmand</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" />
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('healthy', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Équilibré</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" />
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('vegetarian', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Végétarien</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" />
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('high-protein', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Protéiné</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" />
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('low-calorie', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Peu calorique</span>
                         </label>
@@ -104,7 +122,7 @@ function findIdea() {
 
             {:else} 
 
-                <Result onBack={() => idea = false}/>
+                <Result {recipeData} onBack={() => idea = false}/>
             
             {/if}
         </div>
