@@ -48,7 +48,7 @@
 		</div>
 	</div>
 	<div class="text-sm text-center p-2 text-gray-600 dark:text-gray-400">
-		<p>© 2025 by <a href="https://kiadynirina.netlify.app/" target="_blank">KiadyN</a>, lnc.</p>
+		<p>© 2025 by <a href="https://kiadynirina.netlify.app/" target="_blank">KiadyN</a>. Tous droits réservés.</p>
 	</div>
 </div>
 
