@@ -3,6 +3,8 @@
     import Icon from "@iconify/svelte";
 
     export let recipeData;
+    const ingredients = recipeData.extendedIngredients.map(ing => ing.original);
+    const steps = recipeData.analyzedInstructions?.[0]?.steps.map(step => step.step) || [];
     export let onBack;
 </script>
 
@@ -22,7 +24,7 @@
             <div class="mt-3 flex">
                 <span class="font-bold mr-2">Ingrédients :</span> 
                 <ul class="list-disc ml-5">
-                    {#each recipeData.ingredients as ingredient}
+                    {#each ingredients as ingredient}
                         <li>{ingredient}</li>
                     {/each}
                 </ul>
@@ -30,7 +32,9 @@
             <div class="mt-3">
                 <span class="font-bold mr-2">Instructions :</span> 
                 <ul class="list-decimal ml-5">
-                    {recipeData.instructions}
+                    {#each steps as step}
+                        <li>{step}</li>
+                    {/each}
                 </ul>
             </div>
             <p class="mt-3"><span class="font-bold mr-2">Temps de préparation :</span> {recipeData.prepTime}</p>

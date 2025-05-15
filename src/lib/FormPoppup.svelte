@@ -77,19 +77,13 @@ async function findIdea() {
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('light', e)}/>
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('vegan', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Léger</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('comfort food', e)}/>
-                            <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
-                            <span class="ml-2">Gourmand</span>
-                        </label>
-
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('healthy', e)}/>
+                            <input type="checkbox" class="hidden peer" on:change={(e) => handleMoodChange('mediterranean', e)}/>
                             <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 transition-colors"></div>
                             <span class="ml-2">Équilibré</span>
                         </label>
