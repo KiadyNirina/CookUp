@@ -13,6 +13,7 @@ let idea = false;
 let selectedType = '';
 let moods = []; // tableau pour stocker les humeurs sélectionnées
 let recipeData = null;
+let loading = false;
 
 function handleMoodChange(mood, e) {
     if (e.target.checked) {
@@ -23,6 +24,7 @@ function handleMoodChange(mood, e) {
 }
 
 async function findIdea() {
+    loading = true;
     const apiKey = '';
     const tags = moods.join(','); // ex: "vegetarian,healthy"
 
@@ -110,8 +112,8 @@ async function findIdea() {
 
                     <button class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-2 border-yellow-600 hover:bg-transparent hover:text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-auto" on:click={findIdea}>
                         <Icon icon="mdi:lightbulb-on" class="mr-1 text-xl"/>
-                        Trouver des idées
-                    </button>
+                        {loading ? "Chargement..." : "Trouver des idées"}
+                    </button> 
                 </div>
             </div>
 
