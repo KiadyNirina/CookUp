@@ -62,6 +62,7 @@ async function findIdea() {
                 <div class="mt-3 dark:font-thin">
                     <label for="type" class="text-base">Type de repas :</label>
                     <select bind:value={selectedType} name="" id="type" class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer">
+                        <option value="" disabled>Selectionnez le type de repas</option>
                         <option value="breakfast">Petit-déjeuner</option>
                         <option value="lunch">Déjeuner</option>
                         <option value="dinner">Dîner</option>
