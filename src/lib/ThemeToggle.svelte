@@ -24,7 +24,7 @@
     }
 </script>
 
-<button on:click={toggleTheme} class="p-2 rounded hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 text-xl">
+<button on:click={toggleTheme} class="p-2 rounded hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 text-xl active:scale-70">
     {#if isDark}
         <Icon icon="mdi:weather-night" class="text-yellow-600" />
     {:else}

@@ -52,7 +52,7 @@ async function findIdea() {
                         </span>
                     {/if}
                 </h1>
-                <p on:click={handleClose} class="ml-auto pr-2 pl-2 border-2 font-bold border-red-500 bg-red-500 hover:bg-transparent transition-all duration-300 ease-in-out hover:cursor-pointer text-white hover:text-red-500 rounded-md">x</p>
+                <p on:click={handleClose} class="ml-auto pr-2 pl-2 border-2 font-bold border-red-500 bg-red-500 hover:bg-transparent transition-all duration-300 ease-in-out hover:cursor-pointer text-white hover:text-red-500 rounded-md active:scale-70">x</p>
             </div>
 
             {#if !idea}
@@ -110,7 +110,7 @@ async function findIdea() {
                         </label>
                     </div>
 
-                    <button class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-2 border-yellow-600 hover:bg-transparent hover:text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-auto" on:click={findIdea}>
+                    <button class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-2 border-yellow-600 hover:bg-transparent hover:text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-auto active:scale-70" on:click={findIdea}>
                         <Icon icon="mdi:lightbulb-on" class="mr-1 text-xl"/>
                         {loading ? "Chargement..." : "Trouver des idées"}
                     </button> 
