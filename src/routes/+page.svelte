@@ -15,15 +15,6 @@
 			duration: 1,
 			ease: "power2.out"
 		});
-
-		gsap.to(".breakfast", {
-			y: -10,
-			repeat: -1,
-			yoyo: true,
-			duration: 1,
-			ease: "power1.inOut",
-			delay: 1
-		});
 	});
 
 	let poppup = false;
