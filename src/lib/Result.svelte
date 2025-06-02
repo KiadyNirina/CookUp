@@ -57,7 +57,7 @@ function handleFindAnother() {
             </p>
             <div class="mt-5">
                 <div class="mb-4 flex flex-wrap gap-2">
-                    <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-semibold">
+                    <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 p-2 rounded-full text-sm font-semibold">
                         {formattedMealType}
                     </span>
                     {#each moods as mood}
@@ -72,24 +72,24 @@ function handleFindAnother() {
                     alt={recipeData.title || 'Image de la recette'}
                 />
                 <div class="mt-5">
-                    <p><span class="font-bold mr-2">Nom du plat :</span> {recipeData.title}</p>
-                    <div class="mt-3 flex">
-                        <span class="font-bold mr-2">Ingrédients :</span>
-                        <ul class="list-disc ml-5">
+                    <p><span class="font-bold text-xl mr-2">Nom du plat :</span> {recipeData.title}</p>
+                    <div class="mt-3">
+                        <span class="font-bold text-xl mr-2">Ingrédients :</span>
+                        <ul class="list-disc ml-15 mt-1">
                             {#each ingredients as ingredient}
                                 <li>{ingredient}</li>
                             {/each}
                         </ul>
                     </div>
-                    <div class="mt-3">
-                        <span class="font-bold mr-2">Instructions :</span>
-                        <ul class="list-decimal ml-5">
+                    <div class="mt-4">
+                        <span class="font-bold text-xl mr-2">Instructions :</span>
+                        <ul class="list-decimal ml-15 mt-1">
                             {#each steps as step}
                                 <li>{step}</li>
                             {/each}
                         </ul>
                     </div>
-                    <p class="mt-3"><span class="font-bold mr-2">Temps de préparation :</span> {prepTime} minutes</p>
+                    <p class="mt-4"><span class="font-bold text-xl mr-2">Temps de préparation :</span> {prepTime} minutes</p>
                     {#if recipeData.nutrition?.nutrients}
                         <div class="mt-3 flex">
                             <span class="font-bold mr-2">Infos nutritionnelles :</span>

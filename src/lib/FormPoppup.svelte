@@ -87,7 +87,7 @@ async function findIdea() {
             throw new Error('Problème de connexion réseau. Vérifiez votre connexion et réessayez.');
         }
 
-        const apiKey = '';
+        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
         const tags = `${mood},${selectedType}`;
         const res = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`);
         if (!res.ok) {
