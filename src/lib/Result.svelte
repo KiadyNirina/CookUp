@@ -2,6 +2,8 @@
 import { scale } from 'svelte/transition';
 import Icon from '@iconify/svelte';
 import { createEventDispatcher } from 'svelte';
+import { language } from '../stores/language';
+import { translations } from '../translations';
 
 export let recipeData;
 export let selectedType;
@@ -13,25 +15,12 @@ const dispatch = createEventDispatcher();
 
 $: ingredients = recipeData?.extendedIngredients?.map(ing => ing.original) || [];
 $: steps = recipeData?.analyzedInstructions?.[0]?.steps?.map(step => step.step) || [];
-$: prepTime = recipeData?.readyInMinutes || 'Non spécifié';
+$: prepTime = recipeData?.readyInMinutes || ($language === 'en' ? 'Not specified' : 'Non spécifié');
 
-const mealTypeMap = {
-    breakfast: 'petit-déjeuner',
-    lunch: 'déjeuner',
-    dinner: 'dîner',
-    snack: 'collation'
-};
-const formattedMealType = mealTypeMap[selectedType] || 'repas';
+$: t = translations[$language] || translations.en;
 
-const moodMap = {
-    quick: 'rapide',
-    vegan: 'végan',
-    mediterranean: 'méditerranéen',
-    vegetarian: 'végétarien',
-    'high-protein': 'protéiné',
-    'low-calorie': 'peu calorique'
-};
-$: formattedMoods = moods.map(m => moodMap[m] || m).join(', ');
+$: formattedMealType = t.mealTypes[selectedType] || ($language === 'en' ? 'meal' : 'repas');
+$: formattedMoods = moods.map(m => t.moods[m] || m).join(', ');
 $: mealDescription = moods.length > 0 ? `${formattedMealType} ${formattedMoods}` : formattedMealType;
 
 function handleFindAnother() {
@@ -47,52 +36,52 @@ function handleFindAnother() {
         >
             <div class="flex flex-col items-center">
                 <Icon icon="mdi:loading" class="text-yellow-600 text-6xl animate-spin" />
-                <p class="text-yellow-600 font-semibold mt-4 text-lg">Chargement d'une nouvelle idée...</p>
+                <p class="text-yellow-600 font-semibold mt-4 text-lg">{t.loadingIdea}</p>
             </div>
         </div>
     {:else if recipeData}
         <div transition:scale={{ duration: 300, start: 0.95 }} class="dark:font-thin">
             <p class="text-lg font-semibold">
-                Voici une idée pour votre {mealDescription} :
+                {t.suggestion} {mealDescription} :
             </p>
             <div class="mt-5">
                 <div class="mb-4 flex flex-wrap gap-2">
-                    <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 p-2 rounded-full text-sm font-semibold">
+                    <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-semibold">
                         {formattedMealType}
                     </span>
-                    {#each moods as mood}
+                    {#each moods as much}
                         <span class="bg-gray-300 dark:bg-gray-600 p-2 rounded-full text-sm font-semibold">
-                            #{moodMap[mood] || mood}
+                            #{t.moods[mood] || mood}
                         </span>
                     {/each}
                 </div>
                 <img
                     src={recipeData.image}
                     class="border-1 border-gray-400 dark:border-gray-600 rounded-3xl w-full h-full"
-                    alt={recipeData.title || 'Image de la recette'}
+                    alt={recipeData.title || t.recipeImageAlt}
                 />
                 <div class="mt-5">
-                    <p><span class="font-bold text-xl mr-2">Nom du plat :</span> {recipeData.title}</p>
-                    <div class="mt-3">
-                        <span class="font-bold text-xl mr-2">Ingrédients :</span>
-                        <ul class="list-disc ml-15 mt-1">
+                    <p><span class="font-bold mr-2">{t.dishName}</span> {recipeData.title}</p>
+                    <div class="mt-3 flex">
+                        <span class="font-bold mr-2">{t.ingredients}</span>
+                        <ul class="list-disc ml-5">
                             {#each ingredients as ingredient}
                                 <li>{ingredient}</li>
                             {/each}
                         </ul>
                     </div>
-                    <div class="mt-4">
-                        <span class="font-bold text-xl mr-2">Instructions :</span>
-                        <ul class="list-decimal ml-15 mt-1">
+                    <div class="mt-3">
+                        <span class="font-bold mr-2">{t.instructions}</span>
+                        <ul class="list-decimal ml-5">
                             {#each steps as step}
                                 <li>{step}</li>
                             {/each}
                         </ul>
                     </div>
-                    <p class="mt-4"><span class="font-bold text-xl mr-2">Temps de préparation :</span> {prepTime} minutes</p>
+                    <p class="mt-3"><span class="font-bold mr-2">{t.prepTime}</span> {prepTime} {t.minutes}</p>
                     {#if recipeData.nutrition?.nutrients}
                         <div class="mt-3 flex">
-                            <span class="font-bold mr-2">Infos nutritionnelles :</span>
+                            <span class="font-bold mr-2">{t.nutrition}</span>
                             <ul class="list-disc ml-5">
                                 {#each recipeData.nutrition.nutrients as nutrient}
                                     {#if ['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)}
@@ -103,25 +92,24 @@ function handleFindAnother() {
                         </div>
                     {/if}
                 </div>
-
                 <div class="flex justify-end mt-5">
                     <button
                         class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex"
                         on:click={handleFindAnother}
                         disabled={loading}
-                        aria-label="Charger une autre recette"
+                        aria-label={t.anotherIdea}
                     >
                         <Icon icon="mdi:puzzle" class="mr-1 text-xl"/>
-                        Une autre idée
+                        {t.anotherIdea}
                     </button>
                     <button
                         class="p-3 rounded-2xl border-2 border-yellow-600 hover:border-yellow-700 dark:hover:border-yellow-800 bg-transparent text-yellow-600 hover:text-yellow-700 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-1"
                         on:click={onBack}
                         disabled={loading}
-                        aria-label="Modifier les préférences"
+                        aria-label={t.modifyPrefs}
                     >
                         <Icon icon="mdi:silverware-fork-knife" class="mr-1 text-xl"/>
-                        Modifier mes préférences
+                        {t.modifyPrefs}
                     </button>
                 </div>
             </div>
