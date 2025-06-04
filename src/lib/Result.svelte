@@ -3,7 +3,7 @@ import { scale } from 'svelte/transition';
 import Icon from '@iconify/svelte';
 import { createEventDispatcher } from 'svelte';
 import { language } from '../stores/language';
-import { translations } from '../translations';
+import { translations } from '$lib/translations';
 
 export let recipeData;
 export let selectedType;
@@ -13,8 +13,8 @@ export let loading;
 
 const dispatch = createEventDispatcher();
 
-$: ingredients = recipeData?.extendedIngredients?.map(ing => ing.original) || [];
-$: steps = recipeData?.analyzedInstructions?.[0]?.steps?.map(step => step.step) || [];
+$: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => ing.original || '') : [];
+$: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => step.step || '') : [];
 $: prepTime = recipeData?.readyInMinutes || ($language === 'en' ? 'Not specified' : 'Non spécifié');
 
 $: t = translations[$language] || translations.en;
@@ -49,49 +49,56 @@ function handleFindAnother() {
                     <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-semibold">
                         {formattedMealType}
                     </span>
-                    {#each moods as much}
+                    {#each moods as mood}
                         <span class="bg-gray-300 dark:bg-gray-600 p-2 rounded-full text-sm font-semibold">
                             #{t.moods[mood] || mood}
                         </span>
                     {/each}
                 </div>
-                <img
-                    src={recipeData.image}
-                    class="border-1 border-gray-400 dark:border-gray-600 rounded-3xl w-full h-full"
-                    alt={recipeData.title || t.recipeImageAlt}
-                />
+                {#if recipeData.image}
+                    <img
+                        src={recipeData.image}
+                        class="border-1 border-gray-400 dark:border-gray-600 rounded-3xl w-full h-full"
+                        alt={recipeData.title || t.recipeImageAlt}
+                    />
+                {/if}
                 <div class="mt-5">
-                    <p><span class="font-bold mr-2">{t.dishName}</span> {recipeData.title}</p>
-                    <div class="mt-3 flex">
-                        <span class="font-bold mr-2">{t.ingredients}</span>
-                        <ul class="list-disc ml-5">
-                            {#each ingredients as ingredient}
-                                <li>{ingredient}</li>
-                            {/each}
-                        </ul>
-                    </div>
-                    <div class="mt-3">
-                        <span class="font-bold mr-2">{t.instructions}</span>
-                        <ul class="list-decimal ml-5">
-                            {#each steps as step}
-                                <li>{step}</li>
-                            {/each}
-                        </ul>
-                    </div>
+                    <p><span class="font-bold mr-2">{t.dishName}</span> {recipeData.title || ''}</p>
+                    {#if ingredients.length > 0}
+                        <div class="mt-3 flex">
+                            <span class="font-bold mr-2">{t.ingredients}</span>
+                            <ul class="list-disc ml-5">
+                                {#each ingredients as ingredient}
+                                    <li>{ingredient}</li>
+                                {/each}
+                            </ul>
+                        </div>
+                    {/if}
+                    {#if steps.length > 0}
+                        <div class="mt-3">
+                            <span class="font-bold mr-2">{t.instructions}</span>
+                            <ul class="list-decimal ml-5">
+                                {#each steps as step}
+                                    <li>{step}</li>
+                                {/each}
+                            </ul>
+                        </div>
+                    {/if}
                     <p class="mt-3"><span class="font-bold mr-2">{t.prepTime}</span> {prepTime} {t.minutes}</p>
-                    {#if recipeData.nutrition?.nutrients}
+                    {#if recipeData.nutrition?.nutrients?.length}
                         <div class="mt-3 flex">
                             <span class="font-bold mr-2">{t.nutrition}</span>
                             <ul class="list-disc ml-5">
                                 {#each recipeData.nutrition.nutrients as nutrient}
                                     {#if ['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)}
-                                        <li>{nutrient.name} : {nutrient.amount} {nutrient.unit}</li>
+                                        <li>{nutrient.name}: {nutrient.amount} {nutrient.unit}</li>
                                     {/if}
                                 {/each}
                             </ul>
                         </div>
                     {/if}
                 </div>
+
                 <div class="flex justify-end mt-5">
                     <button
                         class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex"

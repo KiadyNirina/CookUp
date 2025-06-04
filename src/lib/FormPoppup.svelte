@@ -4,7 +4,8 @@ import { createEventDispatcher, onMount } from 'svelte';
 import Result from './Result.svelte';
 import { fade } from 'svelte/transition';
 import { language } from '../stores/language';
-import { translations } from "$lib/translations";
+import { translations } from '$lib/translations';
+import { browser } from '$app/environment';
 
 const dispatch = createEventDispatcher();
 
@@ -21,11 +22,6 @@ let errorMessage = '';
 let showErrorPopup = false;
 
 $: t = translations[$language] || translations.en;
-
-// Recharger la recette si la langue change
-$: if (idea && recipeData && $language) {
-    findIdea();
-}
 
 async function translateText(text, target = $language) {
     if (!text || typeof text !== 'string' || text.trim() === '') {
@@ -65,14 +61,11 @@ async function translateText(text, target = $language) {
         }
 
         const result = await response.json();
-        const translatedText = result.responseData.translatedText || text;
+        const translatedText = result.responseData?.translatedText || text;
         if (browser) localStorage.setItem(cacheKey, translatedText);
         return translatedText;
     } catch (error) {
-        console.error('Translation error:', error);
-        if (error.message.includes('Network connection') || error.message.includes('Failed to fetch')) {
-            throw new Error(t.networkError);
-        }
+        console.error('Translation error for text:', text, error);
         return text;
     }
 }
@@ -93,14 +86,13 @@ async function findIdea() {
     loading = true;
     errorMessage = '';
     showErrorPopup = false;
-    recipeData = null;
 
     try {
         if (!navigator.onLine) {
             throw new Error(t.networkError);
         }
 
-        const apiKey = '4a14f4c10ec04aaeba49fcbad3eefb53';
+        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY || '4a14f4c10ec04aaeba49fcbad3eefb53';
         const tags = `${mood},${selectedType}`;
         const res = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`);
         if (!res.ok) {
@@ -108,48 +100,74 @@ async function findIdea() {
         }
         const data = await res.json();
 
-        if (!data.recipes || data.recipes.length === 0) {
+        if (!data.recipes || data.recipes.length === 0 || !data.recipes[0]) {
             throw new Error(t.noRecipeError);
         }
 
         recipeData = data.recipes[0];
+        console.log('Assigned recipeData:', recipeData);
 
-        recipeData.title = await translateText(recipeData.title);
+        // Traduire le titre
+        recipeData.title = await translateText(recipeData.title || '');
+        console.log('Translated title:', recipeData.title);
 
-        recipeData.extendedIngredients = await Promise.all(
-            recipeData.extendedIngredients.map(async (ing, index) => {
-                await delay(index * 1000);
-                return {
-                    ...ing,
-                    original: await translateText(ing.original)
-                };
-            })
-        );
-
-        if (recipeData.analyzedInstructions?.[0]?.steps) {
-            recipeData.analyzedInstructions[0].steps = await Promise.all(
-                recipeData.analyzedInstructions[0].steps.map(async (step, index) => {
-                    await delay(index * 1000);
-                    return {
-                        ...step,
-                        step: await translateText(step.step)
-                    };
+        // Traduire les ingrédients
+        if (recipeData && Array.isArray(recipeData.extendedIngredients)) {
+            recipeData.extendedIngredients = await Promise.all(
+                recipeData.extendedIngredients.map(async (ing, index) => {
+                    try {
+                        await delay(index * 1500);
+                        return {
+                            ...ing,
+                            original: await translateText(ing.original || '')
+                        };
+                    } catch (err) {
+                        console.error('Error translating ingredient:', ing, err);
+                        return { ...ing, original: ing.original || '' };
+                    }
                 })
             );
+            console.log('Translated ingredients:', recipeData.extendedIngredients);
+        } else {
+            console.warn('No extendedIngredients found or recipeData is null:', recipeData);
+            recipeData.extendedIngredients = [];
         }
 
-        console.log(recipeData);
+        // Traduire les instructions
+        if (recipeData && recipeData.analyzedInstructions?.[0]?.steps) {
+            recipeData.analyzedInstructions[0].steps = await Promise.all(
+                recipeData.analyzedInstructions[0].steps.map(async (step, index) => {
+                    try {
+                        await delay(index * 1500);
+                        return {
+                            ...step,
+                            step: await translateText(step.step || '')
+                        };
+                    } catch (err) {
+                        console.error('Error translating step:', step, err);
+                        return { ...step, step: step.step || '' };
+                    }
+                })
+            );
+            console.log('Translated steps:', recipeData.analyzedInstructions[0].steps);
+        } else {
+            console.warn('No analyzedInstructions found or recipeData is null:', recipeData);
+            recipeData.analyzedInstructions = [{ steps: [] }];
+        }
+
+        console.log('Final recipeData:', recipeData);
         idea = true;
     } catch (error) {
-        console.error('Error:', error);
+        console.error('FindIdea error:', error, error.stack);
         errorMessage = error.message.includes('Network connection')
-            ? error.message
+            ? t.networkError
             : error.message.includes('No recipes')
-            ? error.message
-            : t.translationError;
+            ? t.noRecipeError
+            : `${t.translationError} (${error.message})`;
         showErrorPopup = true;
         setTimeout(() => (showErrorPopup = false), 3000);
         idea = false;
+        recipeData = null;
     } finally {
         loading = false;
     }
@@ -166,7 +184,7 @@ function handleFindAnother() {
             <div
                 transition:fade={{ duration: 300 }}
                 class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white p-4 rounded-2xl shadow-lg max-w-md w-full text-center z-60"
-                aria-live="polite"
+                aria-live="assertive"
             >
                 <p class="font-semibold">{errorMessage}</p>
             </div>

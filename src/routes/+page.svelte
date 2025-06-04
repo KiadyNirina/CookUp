@@ -5,8 +5,9 @@
     import { fade } from "svelte/transition";
     import { gsap } from "gsap";
     import { onMount } from "svelte";
-    import { language } from "$lib/stores/language";
+    import { language } from "../stores/language";
     import { translations } from "$lib/translations";
+    import { browser } from "$app/environment";
 
     let bottle;
 
@@ -17,6 +18,12 @@
             duration: 1,
             ease: "power2.out"
         });
+        if (browser) {
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage) {
+                $language = savedLanguage;
+            }
+        }
     });
 
     let poppup = false;
@@ -31,7 +38,12 @@
     $: t = translations[$language] || translations.en;
 
     function toggleLanguage() {
-        $language = $language === 'en' ? 'fr' : 'en';
+        const newLanguage = $language === 'en' ? 'fr' : 'en';
+        $language = newLanguage;
+        if (browser) {
+            localStorage.setItem('language', newLanguage);
+            window.location.reload();
+        }
     }
 </script>
 
