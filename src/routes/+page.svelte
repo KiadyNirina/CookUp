@@ -53,7 +53,7 @@
         <div class="flex ml-auto items-center gap-2">
             <button
                 on:click={toggleLanguage}
-                class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded-full text-sm font-semibold hover:bg-yellow-700 transition-all duration-300"
+                class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded-full text-sm font-semibold hover:cursor-pointer hover:bg-yellow-700 transition-all duration-300"
                 aria-label="Toggle language"
                 aria-current={$language === 'en' ? 'true' : 'false'}
             >

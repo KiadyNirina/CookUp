@@ -46,7 +46,7 @@ function handleFindAnother() {
             </p>
             <div class="mt-5">
                 <div class="mb-4 flex flex-wrap gap-2">
-                    <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-semibold">
+                    <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 p-2 rounded-full text-sm font-semibold">
                         {formattedMealType}
                     </span>
                     {#each moods as mood}
