@@ -77,7 +77,7 @@ function delay(ms) {
 
 async function findIdea() {
     if (!selectedType || !mood || !maxPrepTime) {
-        errorMessage = t.selectMealTypeError; // Updated to include maxPrepTime in validation
+        errorMessage = t.selectMealTypeError;
         showErrorPopup = true;
         setTimeout(() => (showErrorPopup = false), 3000);
         loading = false;
@@ -88,25 +88,39 @@ async function findIdea() {
     errorMessage = '';
     showErrorPopup = false;
 
+    let attempts = 0;
+    const maxAttempts = 3;
+
     try {
         if (!navigator.onLine) {
             throw new Error(t.networkError);
         }
 
-        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
-        const tags = `${mood},${selectedType}`;
-        const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}&maxReadyTime=${maxPrepTime}`;
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`Spoonacular Error: ${res.statusText}`);
-        }
-        const data = await res.json();
+        while (attempts < maxAttempts) {
+            attempts++;
+            const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
+            const tags = `${mood},${selectedType}`;
+            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}&maxReadyTime=${maxPrepTime}`;
+            const res = await fetch(url);
+            if (!res.ok) {
+                throw new Error(`Spoonacular Error: ${res.statusText}`);
+            }
+            const data = await res.json();
 
-        if (!data.recipes || data.recipes.length === 0 || !data.recipes[0]) {
-            throw new Error(t.noRecipeError);
+            if (!data.recipes || data.recipes.length === 0 || !data.recipes[0]) {
+                throw new Error(t.noRecipeError);
+            }
+
+            recipeData = data.recipes[0];
+            if (recipeData.readyInMinutes <= parseInt(maxPrepTime, 10)) {
+                break;
+            }
+            if (attempts === maxAttempts) {
+                throw new Error(t.noRecipeError);
+            }
+            await delay(1000);
         }
 
-        recipeData = data.recipes[0];
         console.log('Assigned recipeData:', recipeData);
 
         // Traduire le titre
