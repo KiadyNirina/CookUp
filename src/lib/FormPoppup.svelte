@@ -16,6 +16,7 @@ function handleClose() {
 let idea = false;
 let selectedType = '';
 let mood = '';
+let maxPrepTime = ''; // New variable for preparation time
 let recipeData = null;
 let loading = false;
 let errorMessage = '';
@@ -75,8 +76,8 @@ function delay(ms) {
 }
 
 async function findIdea() {
-    if (!selectedType || !mood) {
-        errorMessage = t.selectMealTypeError;
+    if (!selectedType || !mood || !maxPrepTime) {
+        errorMessage = t.selectMealTypeError; // Updated to include maxPrepTime in validation
         showErrorPopup = true;
         setTimeout(() => (showErrorPopup = false), 3000);
         loading = false;
@@ -94,7 +95,8 @@ async function findIdea() {
 
         const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
         const tags = `${mood},${selectedType}`;
-        const res = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`);
+        const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}&maxReadyTime=${maxPrepTime}`;
+        const res = await fetch(url);
         if (!res.ok) {
             throw new Error(`Spoonacular Error: ${res.statusText}`);
         }
@@ -229,6 +231,18 @@ function handleFindAnother() {
                         <option value="lunch">{t.mealTypes.lunch}</option>
                         <option value="dinner">{t.mealTypes.dinner}</option>
                         <option value="snack">{t.mealTypes.snack}</option>
+                    </select>
+
+                    <label for="prepTime" class="text-base">{t.prepTime}</label>
+                    <select
+                        bind:value={maxPrepTime}
+                        id="prepTime"
+                        class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer"
+                    >
+                        <option value="" disabled>{t.prepTimePlaceholder}</option>
+                        <option value="30">{t.prepTimeOptions.under30}</option>
+                        <option value="60">{t.prepTimeOptions.under60}</option>
+                        <option value="90">{t.prepTimeOptions.under90}</option>
                     </select>
 
                     <label class="text-base">{t.mood}</label>
