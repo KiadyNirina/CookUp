@@ -92,7 +92,7 @@ async function findIdea() {
             throw new Error(t.networkError);
         }
 
-        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY || '4a14f4c10ec04aaeba49fcbad3eefb53';
+        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
         const tags = `${mood},${selectedType}`;
         const res = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`);
         if (!res.ok) {
