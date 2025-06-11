@@ -194,7 +194,7 @@ function handleFindAnother() {
 }
 </script>
 
-<div class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50">
+<div class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 content-form">
     <div class="bg-white dark:bg-black text-black dark:text-white w-11/12 max-w-2xl p-8 rounded-4xl shadow-lg overflow-y-auto max-h-[90vh]">
         {#if showErrorPopup}
             <div
@@ -260,7 +260,7 @@ function handleFindAnother() {
                     </select>
 
                     <label class="text-base">{t.mood}</label>
-                    <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5">
+                    <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5 mood">
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
@@ -355,3 +355,15 @@ function handleFindAnother() {
         {/if}
     </div>
 </div>
+
+<style>
+    @media screen and (max-width: 640px) {
+        .content-form h1 {
+            font-size: 25px;
+        }
+        .mood {
+            grid-template-columns: none;
+        }
+        
+    }
+</style>
