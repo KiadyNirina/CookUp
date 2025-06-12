@@ -49,7 +49,7 @@
 
 <div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
     <div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl flex items-center bg-white dark:bg-black p-2">
-        <p class="text-xl flex items-end">{t.appName}</p>
+        <p class="text-xl flex items-end">CookUp</p>
         <div class="flex ml-auto items-center gap-2">
             <button
                 on:click={toggleLanguage}

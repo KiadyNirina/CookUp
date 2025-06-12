@@ -1,7 +1,6 @@
 export const translations = {
     en: {
         // Page d'accueil
-        appName: 'Cook Up',
         headline: 'No more meal planning headaches.',
         subheadline: 'Choose a criterion, we handle the rest.',
         getStarted: 'Get started!',
@@ -57,7 +56,6 @@ export const translations = {
     },
     fr: {
         // Page d'accueil
-        appName: 'Cook Up',
         headline: 'Fini le casse-tête des repas.',
         subheadline: 'Choisissez un critère, on s’occupe du reste.',
         getStarted: 'C’est parti !',
