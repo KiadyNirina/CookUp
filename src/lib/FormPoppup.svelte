@@ -16,6 +16,7 @@ function handleClose() {
 let idea = false;
 let selectedType = '';
 let mood = '';
+let maxPrepTime = ''; // New variable for preparation time
 let recipeData = null;
 let loading = false;
 let errorMessage = '';
@@ -75,7 +76,7 @@ function delay(ms) {
 }
 
 async function findIdea() {
-    if (!selectedType || !mood) {
+    if (!selectedType || !mood || !maxPrepTime) {
         errorMessage = t.selectMealTypeError;
         showErrorPopup = true;
         setTimeout(() => (showErrorPopup = false), 3000);
@@ -87,24 +88,39 @@ async function findIdea() {
     errorMessage = '';
     showErrorPopup = false;
 
+    let attempts = 0;
+    const maxAttempts = 3;
+
     try {
         if (!navigator.onLine) {
             throw new Error(t.networkError);
         }
 
-        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY || '4a14f4c10ec04aaeba49fcbad3eefb53';
-        const tags = `${mood},${selectedType}`;
-        const res = await fetch(`https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`);
-        if (!res.ok) {
-            throw new Error(`Spoonacular Error: ${res.statusText}`);
-        }
-        const data = await res.json();
+        while (attempts < maxAttempts) {
+            attempts++;
+            const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
+            const tags = `${mood},${selectedType}`;
+            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}&maxReadyTime=${maxPrepTime}`;
+            const res = await fetch(url);
+            if (!res.ok) {
+                throw new Error(`Spoonacular Error: ${res.statusText}`);
+            }
+            const data = await res.json();
 
-        if (!data.recipes || data.recipes.length === 0 || !data.recipes[0]) {
-            throw new Error(t.noRecipeError);
+            if (!data.recipes || data.recipes.length === 0 || !data.recipes[0]) {
+                throw new Error(t.noRecipeError);
+            }
+
+            recipeData = data.recipes[0];
+            if (recipeData.readyInMinutes <= parseInt(maxPrepTime, 10)) {
+                break;
+            }
+            if (attempts === maxAttempts) {
+                throw new Error(t.noRecipeError);
+            }
+            await delay(1000);
         }
 
-        recipeData = data.recipes[0];
         console.log('Assigned recipeData:', recipeData);
 
         // Traduire le titre
@@ -178,7 +194,7 @@ function handleFindAnother() {
 }
 </script>
 
-<div class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50">
+<div class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 content-form">
     <div class="bg-white dark:bg-black text-black dark:text-white w-11/12 max-w-2xl p-8 rounded-4xl shadow-lg overflow-y-auto max-h-[90vh]">
         {#if showErrorPopup}
             <div
@@ -231,8 +247,20 @@ function handleFindAnother() {
                         <option value="snack">{t.mealTypes.snack}</option>
                     </select>
 
+                    <label for="prepTime" class="text-base">{t.prepTime}</label>
+                    <select
+                        bind:value={maxPrepTime}
+                        id="prepTime"
+                        class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer"
+                    >
+                        <option value="" disabled>{t.prepTimePlaceholder}</option>
+                        <option value="30">{t.prepTimeOptions.under30}</option>
+                        <option value="60">{t.prepTimeOptions.under60}</option>
+                        <option value="90">{t.prepTimeOptions.under90}</option>
+                    </select>
+
                     <label class="text-base">{t.mood}</label>
-                    <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5">
+                    <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5 mood">
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
@@ -327,3 +355,15 @@ function handleFindAnother() {
         {/if}
     </div>
 </div>
+
+<style>
+    @media screen and (max-width: 640px) {
+        .content-form h1 {
+            font-size: 25px;
+        }
+        .mood {
+            grid-template-columns: none;
+        }
+        
+    }
+</style>

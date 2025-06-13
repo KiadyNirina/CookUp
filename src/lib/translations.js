@@ -1,7 +1,6 @@
 export const translations = {
     en: {
         // Page d'accueil
-        appName: 'Cook Up',
         headline: 'No more meal planning headaches.',
         subheadline: 'Choose a criterion, we handle the rest.',
         getStarted: 'Get started!',
@@ -12,10 +11,17 @@ export const translations = {
         choose: 'Choose your preferences and let us inspire you.',
         mealType: 'Meal type:',
         mealTypePlaceholder: 'Select meal type',
+        prepTime: 'Preparation time:',
+        prepTimePlaceholder: 'Select max preparation time',
+        prepTimeOptions: {
+            under30: 'Under 30 minutes',
+            under60: 'Under 60 minutes',
+            under90: 'Under 90 minutes'
+        },
         mood: 'Meal mood:',
         findIdeas: 'Find ideas',
         loading: 'Loading...',
-        selectMealTypeError: 'Please select a meal type and a mood.',
+        selectMealTypeError: 'Please select a meal type, mood, and preparation time.',
         noRecipeError: 'No recipes found for these criteria. Try other preferences.',
         networkError: 'Network connection issue. Check your connection and try again.',
         translationError: 'Error during retrieval or translation. Data displayed in English.',
@@ -50,7 +56,6 @@ export const translations = {
     },
     fr: {
         // Page d'accueil
-        appName: 'Cook Up',
         headline: 'Fini le casse-tête des repas.',
         subheadline: 'Choisissez un critère, on s’occupe du reste.',
         getStarted: 'C’est parti !',
@@ -61,10 +66,17 @@ export const translations = {
         choose: 'Choisissez vos préférences et laissez-nous vous inspirer.',
         mealType: 'Type de repas :',
         mealTypePlaceholder: 'Sélectionnez le type de repas',
+        prepTime: 'Temps de préparation :',
+        prepTimePlaceholder: 'Sélectionnez le temps de préparation max',
+        prepTimeOptions: {
+            under30: 'Moins de 30 minutes',
+            under60: 'Moins de 60 minutes',
+            under90: 'Moins de 90 minutes'
+        },
         mood: 'Humeur du repas :',
         findIdeas: 'Trouver des idées',
         loading: 'Chargement...',
-        selectMealTypeError: 'Veuillez sélectionner un type de repas et une humeur.',
+        selectMealTypeError: 'Veuillez sélectionner un type de repas, une humeur et un temps de préparation.',
         noRecipeError: 'Aucune recette trouvée pour ces critères. Essayez d’autres préférences.',
         networkError: 'Problème de connexion réseau. Vérifiez votre connexion et réessayez.',
         translationError: 'Erreur lors de la récupération ou traduction. Les données sont affichées en anglais.',
