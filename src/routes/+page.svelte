@@ -56,7 +56,7 @@
         <div class="flex ml-auto items-center gap-2">
             <button
                 on:click={toggleLanguage}
-                class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded-full text-sm font-semibold hover:cursor-pointer hover:bg-yellow-700 transition-all duration-300"
+                class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-600 transition-all duration-300"
                 aria-label="Toggle language"
                 aria-current={$language === 'en' ? 'true' : 'false'}
             >
@@ -73,24 +73,24 @@
             <FormPoppup on:close={closePoppup} />
         </div>
     {/if}
-    <div class="h-[100vh]">
+    <div class="h-[100vh] p-[20px]">
         <div class="header flex h-full items-center">
             <div class="sect1 w-1/2">
-                <h1 class="text-8xl font-extrabold">{t.headline}</h1>
+                <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t.headline}</h1>
                 <p class="dark:font-thin mt-5">{t.subheadline}</p>
                 <button
-                    class="button mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-full transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600 active:scale-70"
+                    class="button mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-2xl transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600 active:scale-70"
                     on:click={togglePoppup}
                 >
                     <Icon icon="mdi:timer-outline" class="mr-1" />
                     {t.getStarted}
                 </button>
             </div>
-            <div class="sect2 w-1/2">
+            <div class="sect2 w-1/2 flex items-center">
                 <img
-                    src="/img/breakfast.svg"
+                    src="/img/ramen-96.svg"
                     alt={$language === 'en' ? 'Breakfast' : 'Petit déjeuner'}
-                    class="breakfast"
+                    class="breakfast ml-auto"
                 />
             </div>
         </div>
@@ -101,6 +101,7 @@
 </div>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
     @import "tailwindcss";
     @custom-variant dark (&:where(.dark, .dark *));
     @font-face {
@@ -116,8 +117,10 @@
     * {
         font-family: "NunitoSans";
     }
-    .logo {
-        font-family: "Pacifico";
+    .edu-vic-wa-nt-hand-pre-test {
+        font-family: "Permanent Marker", cursive;
+        font-weight: 400;
+        font-style: normal;
     }
 
     @media screen and (max-width: 640px) {
@@ -135,12 +138,12 @@
             text-align: center;
         }
         .sect2 img {
-            width: 90%;
+            width: 50%;
             margin-left: auto;
             margin-right: auto;
         }
         .sect1 h1 {
-            font-size: 3rem;
+            font-size: 2rem;
         }
         .sect1 p {
             font-size: 12px;
@@ -149,9 +152,6 @@
             margin-left: auto;
             margin-right: auto;
             font-size: 12px;
-        }
-        .footer p {
-            font-size: 10px;
         }
     }
 
@@ -164,9 +164,6 @@
         }
         .button {
             font-size: 12px;
-        }
-        .footer p {
-            font-size: 10px;
         }
     }
 </style>
