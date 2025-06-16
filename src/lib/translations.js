@@ -52,7 +52,12 @@ export const translations = {
             vegetarian: 'Vegetarian',
             'high-protein': 'High-protein',
             'low-calorie': 'Low-calorie'
-        }
+        },
+        prepTimeWarning: 'Warning: Recipe exceeds selected preparation time of',
+        prepTimeWarning2: 'but takes',
+        exportPDF: 'Export to PDF',
+        pdfLoadError: 'Failed to load PDF library. PDF export is unavailable.',
+        pdfGenerationError: 'Failed to generate PDF. Please try again.',
     },
     fr: {
         // Page d'accueil
@@ -107,6 +112,11 @@ export const translations = {
             vegetarian: 'Végétarien',
             'high-protein': 'Protéiné',
             'low-calorie': 'Peu calorique'
-        }
+        },
+        prepTimeWarning: 'Attention : La recette dépasse le temps de préparation choisi de',
+        prepTimeWarning2: 'mais prend',
+        exportPDF: 'Exporter en PDF',
+        pdfLoadError: 'Échec du chargement de la bibliothèque PDF. L\'exportation PDF est indisponible.',
+        pdfGenerationError: 'Échec de la génération du PDF. Veuillez réessayer.',
     }
 };

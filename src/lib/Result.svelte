@@ -4,10 +4,66 @@ import Icon from '@iconify/svelte';
 import { createEventDispatcher } from 'svelte';
 import { language } from '../stores/language';
 import { translations } from '$lib/translations';
+import { browser } from '$app/environment';
+import { onMount, onDestroy } from 'svelte';
+
+let jsPDF = null;
+let pdfLoadError = null;
+let scriptLoaded = false;
+let pollInterval = null;
+
+function checkJsPDF() {
+    if (window.jsPDF) {
+        jsPDF = window.jsPDF;
+        scriptLoaded = true;
+        console.log('jsPDF loaded successfully');
+        clearInterval(pollInterval);
+    }
+}
+
+onMount(() => {
+    if (browser && !jsPDF) {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        script.async = true;
+        script.onload = () => {
+            console.log('jsPDF script loaded');
+            checkJsPDF();
+        };
+        script.onerror = () => {
+            console.error('Failed to load jsPDF from cdnjs');
+            const fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
+            fallbackScript.async = true;
+            fallbackScript.onload = () => {
+                console.log('jsPDF fallback script loaded');
+                checkJsPDF();
+            };
+            fallbackScript.onerror = () => {
+                pdfLoadError = 'Failed to load jsPDF from both CDNs';
+                console.error('Failed to load jsPDF from fallback CDN');
+                clearInterval(pollInterval);
+            };
+            document.head.appendChild(fallbackScript);
+        };
+        document.head.appendChild(script);
+
+        pollInterval = setInterval(checkJsPDF, 500);
+    }
+
+    return () => {
+        if (pollInterval) clearInterval(pollInterval);
+    };
+});
+
+onDestroy(() => {
+    if (pollInterval) clearInterval(pollInterval);
+});
 
 export let recipeData;
 export let selectedType;
 export let moods;
+export let maxPrepTime;
 export let onBack;
 export let loading;
 
@@ -15,7 +71,8 @@ const dispatch = createEventDispatcher();
 
 $: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => ing.original || '') : [];
 $: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => step.step || '') : [];
-$: prepTime = recipeData?.readyInMinutes || ($language === 'en' ? 'Not specified' : 'Non spécifié');
+$: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.minutes}` : ($language === 'en' ? 'Not specified' : 'Non spécifié');
+$: exceedsPrepTime = maxPrepTime && recipeData?.readyInMinutes && recipeData.readyInMinutes > parseInt(maxPrepTime, 10);
 
 $: t = translations[$language] || translations.en;
 
@@ -25,6 +82,81 @@ $: mealDescription = moods.length > 0 ? `${formattedMealType} ${formattedMoods}`
 
 function handleFindAnother() {
     dispatch('findAnother');
+}
+
+function exportToPDF() {
+    if (!jsPDF || !scriptLoaded) {
+        console.error('jsPDF not loaded');
+        alert(t.pdfLoadError || 'PDF generation failed: Library not loaded. Please try again.');
+        return;
+    }
+    if (!recipeData) {
+        console.error('No recipe data available');
+        alert(t.noRecipeError || 'No recipe data available to export.');
+        return;
+    }
+
+    try {
+        console.log('Generating PDF for recipe:', recipeData.title);
+        const doc = new jsPDF();
+        const margin = 10;
+        let y = margin;
+
+        // Title
+        doc.setFontSize(16);
+        doc.text(`${t.suggestion} ${mealDescription}`, margin, y);
+        y += 10;
+
+        // Dish Name
+        doc.setFontSize(12);
+        doc.text(`${t.dishName} ${recipeData.title || ''}`, margin, y);
+        y += 10;
+
+        // Ingredients
+        if (ingredients.length > 0) {
+            doc.text(t.ingredients, margin, y);
+            y += 5;
+            ingredients.forEach((ingredient) => {
+                doc.text(`- ${ingredient}`, margin + 5, y);
+                y += 5;
+            });
+            y += 5;
+        }
+
+        // Instructions
+        if (steps.length > 0) {
+            doc.text(t.instructions, margin, y);
+            y += 5;
+            steps.forEach((step, index) => {
+                doc.text(`${index + 1}. ${step}`, margin + 5, y);
+                y += 5;
+            });
+            y += 5;
+        }
+
+        // Preparation Time
+        doc.text(`${t.prepTime} ${prepTime}`, margin, y);
+        y += 10;
+
+        // Nutritional Info
+        if (recipeData.nutrition?.nutrients?.length) {
+            doc.text(t.nutrition, margin, y);
+            y += 5;
+            recipeData.nutrition.nutrients.forEach(nutrient => {
+                if (['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)) {
+                    doc.text(`- ${nutrient.name}: ${nutrient.amount} ${nutrient.unit}`, margin + 5, y);
+                    y += 5;
+                }
+            });
+        }
+
+        // Save the PDF
+        doc.save(`${recipeData.title || 'recipe'}.pdf`);
+        console.log('PDF generated and downloaded');
+    } catch (err) {
+        console.error('Error generating PDF:', err);
+        alert(t.pdfGenerationError || 'Failed to generate PDF. Please try again.');
+    }
 }
 </script>
 
@@ -44,6 +176,26 @@ function handleFindAnother() {
             <p class="text-lg font-semibold">
                 {t.suggestion} {mealDescription} :
             </p>
+            {#if exceedsPrepTime}
+                <div
+                    class="mt-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-3 rounded-lg"
+                    role="alert"
+                >
+                    <p class="font-semibold">
+                        {t.prepTimeWarning} {maxPrepTime} {t.minutes}, {t.prepTimeWarning2} {recipeData.readyInMinutes} {t.minutes}.
+                    </p>
+                </div>
+            {/if}
+            {#if pdfLoadError}
+                <div
+                    class="mt-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-3 rounded-lg"
+                    role="alert"
+                >
+                    <p class="font-semibold">
+                        {t.pdfLoadError || 'Failed to load PDF library. PDF export is unavailable.'}
+                    </p>
+                </div>
+            {/if}
             <div class="mt-5">
                 <div class="mb-4 flex flex-wrap gap-2">
                     <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 p-2 rounded-full text-sm font-semibold">
@@ -84,14 +236,14 @@ function handleFindAnother() {
                             </ul>
                         </div>
                     {/if}
-                    <p class="mt-3"><span class="font-bold mr-2">{t.prepTime}</span> {prepTime} {t.minutes}</p>
+                    <p class="mt-3"><span class="font-bold mr-2">{t.prepTime}</span> {prepTime}</p>
                     {#if recipeData.nutrition?.nutrients?.length}
                         <div class="mt-3 flex">
                             <span class="font-bold mr-2">{t.nutrition}</span>
                             <ul class="list-disc ml-5">
                                 {#each recipeData.nutrition.nutrients as nutrient}
                                     {#if ['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)}
-                                        <li>{nutrient.name}: {nutrient.amount} {nutrient.unit}</li>
+                                        <li>{nutrient.name}: ${nutrient.amount} ${nutrient.unit}</li>
                                     {/if}
                                 {/each}
                             </ul>
@@ -102,6 +254,15 @@ function handleFindAnother() {
                 <div class="flex justify-end mt-5">
                     <button
                         class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex"
+                        on:click={exportToPDF}
+                        disabled={loading || !scriptLoaded}
+                        aria-label={t.exportPDF}
+                    >
+                        <Icon icon="mdi:file-pdf-box" class="mr-1 text-xl"/>
+                        {t.exportPDF}
+                    </button>
+                    <button
+                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-1"
                         on:click={handleFindAnother}
                         disabled={loading}
                         aria-label={t.anotherIdea}
