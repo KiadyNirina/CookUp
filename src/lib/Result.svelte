@@ -34,7 +34,7 @@ function handleFindAnother() {
     dispatch('findAnother');
 }
 
-function exportToPDF() {
+async function exportToPDF() {
     console.log('exportToPDF called', { scriptLoaded, recipeData });
     if (!scriptLoaded) {
         console.error('jsPDF not available');
@@ -57,60 +57,143 @@ function exportToPDF() {
 
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
-        const margin = 10;
+        const margin = 15;
         const maxWidth = pageWidth - 2 * margin;
         let y = margin;
 
-        doc.setFont('Helvetica', 'normal');
+        const yellowColor = '#D97706';
+        const textColor = '#000000';
 
-        function addText(text, x, fontSize, isBold = false) {
+        function addText(text, x, fontSize, isBold = false, color = textColor) {
             doc.setFontSize(fontSize);
-            doc.setFont('Helvetica', isBold ? 'bold' : 'normal');
+            doc.setFont('Times', isBold ? 'bold' : 'normal');
+            doc.setTextColor(color);
             const lines = doc.splitTextToSize(text, maxWidth);
             for (const line of lines) {
-                if (y + fontSize / 2.83 > pageHeight - margin) {
+                if (y + fontSize / 2.83 > pageHeight - margin - 10) {
+                    addFooter();
                     doc.addPage();
-                    y = margin;
+                    addHeader();
+                    y = margin + 10;
                 }
                 doc.text(line, x, y);
                 y += fontSize / 2.83 + 2;
             }
+            doc.setTextColor(textColor);
             return y;
         }
 
-        y = addText(`${t.suggestion} ${mealDescription}`, margin, 16, true);
-        y += 5;
-        y = addText(`${t.dishName} ${recipeData.title || ''}`, margin, 12, true);
-        y += 5;
+        // Helper function to add a horizontal line
+        function addLine() {
+            doc.setDrawColor(yellowColor);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 5;
+        }
 
+        // Header function
+        function addHeader() {
+            doc.setFontSize(10);
+            doc.setFont('Times', 'normal');
+            doc.setTextColor(textColor);
+            doc.text('Recipe App', margin, 10);
+            doc.setDrawColor(yellowColor);
+            doc.line(margin, 12, pageWidth - margin, 12);
+        }
+
+        // Footer function with page number and date
+        function addFooter() {
+            doc.setFontSize(8);
+            doc.setFont('Times', 'normal');
+            doc.setTextColor(textColor);
+            const pageNumber = doc.internal.getNumberOfPages();
+            const date = new Date().toLocaleDateString($language === 'en' ? 'en-US' : 'fr-FR');
+            doc.text(`Page ${pageNumber} | Generated on ${date}`, margin, pageHeight - 5);
+        }
+
+        // Cover page
+        doc.setFont('Times', 'bold');
+        doc.setFontSize(24);
+        doc.setTextColor(yellowColor);
+        doc.text(recipeData.title || 'Recipe', pageWidth / 2, pageHeight / 3, { align: 'center' });
+        doc.setFontSize(14);
+        doc.setTextColor(textColor);
+        doc.text(`${t.suggestion} ${mealDescription}`, pageWidth / 2, pageHeight / 3 + 10, { align: 'center' });
+
+        // Add recipe image if available
+        if (recipeData.image && browser) {
+            try {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.src = recipeData.image;
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = () => reject(new Error('Failed to load image'));
+                    setTimeout(() => reject(new Error('Image loading timed out')), 5000);
+                });
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
+                const imgWidth = 80;
+                const imgHeight = (img.height * imgWidth) / img.width;
+                if (pageHeight / 3 + 20 + imgHeight < pageHeight - margin) {
+                    doc.addImage(imgData, 'JPEG', (pageWidth - imgWidth) / 2, pageHeight / 3 + 20, imgWidth, imgHeight);
+                }
+            } catch (err) {
+                console.warn('Failed to add image to PDF:', err.message);
+            }
+        }
+
+        doc.addPage();
+        addHeader();
+        y = margin + 10;
+
+        // Dish Name
+        y = addText(`${t.dishName} ${recipeData.title || ''}`, margin, 14, true, yellowColor);
+        addLine();
+
+        // Ingredients
         if (ingredients.length > 0) {
-            y = addText(t.ingredients, margin, 12, true);
+            y = addText(t.ingredients, margin, 12, true, yellowColor);
             for (const ingredient of ingredients) {
                 y = addText(`- ${ingredient}`, margin + 5, 10);
             }
             y += 5;
+            addLine();
         }
 
+        // Instructions
         if (steps.length > 0) {
-            y = addText(t.instructions, margin, 12, true);
+            y = addText(t.instructions, margin, 12, true, yellowColor);
             steps.forEach((step, index) => {
                 y = addText(`${index + 1}. ${step}`, margin + 5, 10);
             });
             y += 5;
+            addLine();
         }
 
-        y = addText(`${t.prepTime} ${prepTime}`, margin, 12, true);
+        // Preparation Time
+        y = addText(`${t.prepTime} ${prepTime}`, margin, 12, true, yellowColor);
         y += 5;
+        addLine();
 
+        // Nutritional Info
         if (recipeData.nutrition?.nutrients?.length) {
-            y = addText(t.nutrition, margin, 12, true);
+            y = addText(t.nutrition, margin, 12, true, yellowColor);
             for (const nutrient of recipeData.nutrition.nutrients) {
                 if (['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)) {
                     y = addText(`- ${nutrient.name}: ${nutrient.amount} ${nutrient.unit}`, margin + 5, 10);
                 }
             }
+            addLine();
         }
 
+        // Add footer to the last page
+        addFooter();
+
+        // Save the PDF
         doc.save(`${recipeData.title || 'recipe'}.pdf`);
         console.log('PDF generated and downloaded');
     } catch (err) {
