@@ -1,64 +1,14 @@
 <script>
+import { jsPDF } from 'jspdf';
 import { scale } from 'svelte/transition';
 import Icon from '@iconify/svelte';
 import { createEventDispatcher } from 'svelte';
 import { language } from '../stores/language';
 import { translations } from '$lib/translations';
 import { browser } from '$app/environment';
-import { onMount, onDestroy } from 'svelte';
 
-let jsPDF = null;
+let scriptLoaded = true;
 let pdfLoadError = null;
-let scriptLoaded = false;
-let pollInterval = null;
-
-function checkJsPDF() {
-    if (window.jsPDF) {
-        jsPDF = window.jsPDF;
-        scriptLoaded = true;
-        console.log('jsPDF loaded successfully');
-        clearInterval(pollInterval);
-    }
-}
-
-onMount(() => {
-    if (browser && !jsPDF) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        script.async = true;
-        script.onload = () => {
-            console.log('jsPDF script loaded');
-            checkJsPDF();
-        };
-        script.onerror = () => {
-            console.error('Failed to load jsPDF from cdnjs');
-            const fallbackScript = document.createElement('script');
-            fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
-            fallbackScript.async = true;
-            fallbackScript.onload = () => {
-                console.log('jsPDF fallback script loaded');
-                checkJsPDF();
-            };
-            fallbackScript.onerror = () => {
-                pdfLoadError = 'Failed to load jsPDF from both CDNs';
-                console.error('Failed to load jsPDF from fallback CDN');
-                clearInterval(pollInterval);
-            };
-            document.head.appendChild(fallbackScript);
-        };
-        document.head.appendChild(script);
-
-        pollInterval = setInterval(checkJsPDF, 500);
-    }
-
-    return () => {
-        if (pollInterval) clearInterval(pollInterval);
-    };
-});
-
-onDestroy(() => {
-    if (pollInterval) clearInterval(pollInterval);
-});
 
 export let recipeData;
 export let selectedType;
@@ -85,9 +35,10 @@ function handleFindAnother() {
 }
 
 function exportToPDF() {
-    if (!jsPDF || !scriptLoaded) {
-        console.error('jsPDF not loaded');
-        alert(t.pdfLoadError || 'PDF generation failed: Library not loaded. Please try again.');
+    console.log('exportToPDF called', { scriptLoaded, recipeData });
+    if (!scriptLoaded) {
+        console.error('jsPDF not available');
+        alert(t.pdfLoadError || 'PDF generation failed: Library not available. Please try again.');
         return;
     }
     if (!recipeData) {
@@ -98,64 +49,73 @@ function exportToPDF() {
 
     try {
         console.log('Generating PDF for recipe:', recipeData.title);
-        const doc = new jsPDF();
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
         const margin = 10;
+        const maxWidth = pageWidth - 2 * margin;
         let y = margin;
 
-        // Title
-        doc.setFontSize(16);
-        doc.text(`${t.suggestion} ${mealDescription}`, margin, y);
-        y += 10;
+        doc.setFont('Helvetica', 'normal');
 
-        // Dish Name
-        doc.setFontSize(12);
-        doc.text(`${t.dishName} ${recipeData.title || ''}`, margin, y);
-        y += 10;
-
-        // Ingredients
-        if (ingredients.length > 0) {
-            doc.text(t.ingredients, margin, y);
-            y += 5;
-            ingredients.forEach((ingredient) => {
-                doc.text(`- ${ingredient}`, margin + 5, y);
-                y += 5;
-            });
-            y += 5;
-        }
-
-        // Instructions
-        if (steps.length > 0) {
-            doc.text(t.instructions, margin, y);
-            y += 5;
-            steps.forEach((step, index) => {
-                doc.text(`${index + 1}. ${step}`, margin + 5, y);
-                y += 5;
-            });
-            y += 5;
-        }
-
-        // Preparation Time
-        doc.text(`${t.prepTime} ${prepTime}`, margin, y);
-        y += 10;
-
-        // Nutritional Info
-        if (recipeData.nutrition?.nutrients?.length) {
-            doc.text(t.nutrition, margin, y);
-            y += 5;
-            recipeData.nutrition.nutrients.forEach(nutrient => {
-                if (['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)) {
-                    doc.text(`- ${nutrient.name}: ${nutrient.amount} ${nutrient.unit}`, margin + 5, y);
-                    y += 5;
+        function addText(text, x, fontSize, isBold = false) {
+            doc.setFontSize(fontSize);
+            doc.setFont('Helvetica', isBold ? 'bold' : 'normal');
+            const lines = doc.splitTextToSize(text, maxWidth);
+            for (const line of lines) {
+                if (y + fontSize / 2.83 > pageHeight - margin) {
+                    doc.addPage();
+                    y = margin;
                 }
-            });
+                doc.text(line, x, y);
+                y += fontSize / 2.83 + 2;
+            }
+            return y;
         }
 
-        // Save the PDF
+        y = addText(`${t.suggestion} ${mealDescription}`, margin, 16, true);
+        y += 5;
+        y = addText(`${t.dishName} ${recipeData.title || ''}`, margin, 12, true);
+        y += 5;
+
+        if (ingredients.length > 0) {
+            y = addText(t.ingredients, margin, 12, true);
+            for (const ingredient of ingredients) {
+                y = addText(`- ${ingredient}`, margin + 5, 10);
+            }
+            y += 5;
+        }
+
+        if (steps.length > 0) {
+            y = addText(t.instructions, margin, 12, true);
+            steps.forEach((step, index) => {
+                y = addText(`${index + 1}. ${step}`, margin + 5, 10);
+            });
+            y += 5;
+        }
+
+        y = addText(`${t.prepTime} ${prepTime}`, margin, 12, true);
+        y += 5;
+
+        if (recipeData.nutrition?.nutrients?.length) {
+            y = addText(t.nutrition, margin, 12, true);
+            for (const nutrient of recipeData.nutrition.nutrients) {
+                if (['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)) {
+                    y = addText(`- ${nutrient.name}: ${nutrient.amount} ${nutrient.unit}`, margin + 5, 10);
+                }
+            }
+        }
+
         doc.save(`${recipeData.title || 'recipe'}.pdf`);
         console.log('PDF generated and downloaded');
     } catch (err) {
-        console.error('Error generating PDF:', err);
-        alert(t.pdfGenerationError || 'Failed to generate PDF. Please try again.');
+        console.error('PDF error:', err.message, err.stack);
+        alert(`${t.pdfGenerationError || 'Failed to generate PDF.'} (${err.message})`);
     }
 }
 </script>
