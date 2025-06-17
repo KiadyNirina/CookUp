@@ -1,64 +1,14 @@
 <script>
+import { jsPDF } from 'jspdf';
 import { scale } from 'svelte/transition';
 import Icon from '@iconify/svelte';
 import { createEventDispatcher } from 'svelte';
 import { language } from '../stores/language';
 import { translations } from '$lib/translations';
 import { browser } from '$app/environment';
-import { onMount, onDestroy } from 'svelte';
 
-let jsPDF = null;
+let scriptLoaded = true;
 let pdfLoadError = null;
-let scriptLoaded = false;
-let pollInterval = null;
-
-function checkJsPDF() {
-    if (window.jsPDF) {
-        jsPDF = window.jsPDF;
-        scriptLoaded = true;
-        console.log('jsPDF loaded successfully');
-        clearInterval(pollInterval);
-    }
-}
-
-onMount(() => {
-    if (browser && !jsPDF) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-        script.async = true;
-        script.onload = () => {
-            console.log('jsPDF script loaded');
-            checkJsPDF();
-        };
-        script.onerror = () => {
-            console.error('Failed to load jsPDF from cdnjs');
-            const fallbackScript = document.createElement('script');
-            fallbackScript.src = 'https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js';
-            fallbackScript.async = true;
-            fallbackScript.onload = () => {
-                console.log('jsPDF fallback script loaded');
-                checkJsPDF();
-            };
-            fallbackScript.onerror = () => {
-                pdfLoadError = 'Failed to load jsPDF from both CDNs';
-                console.error('Failed to load jsPDF from fallback CDN');
-                clearInterval(pollInterval);
-            };
-            document.head.appendChild(fallbackScript);
-        };
-        document.head.appendChild(script);
-
-        pollInterval = setInterval(checkJsPDF, 500);
-    }
-
-    return () => {
-        if (pollInterval) clearInterval(pollInterval);
-    };
-});
-
-onDestroy(() => {
-    if (pollInterval) clearInterval(pollInterval);
-});
 
 export let recipeData;
 export let selectedType;
@@ -84,10 +34,11 @@ function handleFindAnother() {
     dispatch('findAnother');
 }
 
-function exportToPDF() {
-    if (!jsPDF || !scriptLoaded) {
-        console.error('jsPDF not loaded');
-        alert(t.pdfLoadError || 'PDF generation failed: Library not loaded. Please try again.');
+async function exportToPDF() {
+    console.log('exportToPDF called', { scriptLoaded, recipeData });
+    if (!scriptLoaded) {
+        console.error('jsPDF not available');
+        alert(t.pdfLoadError || 'PDF generation failed: Library not available. Please try again.');
         return;
     }
     if (!recipeData) {
@@ -98,64 +49,156 @@ function exportToPDF() {
 
     try {
         console.log('Generating PDF for recipe:', recipeData.title);
-        const doc = new jsPDF();
-        const margin = 10;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        const maxWidth = pageWidth - 2 * margin;
         let y = margin;
 
-        // Title
-        doc.setFontSize(16);
-        doc.text(`${t.suggestion} ${mealDescription}`, margin, y);
-        y += 10;
+        const yellowColor = '#D97706';
+        const textColor = '#000000';
+
+        function addText(text, x, fontSize, isBold = false, color = textColor) {
+            doc.setFontSize(fontSize);
+            doc.setFont('Times', isBold ? 'bold' : 'normal');
+            doc.setTextColor(color);
+            const lines = doc.splitTextToSize(text, maxWidth);
+            for (const line of lines) {
+                if (y + fontSize / 2.83 > pageHeight - margin - 10) {
+                    addFooter();
+                    doc.addPage();
+                    addHeader();
+                    y = margin + 10;
+                }
+                doc.text(line, x, y);
+                y += fontSize / 2.83 + 2;
+            }
+            doc.setTextColor(textColor);
+            return y;
+        }
+
+        // Helper function to add a horizontal line
+        function addLine() {
+            doc.setDrawColor(yellowColor);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 5;
+        }
+
+        // Header function
+        function addHeader() {
+            doc.setFontSize(10);
+            doc.setFont('Times', 'normal');
+            doc.setTextColor(textColor);
+            doc.text('Recipe App', margin, 10);
+            doc.setDrawColor(yellowColor);
+            doc.line(margin, 12, pageWidth - margin, 12);
+        }
+
+        // Footer function with page number and date
+        function addFooter() {
+            doc.setFontSize(8);
+            doc.setFont('Times', 'normal');
+            doc.setTextColor(textColor);
+            const pageNumber = doc.internal.getNumberOfPages();
+            const date = new Date().toLocaleDateString($language === 'en' ? 'en-US' : 'fr-FR');
+            doc.text(`Page ${pageNumber} | Generated on ${date}`, margin, pageHeight - 5);
+        }
+
+        // Cover page
+        doc.setFont('Times', 'bold');
+        doc.setFontSize(24);
+        doc.setTextColor(yellowColor);
+        doc.text(recipeData.title || 'Recipe', pageWidth / 2, pageHeight / 3, { align: 'center' });
+        doc.setFontSize(14);
+        doc.setTextColor(textColor);
+        doc.text(`${t.suggestion} ${mealDescription}`, pageWidth / 2, pageHeight / 3 + 10, { align: 'center' });
+
+        // Add recipe image if available
+        if (recipeData.image && browser) {
+            try {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.src = recipeData.image;
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = () => reject(new Error('Failed to load image'));
+                    setTimeout(() => reject(new Error('Image loading timed out')), 5000);
+                });
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
+                const imgWidth = 80;
+                const imgHeight = (img.height * imgWidth) / img.width;
+                if (pageHeight / 3 + 20 + imgHeight < pageHeight - margin) {
+                    doc.addImage(imgData, 'JPEG', (pageWidth - imgWidth) / 2, pageHeight / 3 + 20, imgWidth, imgHeight);
+                }
+            } catch (err) {
+                console.warn('Failed to add image to PDF:', err.message);
+            }
+        }
+
+        doc.addPage();
+        addHeader();
+        y = margin + 10;
 
         // Dish Name
-        doc.setFontSize(12);
-        doc.text(`${t.dishName} ${recipeData.title || ''}`, margin, y);
-        y += 10;
+        y = addText(`${t.dishName} ${recipeData.title || ''}`, margin, 14, true, yellowColor);
+        addLine();
 
         // Ingredients
         if (ingredients.length > 0) {
-            doc.text(t.ingredients, margin, y);
+            y = addText(t.ingredients, margin, 12, true, yellowColor);
+            for (const ingredient of ingredients) {
+                y = addText(`- ${ingredient}`, margin + 5, 10);
+            }
             y += 5;
-            ingredients.forEach((ingredient) => {
-                doc.text(`- ${ingredient}`, margin + 5, y);
-                y += 5;
-            });
-            y += 5;
+            addLine();
         }
 
         // Instructions
         if (steps.length > 0) {
-            doc.text(t.instructions, margin, y);
-            y += 5;
+            y = addText(t.instructions, margin, 12, true, yellowColor);
             steps.forEach((step, index) => {
-                doc.text(`${index + 1}. ${step}`, margin + 5, y);
-                y += 5;
+                y = addText(`${index + 1}. ${step}`, margin + 5, 10);
             });
             y += 5;
+            addLine();
         }
 
         // Preparation Time
-        doc.text(`${t.prepTime} ${prepTime}`, margin, y);
-        y += 10;
+        y = addText(`${t.prepTime} ${prepTime}`, margin, 12, true, yellowColor);
+        y += 5;
+        addLine();
 
         // Nutritional Info
         if (recipeData.nutrition?.nutrients?.length) {
-            doc.text(t.nutrition, margin, y);
-            y += 5;
-            recipeData.nutrition.nutrients.forEach(nutrient => {
+            y = addText(t.nutrition, margin, 12, true, yellowColor);
+            for (const nutrient of recipeData.nutrition.nutrients) {
                 if (['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)) {
-                    doc.text(`- ${nutrient.name}: ${nutrient.amount} ${nutrient.unit}`, margin + 5, y);
-                    y += 5;
+                    y = addText(`- ${nutrient.name}: ${nutrient.amount} ${nutrient.unit}`, margin + 5, 10);
                 }
-            });
+            }
+            addLine();
         }
+
+        // Add footer to the last page
+        addFooter();
 
         // Save the PDF
         doc.save(`${recipeData.title || 'recipe'}.pdf`);
         console.log('PDF generated and downloaded');
     } catch (err) {
-        console.error('Error generating PDF:', err);
-        alert(t.pdfGenerationError || 'Failed to generate PDF. Please try again.');
+        console.error('PDF error:', err.message, err.stack);
+        alert(`${t.pdfGenerationError || 'Failed to generate PDF.'} (${err.message})`);
     }
 }
 </script>
