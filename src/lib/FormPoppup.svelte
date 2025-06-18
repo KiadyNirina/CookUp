@@ -79,7 +79,7 @@ async function findIdea() {
     if (!selectedType || !mood || !maxPrepTime) {
         errorMessage = t.selectMealTypeError;
         showErrorPopup = true;
-        setTimeout(() => (showErrorPopup = false), 300);
+        setTimeout(() => (showErrorPopup = false), 3000);
         loading = false;
         return;
     }
@@ -181,7 +181,7 @@ async function findIdea() {
             ? t.noRecipeError
             : `${t.translationError} (${error.message})`;
         showErrorPopup = true;
-        setTimeout(() => (showErrorPopup = false), 300);
+        setTimeout(() => (showErrorPopup = false), 3000);
         idea = false;
         recipeData = null;
     } finally {
