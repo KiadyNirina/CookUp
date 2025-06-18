@@ -260,9 +260,9 @@ async function exportToPDF() {
                 <div class="mt-5">
                     <p><span class="font-bold mr-2">{t.dishName}</span> {recipeData.title || ''}</p>
                     {#if ingredients.length > 0}
-                        <div class="mt-3 flex">
+                        <div class="mt-3">
                             <span class="font-bold mr-2">{t.ingredients}</span>
-                            <ul class="list-disc ml-5">
+                            <ul class="list-disc ml-10">
                                 {#each ingredients as ingredient}
                                     <li>{ingredient}</li>
                                 {/each}

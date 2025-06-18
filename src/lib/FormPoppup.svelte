@@ -79,7 +79,7 @@ async function findIdea() {
     if (!selectedType || !mood || !maxPrepTime) {
         errorMessage = t.selectMealTypeError;
         showErrorPopup = true;
-        setTimeout(() => (showErrorPopup = false), 3000);
+        setTimeout(() => (showErrorPopup = false), 300);
         loading = false;
         return;
     }
@@ -118,7 +118,7 @@ async function findIdea() {
             if (attempts === maxAttempts) {
                 throw new Error(t.noRecipeError);
             }
-            await delay(1000);
+            await delay(100);
         }
 
         console.log('Assigned recipeData:', recipeData);
@@ -132,7 +132,7 @@ async function findIdea() {
             recipeData.extendedIngredients = await Promise.all(
                 recipeData.extendedIngredients.map(async (ing, index) => {
                     try {
-                        await delay(index * 1500);
+                        await delay(index * 150);
                         return {
                             ...ing,
                             original: await translateText(ing.original || '')
@@ -154,7 +154,7 @@ async function findIdea() {
             recipeData.analyzedInstructions[0].steps = await Promise.all(
                 recipeData.analyzedInstructions[0].steps.map(async (step, index) => {
                     try {
-                        await delay(index * 1500);
+                        await delay(index * 150);
                         return {
                             ...step,
                             step: await translateText(step.step || '')
@@ -181,7 +181,7 @@ async function findIdea() {
             ? t.noRecipeError
             : `${t.translationError} (${error.message})`;
         showErrorPopup = true;
-        setTimeout(() => (showErrorPopup = false), 3000);
+        setTimeout(() => (showErrorPopup = false), 300);
         idea = false;
         recipeData = null;
     } finally {
