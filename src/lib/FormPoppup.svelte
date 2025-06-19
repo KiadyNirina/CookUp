@@ -6,6 +6,7 @@ import { fade } from 'svelte/transition';
 import { language } from '../stores/language';
 import { translations } from '$lib/translations';
 import { browser } from '$app/environment';
+import { page } from '$app/stores';
 
 const dispatch = createEventDispatcher();
 
@@ -16,13 +17,30 @@ function handleClose() {
 let idea = false;
 let selectedType = '';
 let mood = '';
-let maxPrepTime = ''; // New variable for preparation time
+let maxPrepTime = '';
 let recipeData = null;
 let loading = false;
 let errorMessage = '';
 let showErrorPopup = false;
 
 $: t = translations[$language] || translations.en;
+
+onMount(() => {
+    if (browser) {
+        const params = new URLSearchParams(window.location.search);
+        const type = params.get('type');
+        const moodParam = params.get('mood');
+        const prepTime = params.get('prepTime');
+        const recipeId = params.get('recipeId');
+
+        if (type && moodParam && prepTime && recipeId) {
+            selectedType = type;
+            mood = moodParam;
+            maxPrepTime = prepTime;
+            fetchRecipeById(recipeId);
+        }
+    }
+});
 
 async function translateText(text, target = $language) {
     if (!text || typeof text !== 'string' || text.trim() === '') {
@@ -73,6 +91,96 @@ async function translateText(text, target = $language) {
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function fetchRecipeById(recipeId) {
+    loading = true;
+    errorMessage = '';
+    showErrorPopup = false;
+
+    try {
+        if (!navigator.onLine) {
+            throw new Error(t.networkError);
+        }
+
+        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
+        const url = `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${apiKey}`;
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`Spoonacular Error: ${res.statusText}`);
+        }
+        const data = await res.json();
+
+        if (!data) {
+            throw new Error(t.noRecipeError);
+        }
+
+        recipeData = data;
+
+        // Translate title
+        recipeData.title = await translateText(recipeData.title || '');
+        console.log('Translated title:', recipeData.title);
+
+        // Translate ingredients
+        if (recipeData && Array.isArray(recipeData.extendedIngredients)) {
+            recipeData.extendedIngredients = await Promise.all(
+                recipeData.extendedIngredients.map(async (ing, index) => {
+                    try {
+                        await delay(index * 150);
+                        return {
+                            ...ing,
+                            original: await translateText(ing.original || '')
+                        };
+                    } catch (err) {
+                        console.error('Error translating ingredient:', ing, err);
+                        return { ...ing, original: ing.original || '' };
+                    }
+                })
+            );
+            console.log('Translated ingredients:', recipeData.extendedIngredients);
+        } else {
+            console.warn('No extendedIngredients found or recipeData is null:', recipeData);
+            recipeData.extendedIngredients = [];
+        }
+
+        // Translate instructions
+        if (recipeData && recipeData.analyzedInstructions?.[0]?.steps) {
+            recipeData.analyzedInstructions[0].steps = await Promise.all(
+                recipeData.analyzedInstructions[0].steps.map(async (step, index) => {
+                    try {
+                        await delay(index * 150);
+                        return {
+                            ...step,
+                            step: await translateText(step.step || '')
+                        };
+                    } catch (err) {
+                        console.error('Error translating step:', step, err);
+                        return { ...step, step: step.step || '' };
+                    }
+                })
+            );
+            console.log('Translated steps:', recipeData.analyzedInstructions[0].steps);
+        } else {
+            console.warn('No analyzedInstructions found or recipeData is null:', recipeData);
+            recipeData.analyzedInstructions = [{ steps: [] }];
+        }
+
+        console.log('Final recipeData:', recipeData);
+        idea = true;
+    } catch (error) {
+        console.error('FetchRecipeById error:', error, error.stack);
+        errorMessage = error.message.includes('Network connection')
+            ? t.networkError
+            : error.message.includes('No recipes')
+            ? t.noRecipeError
+            : `${t.translationError} (${error.message})`;
+        showErrorPopup = true;
+        setTimeout(() => (showErrorPopup = false), 3000);
+        idea = false;
+        recipeData = null;
+    } finally {
+        loading = false;
+    }
 }
 
 async function findIdea() {
@@ -364,6 +472,5 @@ function handleFindAnother() {
         .mood {
             grid-template-columns: none;
         }
-        
     }
 </style>

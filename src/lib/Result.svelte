@@ -9,6 +9,7 @@ import { browser } from '$app/environment';
 
 let scriptLoaded = true;
 let pdfLoadError = null;
+let copySuccess = false;
 
 export let recipeData;
 export let selectedType;
@@ -30,8 +31,53 @@ $: formattedMealType = t.mealTypes[selectedType] || ($language === 'en' ? 'meal'
 $: formattedMoods = moods.map(m => t.moods[m] || m).join(', ');
 $: mealDescription = moods.length > 0 ? `${formattedMealType} ${formattedMoods}` : formattedMealType;
 
+$: recipeUrl = browser && recipeData && selectedType && moods[0] && maxPrepTime ? 
+    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&mood=${encodeURIComponent(moods[0])}&prepTime=${encodeURIComponent(maxPrepTime)}&recipeId=${encodeURIComponent(recipeData.id || '')}` : '';
+
 function handleFindAnother() {
     dispatch('findAnother');
+}
+
+function copyRecipeLink() {
+    if (browser && recipeUrl) {
+        navigator.clipboard.writeText(recipeUrl).then(() => {
+            copySuccess = true;
+            setTimeout(() => copySuccess = false, 2000);
+        }).catch(err => {
+            console.error('Failed to copy link:', err);
+            alert(t.copyLinkError || 'Failed to copy link.');
+        });
+    }
+}
+
+function shareToSocial(platform) {
+    if (!browser || !recipeUrl) return;
+
+    const encodedUrl = encodeURIComponent(recipeUrl);
+    const encodedTitle = encodeURIComponent(recipeData.title || 'Delicious Recipe');
+    let shareUrl;
+
+    switch (platform) {
+        case 'instagram':
+            navigator.clipboard.writeText(`${recipeData.title || 'Delicious Recipe'} ${recipeUrl}`)
+                .then(() => {
+                    shareUrl = 'https://www.instagram.com/';
+                    window.open(shareUrl, '_blank');
+                })
+                .catch(err => {
+                    console.error('Failed to copy link for Instagram:', err);
+                    alert(t.copyLinkError || 'Failed to copy link.');
+                });
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            window.open(shareUrl, '_blank');
+            break;
+        case 'whatsapp':
+            shareUrl = `https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`;
+            window.open(shareUrl, '_blank');
+            break;
+    }
 }
 
 async function exportToPDF() {
@@ -83,14 +129,12 @@ async function exportToPDF() {
             return currentY;
         }
 
-        // Helper function
         function addLine(yPos) {
             doc.setDrawColor(yellowColor);
             doc.line(margin, yPos, pageWidth - margin, yPos);
             return yPos + 5;
         }
 
-        // Header function
         function addHeader() {
             doc.setFontSize(10);
             doc.setFont('Times', 'normal');
@@ -100,7 +144,6 @@ async function exportToPDF() {
             doc.line(margin, 12, pageWidth - margin, 12);
         }
 
-        // Footer
         function addFooter() {
             doc.setFontSize(8);
             doc.setFont('Times', 'normal');
@@ -119,9 +162,8 @@ async function exportToPDF() {
 
         let y = margin;
 
-        // Add CookUp logo
         let logoHeight = 0;
-        const logoTargetHeight = 20; // 20mm
+        const logoTargetHeight = 20;
         if (browser) {
             try {
                 const img = new Image();
@@ -198,18 +240,15 @@ async function exportToPDF() {
 
         y = margin + logoHeight + 10 + ((pageHeight - margin - (margin + logoHeight + 10) - totalContentHeight) / 2);
 
-        // Add title
         doc.setFont('Times', 'bold');
         doc.setFontSize(24);
         doc.setTextColor(yellowColor);
         y = addText(recipeData.title || 'Recipe', pageWidth / 2, y, 24, true, yellowColor, { align: 'center' });
 
-        // Add description
         doc.setFontSize(14);
         doc.setTextColor(textColor);
         y = addText(`${t.suggestion} ${mealDescription}`, pageWidth / 2, y, 14, false, textColor, { align: 'center' });
 
-        // Add recipe image
         if (recipeData.image && browser && recipeImageHeight > 0) {
             try {
                 const proxyUrl = `https://cors-anywhere.herokuapp.com/${recipeData.image}`;
@@ -258,11 +297,9 @@ async function exportToPDF() {
         addHeader();
         y = margin + 10;
 
-        // Dish Name
         y = addText(`${t.dishName} ${recipeData.title || ''}`, margin, y, 14, true, yellowColor);
         y = addLine(y);
 
-        // Ingredients
         if (ingredients.length > 0) {
             y = addText(t.ingredients, margin, y, 12, true, yellowColor);
             for (const ingredient of ingredients) {
@@ -272,7 +309,6 @@ async function exportToPDF() {
             y = addLine(y);
         }
 
-        // Instructions
         if (steps.length > 0) {
             y = addText(t.instructions, margin, y, 12, true, yellowColor);
             steps.forEach((step, index) => {
@@ -282,12 +318,10 @@ async function exportToPDF() {
             y = addLine(y);
         }
 
-        // Preparation Time
         y = addText(`${t.prepTime} ${prepTime}`, margin, y, 12, true, yellowColor);
         y += 5;
         y = addLine(y);
 
-        // Nutritional Info
         if (recipeData.nutrition?.nutrients?.length) {
             y = addText(t.nutrition, margin, y, 12, true, yellowColor);
             for (const nutrient of recipeData.nutrition.nutrients) {
@@ -298,10 +332,7 @@ async function exportToPDF() {
             y = addLine(y);
         }
 
-        // Add footer to the last page
         addFooter();
-
-        // Save the PDF
         doc.save(`${recipeData.title || 'recipe'}.pdf`);
         console.log('PDF generated and downloaded');
     } catch (err) {
@@ -380,7 +411,7 @@ async function exportToPDF() {
                     {#if steps.length > 0}
                         <div class="mt-3">
                             <span class="font-bold mr-2">{t.instructions}</span>
-                            <ul class="list-decimal ml-5">
+                            <ul class="list-decimal ml-10">
                                 {#each steps as step}
                                     <li>{step}</li>
                                 {/each}
@@ -402,7 +433,7 @@ async function exportToPDF() {
                     {/if}
                 </div>
 
-                <div class="flex justify-end mt-5">
+                <div class="flex flex-wrap justify-end mt-5 gap-1">
                     <button
                         class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex"
                         on:click={exportToPDF}
@@ -410,25 +441,61 @@ async function exportToPDF() {
                         aria-label={t.exportPDF}
                     >
                         <Icon icon="mdi:file-pdf-box" class="mr-1 text-xl"/>
-                        {t.exportPDF}
+                        {t.exportPDF || 'Export to PDF'}
                     </button>
                     <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-1"
+                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
+                        on:click={copyRecipeLink}
+                        disabled={loading || !recipeUrl}
+                        aria-label={t.copyLink || 'Copy Link'}
+                    >
+                        <Icon icon="mdi:link" class="mr-1 text-xl"/>
+                        {copySuccess ? (t.copySuccess || 'Copied!') : (t.copyLink || 'Copy Link')}
+                    </button>
+                    <button
+                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
+                        on:click={() => shareToSocial('instagram')}
+                        disabled={loading || !recipeUrl}
+                        aria-label={t.shareInstagram || 'Share on Instagram'}
+                    >
+                        <Icon icon="mdi:instagram" class="mr-1 text-xl"/>
+                        {t.shareInstagram || 'Instagram'}
+                    </button>
+                    <button
+                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
+                        on:click={() => shareToSocial('facebook')}
+                        disabled={loading || !recipeUrl}
+                        aria-label={t.shareFacebook || 'Share on Facebook'}
+                    >
+                        <Icon icon="mdi:facebook" class="mr-1 text-xl"/>
+                        {t.shareFacebook || 'Facebook'}
+                    </button>
+                    <button
+                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
+                        on:click={() => shareToSocial('whatsapp')}
+                        disabled={loading || !recipeUrl}
+                        aria-label={t.shareWhatsApp || 'Share on WhatsApp'}
+                    >
+                        <Icon icon="mdi:whatsapp" class="mr-1 text-xl"/>
+                        {t.shareWhatsApp || 'WhatsApp'}
+                    </button>
+                    <button
+                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
                         on:click={handleFindAnother}
                         disabled={loading}
-                        aria-label={t.anotherIdea}
+                        aria-label={t.anotherIdea || 'Find Another Idea'}
                     >
                         <Icon icon="mdi:puzzle" class="mr-1 text-xl"/>
-                        {t.anotherIdea}
+                        {t.anotherIdea || 'Another Idea'}
                     </button>
                     <button
-                        class="p-3 rounded-2xl border-2 border-yellow-600 hover:border-yellow-700 dark:hover:border-yellow-800 bg-transparent text-yellow-600 hover:text-yellow-700 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-1"
+                        class="p-3 rounded-2xl border-2 border-yellow-600 hover:border-yellow-700 dark:hover:border-yellow-800 bg-transparent text-yellow-600 hover:text-yellow-700 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
                         on:click={onBack}
                         disabled={loading}
-                        aria-label={t.modifyPrefs}
+                        aria-label={t.modifyPrefs || 'Modify Preferences'}
                     >
                         <Icon icon="mdi:silverware-fork-knife" class="mr-1 text-xl"/>
-                        {t.modifyPrefs}
+                        {t.modifyPrefs || 'Modify Preferences'}
                     </button>
                 </div>
             </div>
