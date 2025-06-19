@@ -10,6 +10,7 @@
     import { browser } from "$app/environment";
 
     let bottle;
+    let poppup = false;
 
     onMount(() => {
         gsap.from(".breakfast", {
@@ -23,16 +24,21 @@
             if (savedLanguage) {
                 $language = savedLanguage;
             }
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('type') && params.get('mood') && params.get('prepTime') && params.get('recipeId')) {
+                poppup = true;
+            }
         }
     });
-
-    let poppup = false;
 
     function togglePoppup() {
         poppup = !poppup;
     }
     function closePoppup() {
         poppup = false;
+        if (browser) {
+            window.history.replaceState({}, document.title, '/');
+        }
     }
 
     $: t = translations[$language] || translations.en;
@@ -48,7 +54,7 @@
 </script>
 
 <div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
-    <div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl flex items-center bg-white dark:bg-black p-2">
+    <div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl flex items-center bg-white dark:bg-black p-2" style="z-index: 1;">
         <p class="text-xl flex items-end">
             <img src="img/black.png" alt="Logo dark" class="block dark:hidden h-12" />
             <img src="img/white.png" alt="Logo light" class="hidden dark:block h-12" />
