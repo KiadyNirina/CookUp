@@ -1,6 +1,6 @@
 <script>
 import { jsPDF } from 'jspdf';
-import { scale } from 'svelte/transition';
+import { scale, fade } from 'svelte/transition';
 import Icon from '@iconify/svelte';
 import { createEventDispatcher } from 'svelte';
 import { language } from '../stores/language';
@@ -11,6 +11,7 @@ let scriptLoaded = true;
 let pdfLoadError = null;
 let copySuccess = false;
 let pdfLoading = false;
+let showShareOptions = false;
 
 export let recipeData;
 export let selectedType;
@@ -79,6 +80,7 @@ function shareToSocial(platform) {
             window.open(shareUrl, '_blank');
             break;
     }
+    showShareOptions = false;
 }
 
 async function exportToPDF() {
@@ -348,7 +350,7 @@ async function exportToPDF() {
 }
 </script>
 
-<div class="mt-5">
+<div class="mt-8">
     {#if loading}
         <div
             transition:scale={{ duration: 300, start: 0.9 }}
@@ -360,54 +362,117 @@ async function exportToPDF() {
             </div>
         </div>
     {:else if recipeData}
-        <div transition:scale={{ duration: 300, start: 0.95 }} class="dark:font-thin">
-            <p class="text-lg font-semibold">
-                {t.suggestion} {mealDescription} :
+        <div transition:scale={{ duration: 300, start: 0.95 }} class="dark:font-light">
+            <p class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                {t.suggestion} {mealDescription}
             </p>
             {#if exceedsPrepTime}
                 <div
-                    class="mt-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-3 rounded-lg"
+                    class="mt-3 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-3 rounded-lg"
                     role="alert"
                 >
-                    <p class="font-semibold">
+                    <p class="font-medium">
                         {t.prepTimeWarning} {maxPrepTime} {t.minutes}, {t.prepTimeWarning2} {recipeData.readyInMinutes} {t.minutes}.
                     </p>
                 </div>
             {/if}
             {#if pdfLoadError}
                 <div
-                    class="mt-3 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-3 rounded-lg"
+                    class="mt-3 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-3 rounded-lg"
                     role="alert"
                 >
-                    <p class="font-semibold">
+                    <p class="font-medium">
                         {t.pdfLoadError || 'Failed to load PDF library. PDF export is unavailable.'}
                     </p>
                 </div>
             {/if}
-            <div class="mt-5">
-                <div class="mb-4 flex flex-wrap gap-2">
-                    <span class="bg-yellow-200 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-200 p-2 rounded-full text-sm font-semibold">
-                        {formattedMealType}
-                    </span>
-                    {#each moods as mood}
-                        <span class="bg-gray-300 dark:bg-gray-600 p-2 rounded-full text-sm font-semibold">
-                            #{t.moods[mood] || mood}
-                        </span>
-                    {/each}
-                </div>
+            <div class="mt-4">
                 {#if recipeData.image}
                     <img
                         src={recipeData.image}
-                        class="border-1 border-gray-400 dark:border-gray-600 rounded-3xl w-full h-full"
+                        class="rounded-xl w-full h-auto shadow-sm"
                         alt={recipeData.title || t.recipeImageAlt}
                     />
                 {/if}
-                <div class="mt-5">
-                    <p><span class="font-bold mr-2">{t.dishName}</span> {recipeData.title || ''}</p>
+                <div class="mt-4">
+                    <div class="mb-4 flex items-center">
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-3 py-1 rounded-full text-sm font-medium">
+                                {formattedMealType}
+                            </span>
+                            {#each moods as mood}
+                                <span class="bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm font-medium">
+                                    #{t.moods[mood] || mood}
+                                </span>
+                            {/each}
+                        </div>
+
+                        <div class="flex justify-end gap-2 ml-auto">
+                            <button
+                                class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative cursor-pointer"
+                                on:click={copyRecipeLink}
+                                disabled={loading || !recipeUrl}
+                                aria-label={t.copyLink || 'Copy Link'}
+                            >
+                                <Icon icon="mdi:link" class="text-xl" />
+                                {#if copySuccess}
+                                    <span
+                                        in:fade={{ duration: 300 }}
+                                        out:fade={{ duration: 300 }}
+                                        class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded"
+                                    >
+                                        {t.copySuccess || 'Copied!'}
+                                    </span>
+                                {/if}
+                            </button>
+                            <div class="relative">
+                                <button
+                                    class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
+                                    on:click={() => showShareOptions = !showShareOptions}
+                                    disabled={loading || !recipeUrl}
+                                    aria-label={t.share || 'Share'}
+                                >
+                                    <Icon icon="mdi:share-variant" class="text-xl" />
+                                </button>
+                                {#if showShareOptions}
+                                    <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10">
+                                        <button
+                                            class="w-full text-left px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer"
+                                            on:click={() => shareToSocial('instagram')}
+                                            aria-label={t.shareInstagram || 'Share on Instagram'}
+                                        >
+                                            <Icon icon="mdi:instagram" class="mr-2 text-lg" />
+                                            {t.shareInstagram || 'Instagram'}
+                                        </button>
+                                        <button
+                                            class="w-full text-left px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer"
+                                            on:click={() => shareToSocial('facebook')}
+                                            aria-label={t.shareFacebook || 'Share on Facebook'}
+                                        >
+                                            <Icon icon="mdi:facebook" class="mr-2 text-lg" />
+                                            {t.shareFacebook || 'Facebook'}
+                                        </button>
+                                        <button
+                                            class="w-full text-left px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer"
+                                            on:click={() => shareToSocial('whatsapp')}
+                                            aria-label={t.shareWhatsApp || 'Share on WhatsApp'}
+                                        >
+                                            <Icon icon="mdi:whatsapp" class="mr-2 text-lg" />
+                                            {t.shareWhatsApp || 'WhatsApp'}
+                                        </button>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200 text-center">
+                        <span class="text-lg md:text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-500 text-transparent bg-clip-text py-2">
+                            {recipeData.title || ''}
+                    </span></p>
                     {#if ingredients.length > 0}
-                        <div class="mt-3">
-                            <span class="font-bold mr-2">{t.ingredients}</span>
-                            <ul class="list-disc ml-10">
+                        <div class="mt-4">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.ingredients}</span>
+                            <ul class="list-disc ml-6 mt-2 text-gray-600 dark:text-gray-400">
                                 {#each ingredients as ingredient}
                                     <li>{ingredient}</li>
                                 {/each}
@@ -415,99 +480,64 @@ async function exportToPDF() {
                         </div>
                     {/if}
                     {#if steps.length > 0}
-                        <div class="mt-3">
-                            <span class="font-bold mr-2">{t.instructions}</span>
-                            <ul class="list-decimal ml-10">
+                        <div class="mt-4">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.instructions}</span>
+                            <ul class="list-decimal ml-6 mt-2 text-gray-600 dark:text-gray-400">
                                 {#each steps as step}
                                     <li>{step}</li>
                                 {/each}
                             </ul>
                         </div>
                     {/if}
-                    <p class="mt-3"><span class="font-bold mr-2">{t.prepTime}</span> {prepTime}</p>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400"><span class="font-semibold text-gray-800 dark:text-gray-200">{t.prepTime}</span> {prepTime}</p>
                     {#if recipeData.nutrition?.nutrients?.length}
-                        <div class="mt-3 flex">
-                            <span class="font-bold mr-2">{t.nutrition}</span>
-                            <ul class="list-disc ml-5">
+                        <div class="mt-4">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.nutrition}</span>
+                            <ul class="list-disc ml-6 mt-2 text-gray-600 dark:text-gray-400">
                                 {#each recipeData.nutrition.nutrients as nutrient}
                                     {#if ['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)}
-                                        <li>{nutrient.name}: ${nutrient.amount} ${nutrient.unit}</li>
+                                        <li>{nutrient.name}: {nutrient.amount} {nutrient.unit}</li>
                                     {/if}
                                 {/each}
                             </ul>
                         </div>
                     {/if}
                 </div>
-
-                <div class="flex flex-wrap justify-end mt-5 gap-1">
+                <div class="mt-6 space-y-3 sm:flex sm:flex-wrap sm:justify-end sm:gap-3 sm:space-y-0">
                     <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex items-center"
+                        class="w-full sm:w-auto px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all duration-200 font-medium flex items-center justify-center cursor-pointer"
                         on:click={exportToPDF}
                         disabled={loading || !scriptLoaded || pdfLoading}
                         aria-label={t.exportPDF}
                     >
                         {#if pdfLoading}
-                            <Icon icon="mdi:loading" class="mr-1 text-xl animate-spin" />
-                            {t.exportingPDF}
+                            <Icon icon="mdi:loading" class="mr-2 text-lg animate-spin" />
+                            {t.exportingPDF || 'Exporting...'}
                         {:else}
-                            <Icon icon="mdi:file-pdf-box" class="mr-1 text-xl" />
-                            {t.exportPDF}
+                            <Icon icon="mdi:file-pdf-box" class="mr-2 text-lg" />
+                            {t.exportPDF || 'Export to PDF'}
                         {/if}
                     </button>
-                    <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
-                        on:click={copyRecipeLink}
-                        disabled={loading || !recipeUrl}
-                        aria-label={t.copyLink || 'Copy Link'}
-                    >
-                        <Icon icon="mdi:link" class="mr-1 text-xl"/>
-                        {copySuccess ? (t.copySuccess || 'Copied!') : (t.copyLink || 'Copy Link')}
-                    </button>
-                    <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
-                        on:click={() => shareToSocial('instagram')}
-                        disabled={loading || !recipeUrl}
-                        aria-label={t.shareInstagram || 'Share on Instagram'}
-                    >
-                        <Icon icon="mdi:instagram" class="mr-1 text-xl"/>
-                        {t.shareInstagram || 'Instagram'}
-                    </button>
-                    <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
-                        on:click={() => shareToSocial('facebook')}
-                        disabled={loading || !recipeUrl}
-                        aria-label={t.shareFacebook || 'Share on Facebook'}
-                    >
-                        <Icon icon="mdi:facebook" class="mr-1 text-xl"/>
-                        {t.shareFacebook || 'Facebook'}
-                    </button>
-                    <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
-                        on:click={() => shareToSocial('whatsapp')}
-                        disabled={loading || !recipeUrl}
-                        aria-label={t.shareWhatsApp || 'Share on WhatsApp'}
-                    >
-                        <Icon icon="mdi:whatsapp" class="mr-1 text-xl"/>
-                        {t.shareWhatsApp || 'WhatsApp'}
-                    </button>
-                    <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
-                        on:click={handleFindAnother}
-                        disabled={loading}
-                        aria-label={t.anotherIdea || 'Find Another Idea'}
-                    >
-                        <Icon icon="mdi:puzzle" class="mr-1 text-xl"/>
-                        {t.anotherIdea || 'Another Idea'}
-                    </button>
-                    <button
-                        class="p-3 rounded-2xl border-2 border-yellow-600 hover:border-yellow-700 dark:hover:border-yellow-800 bg-transparent text-yellow-600 hover:text-yellow-700 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
-                        on:click={onBack}
-                        disabled={loading}
-                        aria-label={t.modifyPrefs || 'Modify Preferences'}
-                    >
-                        <Icon icon="mdi:silverware-fork-knife" class="mr-1 text-xl"/>
-                        {t.modifyPrefs || 'Modify Preferences'}
-                    </button>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button
+                            class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 hover:shadow-md transition-all duration-200 font-medium flex items-center justify-center cursor-pointer"
+                            on:click={handleFindAnother}
+                            disabled={loading}
+                            aria-label={t.anotherIdea || 'Find Another Idea'}
+                        >
+                            <Icon icon="mdi:puzzle" class="mr-2 text-lg" />
+                            {t.anotherIdea || 'Another Idea'}
+                        </button>
+                        <button
+                            class="w-full sm:w-auto px-4 py-2 bg-transparent border-2 border-gray-600 text-gray-600 dark:text-gray-300 dark:border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 hover:shadow-md transition-all duration-200 font-medium flex items-center justify-center cursor-pointer"
+                            on:click={onBack}
+                            disabled={loading}
+                            aria-label={t.modifyPrefs || 'Modify Preferences'}
+                        >
+                            <Icon icon="mdi:silverware-fork-knife" class="mr-2 text-lg" />
+                            {t.modifyPrefs || 'Modify Preferences'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
