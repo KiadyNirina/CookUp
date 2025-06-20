@@ -10,6 +10,7 @@ import { browser } from '$app/environment';
 let scriptLoaded = true;
 let pdfLoadError = null;
 let copySuccess = false;
+let pdfLoading = false;
 
 export let recipeData;
 export let selectedType;
@@ -82,14 +83,17 @@ function shareToSocial(platform) {
 
 async function exportToPDF() {
     console.log('exportToPDF called', { scriptLoaded, recipeData });
+    pdfLoading = true;
     if (!scriptLoaded) {
         console.error('jsPDF not available');
         alert(t.pdfLoadError || 'PDF generation failed: Library not available. Please try again.');
+        pdfLoading = false;
         return;
     }
     if (!recipeData) {
         console.error('No recipe data available');
         alert(t.noRecipeError || 'No recipe data available to export.');
+        pdfLoading = false;
         return;
     }
 
@@ -338,6 +342,8 @@ async function exportToPDF() {
     } catch (err) {
         console.error('PDF error:', err.message, err.stack);
         alert(`${t.pdfGenerationError || 'Failed to generate PDF.'} (${err.message})`);
+    } finally {
+        pdfLoading = false;
     }
 }
 </script>
@@ -435,13 +441,18 @@ async function exportToPDF() {
 
                 <div class="flex flex-wrap justify-end mt-5 gap-1">
                     <button
-                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex"
+                        class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex items-center"
                         on:click={exportToPDF}
-                        disabled={loading || !scriptLoaded}
+                        disabled={loading || !scriptLoaded || pdfLoading}
                         aria-label={t.exportPDF}
                     >
-                        <Icon icon="mdi:file-pdf-box" class="mr-1 text-xl"/>
-                        {t.exportPDF || 'Export to PDF'}
+                        {#if pdfLoading}
+                            <Icon icon="mdi:loading" class="mr-1 text-xl animate-spin" />
+                            {t.exportingPDF}
+                        {:else}
+                            <Icon icon="mdi:file-pdf-box" class="mr-1 text-xl" />
+                            {t.exportPDF}
+                        {/if}
                     </button>
                     <button
                         class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-yellow-600 hover:bg-yellow-700 dark:hover:bg-yellow-800 transition-all duration-200 ease-in-out hover:cursor-pointer font-bold flex items-center"
