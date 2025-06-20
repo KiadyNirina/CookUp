@@ -303,7 +303,7 @@ function handleFindAnother() {
 </script>
 
 <div class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 content-form">
-    <div class="bg-white dark:bg-black text-black dark:text-white w-11/12 max-w-2xl p-8 rounded-4xl shadow-lg overflow-y-auto max-h-[90vh]">
+    <div class="bg-white dark:bg-black text-black dark:text-white w-11/12 max-w-3xl p-8 rounded-3xl shadow-lg overflow-y-auto max-h-[90vh]">
         {#if showErrorPopup}
             <div
                 transition:fade={{ duration: 300 }}

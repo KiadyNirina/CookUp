@@ -68,6 +68,7 @@ export const translations = {
         shareFacebook: 'Share on Facebook',
         shareWhatsApp: 'Share on WhatsApp',
         copyLinkError: 'Failed to copy link.',
+        exportingPDF: 'Exporting PDF...',
     },
     fr: {
         // Page d'accueil
@@ -134,9 +135,10 @@ export const translations = {
         shareInstagram: 'Partager sur Instagram',
         instagramSharePrompt: 'Lien copié ! Collez-le dans votre publication ou story Instagram.',
         copyLink: 'Copier le lien',
-        copySuccess: 'Copié !',
+        copySuccess: 'Copié!',
         shareFacebook: 'Partager sur Facebook',
         shareWhatsApp: 'Partager sur WhatsApp',
         copyLinkError: 'Échec de la copie du lien.',
+        exportingPDF: 'Exportation du PDF...'
     }
 };
