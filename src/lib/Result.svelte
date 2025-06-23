@@ -57,6 +57,7 @@ function shareToSocial(platform) {
 
     const encodedUrl = encodeURIComponent(recipeUrl);
     const encodedTitle = encodeURIComponent(recipeData.title || 'Delicious Recipe');
+    const appId = import.meta.env.VITE_FACEBOOK_APP_ID;
     let shareUrl;
 
     switch (platform) {
@@ -72,7 +73,7 @@ function shareToSocial(platform) {
                 });
             break;
         case 'facebook':
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            shareUrl = `https://www.facebook.com/dialog/share?app_id=${appId}&href=${encodedUrl}&quote=${encodedTitle}`;
             window.open(shareUrl, '_blank');
             break;
         case 'whatsapp':
