@@ -12,6 +12,7 @@ let pdfLoadError = null;
 let copySuccess = false;
 let pdfLoading = false;
 let showShareOptions = false;
+let isFavorite = false;
 
 export let recipeData;
 export let selectedType;
@@ -38,6 +39,10 @@ $: recipeUrl = browser && recipeData && selectedType && moods[0] && maxPrepTime 
 
 function handleFindAnother() {
     dispatch('findAnother');
+}
+
+function toggleFavorite() {
+    isFavorite = !isFavorite;
 }
 
 function copyRecipeLink() {
@@ -409,6 +414,17 @@ async function exportToPDF() {
                         </div>
 
                         <div class="flex justify-end gap-2 ml-auto">
+                            <button
+                                class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
+                                on:click={toggleFavorite}
+                                aria-label={isFavorite ? (t.removeFavorite || 'Remove from favorites') : (t.addFavorite || 'Add to favorites')}
+                            >
+                                {#if isFavorite}
+                                    <Icon icon="basil:heart-solid" class="text-yellow-600 text-xl" />
+                                {:else}
+                                    <Icon icon="basil:heart-outline" class="text-gray-600 dark:text-gray-300 text-xl" />
+                                {/if}
+                            </button>
                             <button
                                 class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative cursor-pointer"
                                 on:click={copyRecipeLink}
