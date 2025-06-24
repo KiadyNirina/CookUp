@@ -1,3 +1,4 @@
+```svelte
 <script>
 import { jsPDF } from 'jspdf';
 import { scale, fade } from 'svelte/transition';
@@ -13,6 +14,7 @@ let copySuccess = false;
 let pdfLoading = false;
 let showShareOptions = false;
 let isFavorite = false;
+let showInstagramModal = false;
 
 export let recipeData;
 export let selectedType;
@@ -58,23 +60,27 @@ function copyRecipeLink() {
 }
 
 function shareToSocial(platform) {
-    if (!browser || !recipeUrl) return;
+    if (!browser || !recipeUrl) {
+        alert(t.noLinkError || 'No link available to share.');
+        return;
+    }
 
     const encodedUrl = encodeURIComponent(recipeUrl);
-    const encodedTitle = encodeURIComponent(recipeData.title || 'Delicious Recipe');
+    const encodedTitle = encodeURIComponent(recipeData?.title || 'Delicious Recipe');
     const appId = import.meta.env.VITE_FACEBOOK_APP_ID;
     let shareUrl;
 
-    switch (platform) {
+    switch (platform.toLowerCase()) {
         case 'instagram':
-            navigator.clipboard.writeText(`${recipeData.title || 'Delicious Recipe'} ${recipeUrl}`)
+            navigator.clipboard.writeText(`${recipeData?.title || 'Delicious Recipe'} ${recipeUrl}`)
                 .then(() => {
+                    showInstagramModal = true;
                     shareUrl = 'https://www.instagram.com/';
                     window.open(shareUrl, '_blank');
                 })
-                .catch(err => {
-                    console.error('Failed to copy link for Instagram:', err);
-                    alert(t.copyLinkError || 'Failed to copy link.');
+                .catch(error => {
+                    console.error('Failed to copy link for Instagram:', error);
+                    alert(t.copyLinkError || 'Failed to copy link. Please try again.');
                 });
             break;
         case 'facebook':
@@ -85,6 +91,8 @@ function shareToSocial(platform) {
             shareUrl = `https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`;
             window.open(shareUrl, '_blank');
             break;
+        default:
+            console.warn('Unsupported platform:', platform);
     }
     showShareOptions = false;
 }
@@ -354,6 +362,10 @@ async function exportToPDF() {
         pdfLoading = false;
     }
 }
+
+function closeInstagramModal() {
+    showInstagramModal = false;
+}
 </script>
 
 <div class="mt-8">
@@ -414,35 +426,45 @@ async function exportToPDF() {
                         </div>
 
                         <div class="flex justify-end gap-2 ml-auto">
-                            <button
-                                class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
-                                on:click={toggleFavorite}
-                                aria-label={isFavorite ? (t.removeFavorite || 'Remove from favorites') : (t.addFavorite || 'Add to favorites')}
-                            >
-                                {#if isFavorite}
-                                    <Icon icon="basil:heart-solid" class="text-yellow-600 text-xl" />
-                                {:else}
-                                    <Icon icon="basil:heart-outline" class="text-gray-600 dark:text-gray-300 text-xl" />
-                                {/if}
-                            </button>
-                            <button
-                                class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative cursor-pointer"
-                                on:click={copyRecipeLink}
-                                disabled={loading || !recipeUrl}
-                                aria-label={t.copyLink || 'Copy Link'}
-                            >
-                                <Icon icon="mdi:link" class="text-xl" />
-                                {#if copySuccess}
-                                    <span
-                                        in:fade={{ duration: 300 }}
-                                        out:fade={{ duration: 300 }}
-                                        class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded"
-                                    >
-                                        {t.copySuccess || 'Copied!'}
-                                    </span>
-                                {/if}
-                            </button>
-                            <div class="relative">
+                            <div class="relative group">
+                                <button
+                                    class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
+                                    on:click={toggleFavorite}
+                                    aria-label={isFavorite ? (t.removeFavorite || 'Remove from favorites') : (t.addFavorite || 'Add to favorites')}
+                                >
+                                    {#if isFavorite}
+                                        <Icon icon="basil:heart-solid" class="text-yellow-600 text-xl" />
+                                    {:else}
+                                        <Icon icon="basil:heart-outline" class="text-gray-600 dark:text-gray-300 text-xl" />
+                                    {/if}
+                                </button>
+                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                    {isFavorite ? (t.removeFavorite || 'Remove from favorites') : (t.addFavorite || 'Add to favorites')}
+                                </span>
+                            </div>
+                            <div class="relative group">
+                                <button
+                                    class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative cursor-pointer"
+                                    on:click={copyRecipeLink}
+                                    disabled={loading || !recipeUrl}
+                                    aria-label={t.copyLink || 'Copy Link'}
+                                >
+                                    <Icon icon="mdi:link" class="text-xl" />
+                                    {#if copySuccess}
+                                        <span
+                                            in:fade={{ duration: 300 }}
+                                            out:fade={{ duration: 300 }}
+                                            class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded"
+                                        >
+                                            {t.copySuccess || 'Copied!'}
+                                        </span>
+                                    {/if}
+                                </button>
+                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                    {t.copyLink || 'Copy recipe link'}
+                                </span>
+                            </div>
+                            <div class="relative group">
                                 <button
                                     class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
                                     on:click={() => showShareOptions = !showShareOptions}
@@ -451,6 +473,9 @@ async function exportToPDF() {
                                 >
                                     <Icon icon="mdi:share-variant" class="text-xl" />
                                 </button>
+                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                    {t.share || 'Share recipe'}
+                                </span>
                                 {#if showShareOptions}
                                     <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10">
                                         <button
@@ -559,4 +584,48 @@ async function exportToPDF() {
             </div>
         </div>
     {/if}
+
+    {#if showInstagramModal}
+        <div
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            transition:fade={{ duration: 200 }}
+        >
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl"
+                transition:scale={{ duration: 200, start: 0.95 }}
+            >
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                        {t.shareInstagram || 'Share on Instagram'}
+                    </h2>
+                    <button
+                        class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-200"
+                        on:click={closeInstagramModal}
+                        aria-label={t.close || 'Close'}
+                    >
+                        <Icon icon="mdi:close" class="text-xl" />
+                    </button>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                    {t.instagramShareInstructions ||
+                        'The recipe link has been copied to your clipboard. Paste it into an Instagram Story or message to share with your followers. To share with a specific list of followers, use Instagram\'s "Close Friends" feature or send a direct message to your selected contacts.'}
+                </p>
+                <div class="flex justify-end">
+                    <button
+                        class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all duration-200 font-medium"
+                        on:click={closeInstagramModal}
+                        aria-label={t.close || 'Close'}
+                    >
+                        {t.close || 'Close'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>
+
+<style>
+    .group:hover .group-hover\\:block {
+        display: block;
+    }
+</style>
