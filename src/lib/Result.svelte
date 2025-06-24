@@ -1,4 +1,3 @@
-```svelte
 <script>
 import { jsPDF } from 'jspdf';
 import { scale, fade } from 'svelte/transition';
