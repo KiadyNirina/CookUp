@@ -69,6 +69,11 @@ export const translations = {
         shareWhatsApp: 'Share on WhatsApp',
         copyLinkError: 'Failed to copy link.',
         exportingPDF: 'Exporting PDF...',
+        share: 'Share',
+        addFavorite: 'Add to favorites',
+        removeFavorite: 'Remove from favorites',
+        instagramShareInstructions: 'The recipe link has been copied to your clipboard. Paste it into an Instagram Story or message to share with your followers. To share with a specific list of followers, use Instagram\'s "Close Friends" feature or send a direct message to your selected contacts.',
+        close: 'Close',
     },
     fr: {
         // Page d'accueil
@@ -139,6 +144,11 @@ export const translations = {
         shareFacebook: 'Partager sur Facebook',
         shareWhatsApp: 'Partager sur WhatsApp',
         copyLinkError: 'Échec de la copie du lien.',
-        exportingPDF: 'Exportation du PDF...'
+        exportingPDF: 'Exportation du PDF...',
+        share: 'Partager',
+        addFavorite: 'Ajouter aux favoris',
+        removeFavorite: 'Retirer des favoris',
+        instagramShareInstructions: 'Le lien de la recette a été copié dans votre presse-papiers. Collez-le dans une story Instagram ou un message pour le partager avec vos abonnés. Pour partager avec une liste spécifique d’abonnés, utilisez la fonctionnalité "Amis proches" d’Instagram ou envoyez un message direct à vos contacts sélectionnés.',
+        close: 'Fermer',
     }
 };

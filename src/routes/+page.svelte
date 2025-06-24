@@ -11,6 +11,12 @@
 
     let bottle;
     let poppup = false;
+    let showLanguageDropdown = false;
+
+    const availableLanguages = [
+        { code: 'en', label: 'EN' },
+        { code: 'fr', label: 'FR' },
+    ];
 
     onMount(() => {
         gsap.from(".breakfast", {
@@ -34,6 +40,7 @@
     function togglePoppup() {
         poppup = !poppup;
     }
+
     function closePoppup() {
         poppup = false;
         if (browser) {
@@ -41,33 +48,63 @@
         }
     }
 
-    $: t = translations[$language] || translations.en;
-
-    function toggleLanguage() {
-        const newLanguage = $language === 'en' ? 'fr' : 'en';
-        $language = newLanguage;
+    function toggleLanguage(langCode) {
+        $language = langCode;
         if (browser) {
-            localStorage.setItem('language', newLanguage);
+            localStorage.setItem('language', langCode);
             window.location.reload();
         }
+        showLanguageDropdown = false;
     }
+
+    function toggleLanguageDropdown() {
+        showLanguageDropdown = !showLanguageDropdown;
+    }
+
+    function handleOutsideClick(event) {
+        if (showLanguageDropdown && !event.target.closest('.language-dropdown')) {
+            showLanguageDropdown = false;
+        }
+    }
+
+    $: t = translations[$language] || translations[$language] || translations.en;
+
 </script>
 
+<svelte:window on:mousedown={handleOutsideClick} />
+
 <div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
-    <div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl flex items-center bg-white dark:bg-black p-2" style="z-index: 1;">
+    <div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl mx-auto flex items-center bg-white dark:bg-black p-2" style="z-index: 100;">
         <p class="text-xl flex items-end">
             <img src="img/black.png" alt="Logo dark" class="block dark:hidden h-12" />
             <img src="img/white.png" alt="Logo light" class="hidden dark:block h-12" />
         </p>
         <div class="flex ml-auto items-center gap-2">
-            <button
-                on:click={toggleLanguage}
-                class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-600 transition-all duration-300"
-                aria-label="Toggle language"
-                aria-current={$language === 'en' ? 'true' : 'false'}
-            >
-                {$language === 'en' ? 'EN' : 'FR'}
-            </button>
+            <div class="relative language-dropdown">
+                <button
+                    on:click={toggleLanguageDropdown}
+                    class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-600 transition-all duration-300 flex items-center"
+                    aria-label="Select language"
+                >
+                    {availableLanguages.find(lang => lang.code === $language)?.label || 'English'}
+                    <Icon icon="mdi:chevron-down" class="ml-1" />
+                </button>
+                {#if showLanguageDropdown}
+                    <div
+                        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-10"
+                        transition:fade={{ duration: 150 }}
+                    >
+                        {#each availableLanguages as lang}
+                            <button
+                                on:click={() => toggleLanguage(lang.code)}
+                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {$language === lang.code ? 'bg-gray-100 dark:bg-gray-700' : ''}"
+                            >
+                                {lang.label}
+                            </button>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
             <a href="https://github.com/KiadyNirina/CookUp" target="_blank" class="p-2 rounded hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 text-xl active:scale-70">
                 <Icon icon="mdi:github" />
             </a>
