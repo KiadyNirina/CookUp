@@ -49,6 +49,11 @@
                                 recipeCountInternational = Math.round(this.targets()[0].count);
                             }
                         });
+                        gsap.fromTo(
+                            recipeSection,
+                            { opacity: 0, y: 30 },
+                            { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
+                        );
                         observer.disconnect();
                     }
                 },
@@ -170,10 +175,10 @@
         </div>
     </div>
 
-
     <section
         bind:this={recipeSection}
         class="recipe-count-section p-[20px] h-[100vh] mt-32 mb-32"
+        style="opacity: 0;"
     >
         <div class="max-w-7xl mx-auto text-center">
             <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
@@ -212,7 +217,6 @@
         </div>
     </section>
 
-    
     <div class="footer text-sm text-center p-2 text-gray-600 dark:text-gray-400">
         {@html t.footer}
     </div>
@@ -239,16 +243,6 @@
         font-family: "Permanent Marker", cursive;
         font-weight: 400;
         font-style: normal;
-    }
-    .recipe-count-section {
-        opacity: 0;
-        animation: fadeIn 1s ease-in-out forwards;
-        animation-delay: 0.2s;
-    }
-    @keyframes fadeIn {
-        to {
-            opacity: 1;
-        }
     }
     @media screen and (max-width: 640px) {
         .header {
