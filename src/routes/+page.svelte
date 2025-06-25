@@ -13,6 +13,7 @@
     let poppup = false;
     let showLanguageDropdown = false;
     let recipeCount = 0;
+    let recipeCountInternational = 0;
     let recipeSection;
 
     const availableLanguages = [
@@ -38,6 +39,14 @@
                             ease: "power1.out",
                             onUpdate: function () {
                                 recipeCount = Math.round(this.targets()[0].count);
+                            }
+                        });
+                        gsap.to({ count: 0 }, {
+                            count: 100,
+                            duration: 2.5,
+                            ease: "power1.out",
+                            onUpdate: function () {
+                                recipeCountInternational = Math.round(this.targets()[0].count);
                             }
                         });
                         observer.disconnect();
@@ -185,7 +194,9 @@
                 </div>
                 <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
                     <Icon icon="mdi:earth" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
-                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">100 +</p>
+                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+                        {recipeCountInternational.toLocaleString()} +
+                    </p>
                     <p class="dark:font-thin mt-2">
                         {t.recipeCountInternational}
                     </p>
