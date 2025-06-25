@@ -12,6 +12,8 @@
     let bottle;
     let poppup = false;
     let showLanguageDropdown = false;
+    let recipeCount = 0;
+    let recipeSection;
 
     const availableLanguages = [
         { code: 'en', label: 'EN' },
@@ -25,6 +27,27 @@
             duration: 1,
             ease: "power2.out"
         });
+
+        if (browser && recipeSection) {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    if (entries[0].isIntersecting) {
+                        gsap.to({ count: 0 }, {
+                            count: 365000,
+                            duration: 2.5,
+                            ease: "power1.out",
+                            onUpdate: function () {
+                                recipeCount = Math.round(this.targets()[0].count);
+                            }
+                        });
+                        observer.disconnect();
+                    }
+                },
+                { threshold: 0.5 }
+            );
+            observer.observe(recipeSection);
+        }
+
         if (browser) {
             const savedLanguage = localStorage.getItem('language');
             if (savedLanguage) {
@@ -67,8 +90,7 @@
         }
     }
 
-    $: t = translations[$language] || translations[$language] || translations.en;
-
+    $: t = translations[$language] || translations.en;
 </script>
 
 <svelte:window on:mousedown={handleOutsideClick} />
@@ -138,6 +160,48 @@
             </div>
         </div>
     </div>
+
+
+    <section
+        bind:this={recipeSection}
+        class="recipe-count-section p-[20px] h-[100vh] mt-32 mb-32"
+    >
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
+                {t.recipeCountTitle}
+            </h2>
+            <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
+                {t.recipeCountSubtitle}
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-5">
+                <div class="recipe-count p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
+                    <Icon icon="mdi:food-fork-drink" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
+                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+                        {recipeCount.toLocaleString()} +
+                    </p>
+                    <p class="dark:font-thin mt-2">
+                        {t.recipeCountTotal}
+                    </p>
+                </div>
+                <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
+                    <Icon icon="mdi:earth" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
+                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">100 +</p>
+                    <p class="dark:font-thin mt-2">
+                        {t.recipeCountInternational}
+                    </p>
+                </div>
+                <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
+                    <Icon icon="mdi:calendar-refresh" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
+                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">Daily</p>
+                    <p class="dark:font-thin mt-2">
+                        {t.recipeCountUpdates}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
     <div class="footer text-sm text-center p-2 text-gray-600 dark:text-gray-400">
         {@html t.footer}
     </div>
@@ -165,7 +229,16 @@
         font-weight: 400;
         font-style: normal;
     }
-
+    .recipe-count-section {
+        opacity: 0;
+        animation: fadeIn 1s ease-in-out forwards;
+        animation-delay: 0.2s;
+    }
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
     @media screen and (max-width: 640px) {
         .header {
             flex-direction: column;
@@ -196,8 +269,20 @@
             margin-right: auto;
             font-size: 12px;
         }
+        .recipe-count-section h2 {
+            font-size: 1.8rem;
+        }
+        .recipe-count-section p {
+            font-size: 12px;
+        }
+        .recipe-count p:first-child,
+        .recipe-count-section .grid > div p:first-child {
+            font-size: 1.5rem;
+        }
+        .recipe-count-section .grid > div p:last-child {
+            font-size: 12px;
+        }
     }
-
     @media screen and (min-width: 641px) and (max-width: 768px) {
         .sect1 h1 {
             font-size: 3rem;
@@ -206,6 +291,16 @@
             font-size: 15px;
         }
         .button {
+            font-size: 12px;
+        }
+        .recipe-count-section h2 {
+            font-size: 2rem;
+        }
+        .recipe-count p:first-child,
+        .recipe-count-section .grid > div p:first-child {
+            font-size: 1.8rem;
+        }
+        .recipe-count-section .grid > div p:last-child {
             font-size: 12px;
         }
     }
