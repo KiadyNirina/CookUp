@@ -339,11 +339,21 @@ function handleFindAnother() {
                         id="type"
                         class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer"
                     >
-                        <option value="" disabled>{t.mealTypePlaceholder}</option>
+                        <option value="" disabled bond>{t.mealTypePlaceholder}</option>
+                        <option value="main course">{t.mealTypes['main_course']}</option>
+                        <option value="side dish">{t.mealTypes['side_dish']}</option>
+                        <option value="dessert">{t.mealTypes.dessert}</option>
+                        <option value="appetizer">{t.mealTypes.appetizer}</option>
+                        <option value="salad">{t.mealTypes.salad}</option>
+                        <option value="bread">{t.mealTypes.bread}</option>
                         <option value="breakfast">{t.mealTypes.breakfast}</option>
-                        <option value="lunch">{t.mealTypes.lunch}</option>
-                        <option value="dinner">{t.mealTypes.dinner}</option>
+                        <option value="soup">{t.mealTypes.soup}</option>
+                        <option value="beverage">{t.mealTypes.beverage}</option>
+                        <option value="sauce">{t.mealTypes.sauce}</option>
+                        <option value="marinade">{t.mealTypes.marinade}</option>
+                        <option value="fingerfood">{t.mealTypes.fingerfood}</option>
                         <option value="snack">{t.mealTypes.snack}</option>
+                        <option value="drink">{t.mealTypes.drink}</option>
                     </select>
 
                     <label class="text-base">{t.mood}</label>

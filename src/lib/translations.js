@@ -11,13 +11,6 @@ export const translations = {
         choose: 'Choose your preferences and let us inspire you.',
         mealType: 'Meal type:',
         mealTypePlaceholder: 'Select meal type',
-        prepTime: 'Preparation time:',
-        prepTimePlaceholder: 'Select max preparation time',
-        prepTimeOptions: {
-            under30: 'Under 30 minutes',
-            under60: 'Under 60 minutes',
-            under90: 'Under 90 minutes'
-        },
         mood: 'Meal mood:',
         findIdeas: 'Find ideas',
         loading: 'Loading...',
@@ -39,10 +32,20 @@ export const translations = {
         loadingIdea: 'Loading a new idea...',
         // Types de repas
         mealTypes: {
+            'main_course': 'Main Course',
+            'side_dish': 'Side Dish',
+            dessert: 'Dessert',
+            appetizer: 'Appetizer',
+            salad: 'Salad',
+            bread: 'Bread',
             breakfast: 'Breakfast',
-            lunch: 'Lunch',
-            dinner: 'Dinner',
-            snack: 'Snack'
+            soup: 'Soup',
+            beverage: 'Beverage',
+            sauce: 'Sauce',
+            marinade: 'Marinade',
+            fingerfood: 'Fingerfood',
+            snack: 'Snack',
+            drink: 'Drink'
         },
         // Humeurs
         moods: {
@@ -92,13 +95,6 @@ export const translations = {
         choose: 'Choisissez vos préférences et laissez-nous vous inspirer.',
         mealType: 'Type de repas :',
         mealTypePlaceholder: 'Sélectionnez le type de repas',
-        prepTime: 'Temps de préparation :',
-        prepTimePlaceholder: 'Sélectionnez le temps de préparation max',
-        prepTimeOptions: {
-            under30: 'Moins de 30 minutes',
-            under60: 'Moins de 60 minutes',
-            under90: 'Moins de 90 minutes'
-        },
         mood: 'Humeur du repas :',
         findIdeas: 'Trouver des idées',
         loading: 'Chargement...',
@@ -120,10 +116,20 @@ export const translations = {
         loadingIdea: 'Chargement d\'une nouvelle idée...',
         // Types de repas
         mealTypes: {
-            breakfast: 'Petit-déjeuner',
-            lunch: 'Déjeuner',
-            dinner: 'Dîner',
-            snack: 'Collation'
+            'main_course': 'Plat Principal',
+            'side_dish': 'Accompagnement',
+            dessert: 'Dessert',
+            appetizer: 'Apéritif',
+            salad: 'Salade',
+            bread: 'Pain',
+            breakfast: 'Petit Déjeuner',
+            soup: 'Soupe',
+            beverage: 'Boisson',
+            sauce: 'Sauce',
+            marinade: 'Marinade',
+            fingerfood: 'Amuse-Gueule',
+            snack: 'Collation',
+            drink: 'Boisson'
         },
         // Humeurs
         moods: {
