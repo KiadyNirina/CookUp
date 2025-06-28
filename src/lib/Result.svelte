@@ -18,8 +18,6 @@ let showInstagramModal = false;
 export let recipeData;
 export let selectedType;
 export let moods;
-export let maxPrepTime;
-export let onBack;
 export let loading;
 
 const dispatch = createEventDispatcher();
@@ -27,7 +25,6 @@ const dispatch = createEventDispatcher();
 $: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => ing.original || '') : [];
 $: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => step.step || '') : [];
 $: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.minutes}` : ($language === 'en' ? 'Not specified' : 'Non spécifié');
-$: exceedsPrepTime = maxPrepTime && recipeData?.readyInMinutes && recipeData.readyInMinutes > parseInt(maxPrepTime, 10);
 
 $: t = translations[$language] || translations.en;
 
@@ -35,8 +32,8 @@ $: formattedMealType = t.mealTypes[selectedType] || ($language === 'en' ? 'meal'
 $: formattedMoods = moods.map(m => t.moods[m] || m).join(', ');
 $: mealDescription = moods.length > 0 ? `${formattedMealType} ${formattedMoods}` : formattedMealType;
 
-$: recipeUrl = browser && recipeData && selectedType && moods[0] && maxPrepTime ? 
-    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&mood=${encodeURIComponent(moods[0])}&prepTime=${encodeURIComponent(maxPrepTime)}&recipeId=${encodeURIComponent(recipeData.id || '')}` : '';
+$: recipeUrl = browser && recipeData && selectedType && moods[0] ? 
+    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&mood=${encodeURIComponent(moods[0])}&recipeId=${encodeURIComponent(recipeData.id || '')}` : '';
 
 function handleFindAnother() {
     dispatch('findAnother');
@@ -83,7 +80,7 @@ function shareToSocial(platform) {
                 });
             break;
         case 'facebook':
-            shareUrl = `https://www.facebook.com/dialog/share?app_id=${appId}&href=${encodedUrl}&quote=${encodedTitle}`;
+            shareUrl = `https://www.facebook.com/dialog/share?app_id=${appId}&href=${encodedUrl}"e=${encodedTitle}`;
             window.open(shareUrl, '_blank');
             break;
         case 'whatsapp':
@@ -383,16 +380,6 @@ function closeInstagramModal() {
             <p class="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 {t.suggestion} {mealDescription}
             </p>
-            {#if exceedsPrepTime}
-                <div
-                    class="mt-3 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-3 rounded-lg"
-                    role="alert"
-                >
-                    <p class="font-medium">
-                        {t.prepTimeWarning} {maxPrepTime} {t.minutes}, {t.prepTimeWarning2} {recipeData.readyInMinutes} {t.minutes}.
-                    </p>
-                </div>
-            {/if}
             {#if pdfLoadError}
                 <div
                     class="mt-3 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-3 rounded-lg"
@@ -509,7 +496,8 @@ function closeInstagramModal() {
                     <p class="font-semibold text-gray-800 dark:text-gray-200 text-center">
                         <span class="text-lg md:text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-500 text-transparent bg-clip-text py-2">
                             {recipeData.title || ''}
-                    </span></p>
+                        </span>
+                    </p>
                     {#if ingredients.length > 0}
                         <div class="mt-4">
                             <span class="font-semibold text-gray-800 dark:text-gray-200">{t.ingredients}</span>
