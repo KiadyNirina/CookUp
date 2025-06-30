@@ -17,7 +17,6 @@ function handleClose() {
 let idea = false;
 let selectedType = '';
 let mood = '';
-let maxPrepTime = '';
 let recipeData = null;
 let loading = false;
 let errorMessage = '';
@@ -30,13 +29,11 @@ onMount(() => {
         const params = new URLSearchParams(window.location.search);
         const type = params.get('type');
         const moodParam = params.get('mood');
-        const prepTime = params.get('prepTime');
         const recipeId = params.get('recipeId');
 
-        if (type && moodParam && prepTime && recipeId) {
+        if (type && moodParam && recipeId) {
             selectedType = type;
             mood = moodParam;
-            maxPrepTime = prepTime;
             fetchRecipeById(recipeId);
         }
     }
@@ -184,7 +181,7 @@ async function fetchRecipeById(recipeId) {
 }
 
 async function findIdea() {
-    if (!selectedType || !mood || !maxPrepTime) {
+    if (!selectedType || !mood) {
         errorMessage = t.selectMealTypeError;
         showErrorPopup = true;
         setTimeout(() => (showErrorPopup = false), 3000);
@@ -208,7 +205,7 @@ async function findIdea() {
             attempts++;
             const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
             const tags = `${mood},${selectedType}`;
-            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}&maxReadyTime=${maxPrepTime}`;
+            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`;
             const res = await fetch(url);
             if (!res.ok) {
                 throw new Error(`Spoonacular Error: ${res.statusText}`);
@@ -220,13 +217,7 @@ async function findIdea() {
             }
 
             recipeData = data.recipes[0];
-            if (recipeData.readyInMinutes <= parseInt(maxPrepTime, 10)) {
-                break;
-            }
-            if (attempts === maxAttempts) {
-                throw new Error(t.noRecipeError);
-            }
-            await delay(100);
+            break;
         }
 
         console.log('Assigned recipeData:', recipeData);
@@ -348,23 +339,21 @@ function handleFindAnother() {
                         id="type"
                         class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer"
                     >
-                        <option value="" disabled>{t.mealTypePlaceholder}</option>
+                        <option value="" disabled bond>{t.mealTypePlaceholder}</option>
+                        <option value="main course">{t.mealTypes['main_course']}</option>
+                        <option value="side dish">{t.mealTypes['side_dish']}</option>
+                        <option value="dessert">{t.mealTypes.dessert}</option>
+                        <option value="appetizer">{t.mealTypes.appetizer}</option>
+                        <option value="salad">{t.mealTypes.salad}</option>
+                        <option value="bread">{t.mealTypes.bread}</option>
                         <option value="breakfast">{t.mealTypes.breakfast}</option>
-                        <option value="lunch">{t.mealTypes.lunch}</option>
-                        <option value="dinner">{t.mealTypes.dinner}</option>
+                        <option value="soup">{t.mealTypes.soup}</option>
+                        <option value="beverage">{t.mealTypes.beverage}</option>
+                        <option value="sauce">{t.mealTypes.sauce}</option>
+                        <option value="marinade">{t.mealTypes.marinade}</option>
+                        <option value="fingerfood">{t.mealTypes.fingerfood}</option>
                         <option value="snack">{t.mealTypes.snack}</option>
-                    </select>
-
-                    <label for="prepTime" class="text-base">{t.prepTime}</label>
-                    <select
-                        bind:value={maxPrepTime}
-                        id="prepTime"
-                        class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer"
-                    >
-                        <option value="" disabled>{t.prepTimePlaceholder}</option>
-                        <option value="30">{t.prepTimeOptions.under30}</option>
-                        <option value="60">{t.prepTimeOptions.under60}</option>
-                        <option value="90">{t.prepTimeOptions.under90}</option>
+                        <option value="drink">{t.mealTypes.drink}</option>
                     </select>
 
                     <label class="text-base">{t.mood}</label>
@@ -459,7 +448,7 @@ function handleFindAnother() {
                 </div>
             </div>
         {:else}
-            <Result {recipeData} {selectedType} moods={[mood]} {maxPrepTime} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
+            <Result {recipeData} {selectedType} moods={[mood]} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
         {/if}
     </div>
 </div>
