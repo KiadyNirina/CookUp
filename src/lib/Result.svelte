@@ -17,8 +17,9 @@ let showInstagramModal = false;
 
 export let recipeData;
 export let selectedType;
-export let moods;
+export let diets;
 export let loading;
+export let onBack;
 
 const dispatch = createEventDispatcher();
 
@@ -29,11 +30,11 @@ $: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.min
 $: t = translations[$language] || translations.en;
 
 $: formattedMealType = t.mealTypes[selectedType] || ($language === 'en' ? 'meal' : 'repas');
-$: formattedMoods = moods.map(m => t.moods[m] || m).join(', ');
-$: mealDescription = moods.length > 0 ? `${formattedMealType} ${formattedMoods}` : formattedMealType;
+$: formattedDiets = diets.filter(d => d).map(d => t.diets[d] || d).join(', ');
+$: mealDescription = formattedDiets ? `${formattedMealType} (${formattedDiets})` : formattedMealType;
 
-$: recipeUrl = browser && recipeData && selectedType && moods[0] ? 
-    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&mood=${encodeURIComponent(moods[0])}&recipeId=${encodeURIComponent(recipeData.id || '')}` : '';
+$: recipeUrl = browser && recipeData && selectedType && diets[0] ? 
+    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}` : '';
 
 function handleFindAnother() {
     dispatch('findAnother');
@@ -80,7 +81,7 @@ function shareToSocial(platform) {
                 });
             break;
         case 'facebook':
-            shareUrl = `https://www.facebook.com/dialog/share?app_id=${appId}&href=${encodedUrl}"e=${encodedTitle}`;
+            shareUrl = `https://www.facebook.com/dialog/share?app_id=${appId}&href=${encodedUrl}&quote=${encodedTitle}`;
             window.open(shareUrl, '_blank');
             break;
         case 'whatsapp':
@@ -404,10 +405,12 @@ function closeInstagramModal() {
                             <span class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-3 py-1 rounded-full text-sm font-medium">
                                 {formattedMealType}
                             </span>
-                            {#each moods as mood}
-                                <span class="bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm font-medium">
-                                    #{t.moods[mood] || mood}
-                                </span>
+                            {#each diets as diet}
+                                {#if diet}
+                                    <span class="bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm font-medium">
+                                        #{t.diets[diet] || diet}
+                                    </span>
+                                {/if}
                             {/each}
                         </div>
 
