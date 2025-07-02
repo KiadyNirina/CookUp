@@ -11,10 +11,11 @@ export const translations = {
         choose: 'Choose your preferences and let us inspire you.',
         mealType: 'Meal type:',
         mealTypePlaceholder: 'Select meal type',
-        mood: 'Meal mood:',
+        diet: 'Diet:',
+        dietPlaceholder: 'Any Diet',
         findIdeas: 'Find ideas',
         loading: 'Loading...',
-        selectMealTypeError: 'Please select a meal type, mood, and preparation time.',
+        selectMealTypeError: 'Please select a meal type.',
         noRecipeError: 'No recipes found for these criteria. Try other preferences.',
         networkError: 'Network connection issue. Check your connection and try again.',
         translationError: 'Error during retrieval or translation. Data displayed in English.',
@@ -47,14 +48,19 @@ export const translations = {
             snack: 'Snack',
             drink: 'Drink'
         },
-        // Humeurs
-        moods: {
-            quick: 'Quick',
-            vegan: 'Vegan',
-            mediterranean: 'Mediterranean',
+        // Diets
+        diets: {
+            'gluten_free': 'Gluten Free',
+            ketogenic: 'Ketogenic',
             vegetarian: 'Vegetarian',
-            'high-protein': 'High-protein',
-            'low-calorie': 'Low-calorie'
+            'lacto_vegetarian': 'Lacto-Vegetarian',
+            'ovo_vegetarian': 'Ovo-Vegetarian',
+            vegan: 'Vegan',
+            pescatarian: 'Pescatarian',
+            paleo: 'Paleo',
+            primal: 'Primal',
+            'low_fodmap': 'Low FODMAP',
+            whole30: 'Whole30'
         },
         prepTimeWarning: 'Warning: Recipe exceeds selected preparation time of',
         prepTimeWarning2: 'but takes',
@@ -77,11 +83,11 @@ export const translations = {
         removeFavorite: 'Remove from favorites',
         instagramShareInstructions: 'The recipe link has been copied to your clipboard. Paste it into an Instagram Story or message to share with your followers. To share with a specific list of followers, use Instagram\'s "Close Friends" feature or send a direct message to your selected contacts.',
         close: 'Close',
-        recipeCountTitle: "Explore Our Recipe Collection",
-        recipeCountSubtitle: "Dive into a world of flavors with over 365,000 recipes from around the globe.",
-        recipeCountTotal: "Total Recipes",
-        recipeCountInternational: "International Cuisines",
-        recipeCountUpdates: "Daily Updates"
+        recipeCountTitle: 'Explore Our Recipe Collection',
+        recipeCountSubtitle: 'Dive into a world of flavors with over 365,000 recipes from around the globe.',
+        recipeCountTotal: 'Total Recipes',
+        recipeCountInternational: 'International Cuisines',
+        recipeCountUpdates: 'Daily Updates'
     },
     fr: {
         // Page d'accueil
@@ -95,10 +101,11 @@ export const translations = {
         choose: 'Choisissez vos préférences et laissez-nous vous inspirer.',
         mealType: 'Type de repas :',
         mealTypePlaceholder: 'Sélectionnez le type de repas',
-        mood: 'Humeur du repas :',
+        diet: 'Régime :',
+        dietPlaceholder: 'Tous régimes',
         findIdeas: 'Trouver des idées',
         loading: 'Chargement...',
-        selectMealTypeError: 'Veuillez sélectionner un type de repas, une humeur et un temps de préparation.',
+        selectMealTypeError: 'Veuillez sélectionner un type de repas.',
         noRecipeError: 'Aucune recette trouvée pour ces critères. Essayez d’autres préférences.',
         networkError: 'Problème de connexion réseau. Vérifiez votre connexion et réessayez.',
         translationError: 'Erreur lors de la récupération ou traduction. Les données sont affichées en anglais.',
@@ -131,14 +138,19 @@ export const translations = {
             snack: 'Collation',
             drink: 'Boisson'
         },
-        // Humeurs
-        moods: {
-            quick: 'Rapide',
-            vegan: 'Végan',
-            mediterranean: 'Méditerranéen',
+        // Diets
+        diets: {
+            'gluten_free': 'Sans Gluten',
+            ketogenic: 'Cétogène',
             vegetarian: 'Végétarien',
-            'high-protein': 'Protéiné',
-            'low-calorie': 'Peu calorique'
+            'lacto_vegetarian': 'Lacto-Végétarien',
+            'ovo_vegetarian': 'Ovo-Végétarien',
+            vegan: 'Végan',
+            pescatarian: 'Pescatarien',
+            paleo: 'Paléo',
+            primal: 'Primal',
+            'low_fodmap': 'Faible en FODMAP',
+            whole30: 'Whole30'
         },
         prepTimeWarning: 'Attention : La recette dépasse le temps de préparation choisi de',
         prepTimeWarning2: 'mais prend',
@@ -151,7 +163,7 @@ export const translations = {
         shareInstagram: 'Partager sur Instagram',
         instagramSharePrompt: 'Lien copié ! Collez-le dans votre publication ou story Instagram.',
         copyLink: 'Copier le lien',
-        copySuccess: 'Copié!',
+        copySuccess: 'Copié !',
         shareFacebook: 'Partager sur Facebook',
         shareWhatsApp: 'Partager sur WhatsApp',
         copyLinkError: 'Échec de la copie du lien.',
@@ -161,10 +173,10 @@ export const translations = {
         removeFavorite: 'Retirer des favoris',
         instagramShareInstructions: 'Le lien de la recette a été copié dans votre presse-papiers. Collez-le dans une story Instagram ou un message pour le partager avec vos abonnés. Pour partager avec une liste spécifique d’abonnés, utilisez la fonctionnalité "Amis proches" d’Instagram ou envoyez un message direct à vos contacts sélectionnés.',
         close: 'Fermer',
-        recipeCountTitle: "Explorez notre collection de recettes",
-        recipeCountSubtitle: "Plongez dans un univers de saveurs avec plus de 365 000 recettes du monde entier.",
-        recipeCountTotal: "Recettes totales",
-        recipeCountInternational: "Cuisines internationales",
-        recipeCountUpdates: "Mises à jour quotidiennes"
+        recipeCountTitle: 'Explorez notre collection de recettes',
+        recipeCountSubtitle: 'Plongez dans un univers de saveurs avec plus de 365 000 recettes du monde entier.',
+        recipeCountTotal: 'Recettes totales',
+        recipeCountInternational: 'Cuisines internationales',
+        recipeCountUpdates: 'Mises à jour quotidiennes'
     }
 };

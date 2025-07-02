@@ -16,7 +16,7 @@ function handleClose() {
 
 let idea = false;
 let selectedType = '';
-let mood = '';
+let diet = '';
 let recipeData = null;
 let loading = false;
 let errorMessage = '';
@@ -28,12 +28,12 @@ onMount(() => {
     if (browser) {
         const params = new URLSearchParams(window.location.search);
         const type = params.get('type');
-        const moodParam = params.get('mood');
+        const dietParam = params.get('diet');
         const recipeId = params.get('recipeId');
 
-        if (type && moodParam && recipeId) {
+        if (type && dietParam && recipeId) {
             selectedType = type;
-            mood = moodParam;
+            diet = dietParam;
             fetchRecipeById(recipeId);
         }
     }
@@ -114,11 +114,9 @@ async function fetchRecipeById(recipeId) {
 
         recipeData = data;
 
-        // Translate title
         recipeData.title = await translateText(recipeData.title || '');
         console.log('Translated title:', recipeData.title);
 
-        // Translate ingredients
         if (recipeData && Array.isArray(recipeData.extendedIngredients)) {
             recipeData.extendedIngredients = await Promise.all(
                 recipeData.extendedIngredients.map(async (ing, index) => {
@@ -140,7 +138,6 @@ async function fetchRecipeById(recipeId) {
             recipeData.extendedIngredients = [];
         }
 
-        // Translate instructions
         if (recipeData && recipeData.analyzedInstructions?.[0]?.steps) {
             recipeData.analyzedInstructions[0].steps = await Promise.all(
                 recipeData.analyzedInstructions[0].steps.map(async (step, index) => {
@@ -181,7 +178,7 @@ async function fetchRecipeById(recipeId) {
 }
 
 async function findIdea() {
-    if (!selectedType || !mood) {
+    if (!selectedType) {
         errorMessage = t.selectMealTypeError;
         showErrorPopup = true;
         setTimeout(() => (showErrorPopup = false), 3000);
@@ -204,7 +201,7 @@ async function findIdea() {
         while (attempts < maxAttempts) {
             attempts++;
             const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
-            const tags = `${mood},${selectedType}`;
+            const tags = diet ? `${diet},${selectedType}` : selectedType;
             const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`;
             const res = await fetch(url);
             if (!res.ok) {
@@ -222,11 +219,9 @@ async function findIdea() {
 
         console.log('Assigned recipeData:', recipeData);
 
-        // Traduire le titre
         recipeData.title = await translateText(recipeData.title || '');
         console.log('Translated title:', recipeData.title);
 
-        // Traduire les ingrédients
         if (recipeData && Array.isArray(recipeData.extendedIngredients)) {
             recipeData.extendedIngredients = await Promise.all(
                 recipeData.extendedIngredients.map(async (ing, index) => {
@@ -248,7 +243,6 @@ async function findIdea() {
             recipeData.extendedIngredients = [];
         }
 
-        // Traduire les instructions
         if (recipeData && recipeData.analyzedInstructions?.[0]?.steps) {
             recipeData.analyzedInstructions[0].steps = await Promise.all(
                 recipeData.analyzedInstructions[0].steps.map(async (step, index) => {
@@ -339,7 +333,7 @@ function handleFindAnother() {
                         id="type"
                         class="w-full mt-1 mb-5 p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600 dark:focus:ring-yellow-500 hover:cursor-pointer"
                     >
-                        <option value="" disabled bond>{t.mealTypePlaceholder}</option>
+                        <option value="" disabled selected>{t.mealTypePlaceholder}</option>
                         <option value="main course">{t.mealTypes['main_course']}</option>
                         <option value="side dish">{t.mealTypes['side_dish']}</option>
                         <option value="dessert">{t.mealTypes.dessert}</option>
@@ -356,84 +350,152 @@ function handleFindAnother() {
                         <option value="drink">{t.mealTypes.drink}</option>
                     </select>
 
-                    <label class="text-base">{t.mood}</label>
-                    <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5 mood">
+                    <label class="text-base">{t.diet}</label>
+                    <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5 diet">
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
                                 class="hidden peer"
-                                name="mood"
-                                value="quick"
-                                bind:group={mood}
-                                aria-label={t.moods.quick}
+                                name="diet"
+                                value=""
+                                bind:group={diet}
+                                aria-label={t.dietPlaceholder || 'Any Diet'}
                             />
                             <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.moods.quick}</span>
+                            <span class="ml-2">{t.dietPlaceholder || 'Any Diet'}</span>
                         </label>
 
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
                                 class="hidden peer"
-                                name="mood"
-                                value="vegan"
-                                bind:group={mood}
-                                aria-label={t.moods.vegan}
+                                name="diet"
+                                value="gluten free"
+                                bind:group={diet}
+                                aria-label={t.diets['gluten_free'] || 'Gluten Free'}
                             />
                             <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.moods.vegan}</span>
+                            <span class="ml-2">{t.diets['gluten_free'] || 'Gluten Free'}</span>
                         </label>
-
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
                                 class="hidden peer"
-                                name="mood"
-                                value="mediterranean"
-                                bind:group={mood}
-                                aria-label={t.moods.mediterranean}
+                                name="diet"
+                                value="ketogenic"
+                                bind:group={diet}
+                                aria-label={t.diets.ketogenic || 'Ketogenic'}
                             />
                             <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.moods.mediterranean}</span>
+                            <span class="ml-2">{t.diets.ketogenic || 'Ketogenic'}</span>
                         </label>
-
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
                                 class="hidden peer"
-                                name="mood"
+                                name="diet"
                                 value="vegetarian"
-                                bind:group={mood}
-                                aria-label={t.moods.vegetarian}
+                                bind:group={diet}
+                                aria-label={t.diets.vegetarian || 'Vegetarian'}
                             />
                             <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.moods.vegetarian}</span>
+                            <span class="ml-2">{t.diets.vegetarian || 'Vegetarian'}</span>
                         </label>
-
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
                                 class="hidden peer"
-                                name="mood"
-                                value="high-protein"
-                                bind:group={mood}
-                                aria-label={t.moods['high-protein']}
+                                name="diet"
+                                value="lacto-vegetarian"
+                                bind:group={diet}
+                                aria-label={t.diets['lacto_vegetarian'] || 'Lacto-Vegetarian'}
                             />
                             <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.moods['high-protein']}</span>
+                            <span class="ml-2">{t.diets['lacto_vegetarian'] || 'Lacto-Vegetarian'}</span>
                         </label>
-
                         <label class="inline-flex items-center cursor-pointer">
                             <input
                                 type="radio"
                                 class="hidden peer"
-                                name="mood"
-                                value="low-calorie"
-                                bind:group={mood}
-                                aria-label={t.moods['low-calorie']}
+                                name="diet"
+                                value="ovo-vegetarian"
+                                bind:group={diet}
+                                aria-label={t.diets['ovo_vegetarian'] || 'Ovo-Vegetarian'}
                             />
                             <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.moods['low-calorie']}</span>
+                            <span class="ml-2">{t.diets['ovo_vegetarian'] || 'Ovo-Vegetarian'}</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input
+                                type="radio"
+                                class="hidden peer"
+                                name="diet"
+                                value="vegan"
+                                bind:group={diet}
+                                aria-label={t.diets.vegan || 'Vegan'}
+                            />
+                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                            <span class="ml-2">{t.diets.vegan || 'Vegan'}</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input
+                                type="radio"
+                                class="hidden peer"
+                                name="diet"
+                                value="pescatarian"
+                                bind:group={diet}
+                                aria-label={t.diets.pescatarian || 'Pescatarian'}
+                            />
+                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                            <span class="ml-2">{t.diets.pescatarian || 'Pescatarian'}</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input
+                                type="radio"
+                                class="hidden peer"
+                                name="diet"
+                                value="paleo"
+                                bind:group={diet}
+                                aria-label={t.diets.paleo || 'Paleo'}
+                            />
+                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                            <span class="ml-2">{t.diets.paleo || 'Paleo'}</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input
+                                type="radio"
+                                class="hidden peer"
+                                name="diet"
+                                value="primal"
+                                bind:group={diet}
+                                aria-label={t.diets.primal || 'Primal'}
+                            />
+                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                            <span class="ml-2">{t.diets.primal || 'Primal'}</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input
+                                type="radio"
+                                class="hidden peer"
+                                name="diet"
+                                value="low FODMAP"
+                                bind:group={diet}
+                                aria-label={t.diets['low_fodmap'] || 'Low FODMAP'}
+                            />
+                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                            <span class="ml-2">{t.diets['low_fodmap'] || 'Low FODMAP'}</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input
+                                type="radio"
+                                class="hidden peer"
+                                name="diet"
+                                value="whole30"
+                                bind:group={diet}
+                                aria-label={t.diets.whole30 || 'Whole30'}
+                            />
+                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                            <span class="ml-2">{t.diets.whole30 || 'Whole30'}</span>
                         </label>
                     </div>
 
@@ -448,7 +510,7 @@ function handleFindAnother() {
                 </div>
             </div>
         {:else}
-            <Result {recipeData} {selectedType} moods={[mood]} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
+            <Result {recipeData} {selectedType} diets={[diet]} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
         {/if}
     </div>
 </div>
@@ -458,7 +520,7 @@ function handleFindAnother() {
         .content-form h1 {
             font-size: 25px;
         }
-        .mood {
+        .diet {
             grid-template-columns: none;
         }
     }
