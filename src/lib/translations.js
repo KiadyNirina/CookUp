@@ -87,7 +87,19 @@ export const translations = {
         recipeCountSubtitle: 'Dive into a world of flavors with over 365,000 recipes from around the globe.',
         recipeCountTotal: 'Total Recipes',
         recipeCountInternational: 'International Cuisines',
-        recipeCountUpdates: 'Daily Updates'
+        recipeCountUpdates: 'Daily Updates',
+        cuisine: 'Cuisine :',
+        excludeIngredients: 'Exclude Ingredients :',
+        ingredientsEx: {
+            peanuts: 'Peanuts',
+            gluten: 'Gluten',
+            dairy: 'Dairy',
+            eggs: 'Eggs',
+            soy: 'Soy',
+            fish: 'Fish',
+            shellfish: 'Shellfish',
+            'tree nuts': 'Tree Nuts'
+        },
     },
     fr: {
         // Page d'accueil
@@ -177,6 +189,18 @@ export const translations = {
         recipeCountSubtitle: 'Plongez dans un univers de saveurs avec plus de 365 000 recettes du monde entier.',
         recipeCountTotal: 'Recettes totales',
         recipeCountInternational: 'Cuisines internationales',
-        recipeCountUpdates: 'Mises à jour quotidiennes'
+        recipeCountUpdates: 'Mises à jour quotidiennes',
+        cuisine: 'Cuisine :',
+        excludeIngredients: 'Exclure les ingrédients :',
+        ingredientsEx: {
+            peanuts: 'Arachides',
+            gluten: 'Gluten',
+            dairy: 'Produits laitiers',
+            eggs: 'Œufs',
+            soy: 'Soja',
+            fish: 'Poisson',
+            shellfish: 'Fruits de mer',
+            'tree nuts': 'Noix'
+        },
     }
 };

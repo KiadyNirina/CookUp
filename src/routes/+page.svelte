@@ -15,6 +15,7 @@
     let recipeCount = 0;
     let recipeCountInternational = 0;
     let recipeSection;
+    let urlParams = { type: '', diet: '', recipeId: '', excludeIngredients: [] };
 
     const availableLanguages = [
         { code: 'en', label: 'EN' },
@@ -68,7 +69,13 @@
                 $language = savedLanguage;
             }
             const params = new URLSearchParams(window.location.search);
-            if (params.get('type') && params.get('mood') && params.get('prepTime') && params.get('recipeId')) {
+            const type = params.get('type');
+            const diet = params.get('diet') || '';
+            const recipeId = params.get('recipeId');
+            const excludeIngredients = params.get('excludeIngredients')?.split(',').filter(Boolean) || [];
+
+            if (type && recipeId) {
+                urlParams = { type, diet, recipeId, excludeIngredients };
                 poppup = true;
             }
         }
@@ -76,6 +83,9 @@
 
     function togglePoppup() {
         poppup = !poppup;
+        if (!poppup && browser) {
+            window.history.replaceState({}, document.title, '/');
+        }
     }
 
     function closePoppup() {
@@ -149,7 +159,7 @@
     </div>
     {#if poppup}
         <div transition:fade={{ duration: 150 }}>
-            <FormPoppup on:close={closePoppup} />
+            <FormPoppup {urlParams} on:close={closePoppup} />
         </div>
     {/if}
     <div class="h-[100vh] p-[20px]">

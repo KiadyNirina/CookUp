@@ -18,6 +18,7 @@ let showInstagramModal = false;
 export let recipeData;
 export let selectedType;
 export let diets;
+export let excludedIngredients = [];
 export let loading;
 export let onBack;
 
@@ -26,6 +27,8 @@ const dispatch = createEventDispatcher();
 $: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => ing.original || '') : [];
 $: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => step.step || '') : [];
 $: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.minutes}` : ($language === 'en' ? 'Not specified' : 'Non spécifié');
+$: cuisine = Array.isArray(recipeData?.cuisines) && recipeData.cuisines.length > 0 ? recipeData.cuisines.join(', ') : ($language === 'en' ? 'Not specified' : 'Non spécifié');
+$: formattedExcludedIngredients = excludedIngredients.length > 0 ? excludedIngredients.map(ing => t.ingredients[ing.replace(' ', '_')] || ing).join(', ') : ($language === 'en' ? 'None' : 'Aucun');
 
 $: t = translations[$language] || translations.en;
 
@@ -33,8 +36,8 @@ $: formattedMealType = t.mealTypes[selectedType] || ($language === 'en' ? 'meal'
 $: formattedDiets = diets.filter(d => d).map(d => t.diets[d] || d).join(', ');
 $: mealDescription = formattedDiets ? `${formattedMealType} (${formattedDiets})` : formattedMealType;
 
-$: recipeUrl = browser && recipeData && selectedType && diets[0] ? 
-    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}` : '';
+$: recipeUrl = browser && recipeData && selectedType ? 
+    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}&excludeIngredients=${encodeURIComponent(excludedIngredients.join(','))}` : '';
 
 function handleFindAnother() {
     dispatch('findAnother');
@@ -45,15 +48,20 @@ function toggleFavorite() {
 }
 
 function copyRecipeLink() {
-    if (browser && recipeUrl) {
-        navigator.clipboard.writeText(recipeUrl).then(() => {
-            copySuccess = true;
-            setTimeout(() => copySuccess = false, 2000);
-        }).catch(err => {
-            console.error('Failed to copy link:', err);
-            alert(t.copyLinkError || 'Failed to copy link.');
-        });
+    if (!browser || !recipeUrl) {
+        console.error('Copy link failed: browser or recipeUrl missing', { browser, recipeUrl });
+        alert(t.noLinkError || 'No link available to copy.');
+        return;
     }
+
+    navigator.clipboard.writeText(recipeUrl).then(() => {
+        console.log('Link copied successfully:', recipeUrl);
+        copySuccess = true;
+        setTimeout(() => copySuccess = false, 2000);
+    }).catch(err => {
+        console.error('Failed to copy link:', err);
+        alert(t.copyLinkError || 'Failed to copy link.');
+    });
 }
 
 function shareToSocial(platform) {
@@ -222,6 +230,11 @@ async function exportToPDF() {
         const descriptionHeight = (descriptionLines.length * 14 / 2.83) + (descriptionLines.length * 2);
         totalContentHeight += descriptionHeight + 10;
 
+        const cuisineText = `${t.cuisine} ${cuisine}`;
+        const cuisineLines = doc.splitTextToSize(cuisineText, maxWidth);
+        const cuisineHeight = (cuisineLines.length * 12 / 2.83) + (cuisineLines.length * 2);
+        totalContentHeight += cuisineHeight + 10;
+
         if (recipeData.image && browser) {
             try {
                 const proxyUrl = `https://cors-anywhere.herokuapp.com/${recipeData.image}`;
@@ -315,6 +328,9 @@ async function exportToPDF() {
         y = margin + 10;
 
         y = addText(`${t.dishName} ${recipeData.title || ''}`, margin, y, 14, true, yellowColor);
+        y = addLine(y);
+
+        y = addText(`${t.cuisine} ${cuisine}`, margin, y, 12, true, yellowColor);
         y = addLine(y);
 
         if (ingredients.length > 0) {
@@ -412,6 +428,11 @@ function closeInstagramModal() {
                                     </span>
                                 {/if}
                             {/each}
+                            {#if cuisine && cuisine !== ($language === 'en' ? 'Not specified' : 'Non spécifié')}
+                                <span class="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
+                                    {cuisine}
+                                </span>
+                            {/if}
                         </div>
 
                         <div class="flex justify-end gap-2 ml-auto">
@@ -501,6 +522,11 @@ function closeInstagramModal() {
                             {recipeData.title || ''}
                         </span>
                     </p>
+                    {#if cuisine && cuisine !== ($language === 'en' ? 'Not specified' : 'Non spécifié')}
+                        <p class="mt-4 text-gray-600 dark:text-gray-400">
+                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.cuisine}</span> {cuisine}
+                        </p>
+                    {/if}
                     {#if ingredients.length > 0}
                         <div class="mt-4">
                             <span class="font-semibold text-gray-800 dark:text-gray-200">{t.ingredients}</span>
