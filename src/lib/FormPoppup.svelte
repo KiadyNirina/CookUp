@@ -17,6 +17,7 @@ function handleClose() {
 let idea = false;
 let selectedType = '';
 let diet = '';
+let excludedIngredients = [];
 let recipeData = null;
 let loading = false;
 let errorMessage = '';
@@ -24,16 +25,29 @@ let showErrorPopup = false;
 
 $: t = translations[$language] || translations.en;
 
+const commonIngredients = [
+    'peanuts',
+    'gluten',
+    'dairy',
+    'eggs',
+    'soy',
+    'fish',
+    'shellfish',
+    'tree nuts'
+];
+
 onMount(() => {
     if (browser) {
         const params = new URLSearchParams(window.location.search);
         const type = params.get('type');
         const dietParam = params.get('diet');
         const recipeId = params.get('recipeId');
+        const exclude = params.get('excludeIngredients')?.split(',');
 
         if (type && dietParam && recipeId) {
             selectedType = type;
             diet = dietParam;
+            excludedIngredients = exclude || [];
             fetchRecipeById(recipeId);
         }
     }
@@ -202,7 +216,8 @@ async function findIdea() {
             attempts++;
             const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
             const tags = diet ? `${diet},${selectedType}` : selectedType;
-            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}`;
+            const excludeParams = excludedIngredients.length > 0 ? `&excludeIngredients=${encodeURIComponent(excludedIngredients.join(','))}` : '';
+            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}${excludeParams}`;
             const res = await fetch(url);
             if (!res.ok) {
                 throw new Error(`Spoonacular Error: ${res.statusText}`);
@@ -266,6 +281,16 @@ async function findIdea() {
 
         console.log('Final recipeData:', recipeData);
         idea = true;
+
+        if (browser && recipeData) {
+            const params = new URLSearchParams({
+                type: selectedType,
+                diet: diet || '',
+                recipeId: recipeData.id || '',
+                excludeIngredients: excludedIngredients.join(',')
+            });
+            window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
+        }
     } catch (error) {
         console.error('FindIdea error:', error, error.stack);
         errorMessage = error.message.includes('Network connection')
@@ -364,139 +389,37 @@ function handleFindAnother() {
                             <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
                             <span class="ml-2">{t.dietPlaceholder || 'Any Diet'}</span>
                         </label>
+                        {#each ['gluten free', 'ketogenic', 'vegetarian', 'lacto-vegetarian', 'ovo-vegetarian', 'vegan', 'pescatarian', 'paleo', 'primal', 'low FODMAP', 'whole30'] as dietOption}
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input
+                                    type="radio"
+                                    class="hidden peer"
+                                    name="diet"
+                                    value={dietOption}
+                                    bind:group={diet}
+                                    aria-label={t.diets[dietOption.replace(' ', '_')] || dietOption}
+                                />
+                                <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                                <span class="ml-2">{t.diets[dietOption.replace(' ', '_')] || dietOption}</span>
+                            </label>
+                        {/each}
+                    </div>
 
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="gluten free"
-                                bind:group={diet}
-                                aria-label={t.diets['gluten_free'] || 'Gluten Free'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets['gluten_free'] || 'Gluten Free'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="ketogenic"
-                                bind:group={diet}
-                                aria-label={t.diets.ketogenic || 'Ketogenic'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets.ketogenic || 'Ketogenic'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="vegetarian"
-                                bind:group={diet}
-                                aria-label={t.diets.vegetarian || 'Vegetarian'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets.vegetarian || 'Vegetarian'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="lacto-vegetarian"
-                                bind:group={diet}
-                                aria-label={t.diets['lacto_vegetarian'] || 'Lacto-Vegetarian'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets['lacto_vegetarian'] || 'Lacto-Vegetarian'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="ovo-vegetarian"
-                                bind:group={diet}
-                                aria-label={t.diets['ovo_vegetarian'] || 'Ovo-Vegetarian'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets['ovo_vegetarian'] || 'Ovo-Vegetarian'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="vegan"
-                                bind:group={diet}
-                                aria-label={t.diets.vegan || 'Vegan'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets.vegan || 'Vegan'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="pescatarian"
-                                bind:group={diet}
-                                aria-label={t.diets.pescatarian || 'Pescatarian'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets.pescatarian || 'Pescatarian'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="paleo"
-                                bind:group={diet}
-                                aria-label={t.diets.paleo || 'Paleo'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets.paleo || 'Paleo'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="primal"
-                                bind:group={diet}
-                                aria-label={t.diets.primal || 'Primal'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets.primal || 'Primal'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="low FODMAP"
-                                bind:group={diet}
-                                aria-label={t.diets['low_fodmap'] || 'Low FODMAP'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets['low_fodmap'] || 'Low FODMAP'}</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input
-                                type="radio"
-                                class="hidden peer"
-                                name="diet"
-                                value="whole30"
-                                bind:group={diet}
-                                aria-label={t.diets.whole30 || 'Whole30'}
-                            />
-                            <div class="w-5 h-5 border-2 rounded-full border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                            <span class="ml-2">{t.diets.whole30 || 'Whole30'}</span>
-                        </label>
+                    <label class="text-base">{t.excludeIngredients}</label>
+                    <div class="grid grid-cols-4 gap-x-4 gap-y-2 mt-1 mb-5 exclude-ingredients">
+                        {#each commonIngredients as ingredient}
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    class="hidden peer"
+                                    value={ingredient}
+                                    bind:group={excludedIngredients}
+                                    aria-label={t.ingredientsEx[ingredient.replace(' ', '_')] || ingredient}
+                                />
+                                <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                                <span class="ml-2">{t.ingredientsEx[ingredient.replace(' ', '_')] || ingredient}</span>
+                            </label>
+                        {/each}
                     </div>
 
                     <button
@@ -510,7 +433,7 @@ function handleFindAnother() {
                 </div>
             </div>
         {:else}
-            <Result {recipeData} {selectedType} diets={[diet]} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
+            <Result {recipeData} {selectedType} diets={[diet]} {loading} {excludedIngredients} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
         {/if}
     </div>
 </div>
@@ -520,7 +443,7 @@ function handleFindAnother() {
         .content-form h1 {
             font-size: 25px;
         }
-        .diet {
+        .diet, .exclude-ingredients {
             grid-template-columns: none;
         }
     }

@@ -89,6 +89,17 @@ export const translations = {
         recipeCountInternational: 'International Cuisines',
         recipeCountUpdates: 'Daily Updates',
         cuisine: 'Cuisine :',
+        excludeIngredients: 'Exclude Ingredients :',
+        ingredientsEx: {
+            peanuts: 'Peanuts',
+            gluten: 'Gluten',
+            dairy: 'Dairy',
+            eggs: 'Eggs',
+            soy: 'Soy',
+            fish: 'Fish',
+            shellfish: 'Shellfish',
+            'tree nuts': 'Tree Nuts'
+        },
     },
     fr: {
         // Page d'accueil
@@ -180,5 +191,16 @@ export const translations = {
         recipeCountInternational: 'Cuisines internationales',
         recipeCountUpdates: 'Mises à jour quotidiennes',
         cuisine: 'Cuisine :',
+        excludeIngredients: 'Exclure les ingrédients :',
+        ingredientsEx: {
+            peanuts: 'Arachides',
+            gluten: 'Gluten',
+            dairy: 'Produits laitiers',
+            eggs: 'Œufs',
+            soy: 'Soja',
+            fish: 'Poisson',
+            shellfish: 'Fruits de mer',
+            'tree nuts': 'Noix'
+        },
     }
 };
