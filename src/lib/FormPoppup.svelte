@@ -6,7 +6,8 @@ import { fade } from 'svelte/transition';
 import { language } from '../stores/language';
 import { translations } from '$lib/translations';
 import { browser } from '$app/environment';
-import { page } from '$app/stores';
+
+export let urlParams = { type: '', diet: '', recipeId: '', excludeIngredients: [] };
 
 const dispatch = createEventDispatcher();
 
@@ -37,19 +38,12 @@ const commonIngredients = [
 ];
 
 onMount(() => {
-    if (browser) {
-        const params = new URLSearchParams(window.location.search);
-        const type = params.get('type');
-        const dietParam = params.get('diet');
-        const recipeId = params.get('recipeId');
-        const exclude = params.get('excludeIngredients')?.split(',');
-
-        if (type && dietParam && recipeId) {
-            selectedType = type;
-            diet = dietParam;
-            excludedIngredients = exclude || [];
-            fetchRecipeById(recipeId);
-        }
+    if (browser && urlParams.type && urlParams.recipeId) {
+        selectedType = urlParams.type;
+        diet = urlParams.diet || '';
+        excludedIngredients = urlParams.excludeIngredients || [];
+        idea = true;
+        fetchRecipeById(urlParams.recipeId);
     }
 });
 
@@ -433,7 +427,7 @@ function handleFindAnother() {
                 </div>
             </div>
         {:else}
-            <Result {recipeData} {selectedType} diets={[diet]} {loading} {excludedIngredients} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
+            <Result {recipeData} {selectedType} diets={[diet]} {excludedIngredients} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
         {/if}
     </div>
 </div>
