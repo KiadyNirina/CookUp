@@ -482,7 +482,7 @@ function handleFindAnother() {
                     </label>
 
                     {#if showAdvanced}
-                    <hr class="mb-2 border-gray-400 dark:border-gray-800">
+                    <hr class="mb-3 border-gray-300 dark:border-gray-700">
                         <div transition:fade={{ duration: 300 }} class="mb-5">
                             <label class="text-base">{t.nutritionPrefs || 'Nutrition Preferences'}</label>
                             <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-1 nutrition-prefs">
