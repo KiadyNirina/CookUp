@@ -110,6 +110,11 @@ export const translations = {
         protein: "Protein",
         fat: "Fat",
         calories: "Calories",
+        otherIngredient: 'Other',
+        otherIngredientPlaceholder: 'Enter ingredient to exclude...',
+        add: 'Add',
+        excludedIngredientsList: 'Excluded ingredients:',
+        removeIngredient: 'Remove ingredient'
     },
     fr: {
         // Page d'accueil
@@ -222,5 +227,10 @@ export const translations = {
         protein: "Protéines",
         fat: "Lipides",
         calories: "Calories",
+        otherIngredient: 'Autre',
+        otherIngredientPlaceholder: 'Entrez un ingrédient à exclure...',
+        add: 'Ajouter',
+        excludedIngredientsList: 'Ingrédients exclus:',
+        removeIngredient: 'Retirer l\'ingrédient'
     }
 };

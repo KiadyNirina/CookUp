@@ -18,7 +18,7 @@ let showInstagramModal = false;
 export let recipeData;
 export let selectedType;
 export let diets;
-export let excludedIngredients = [];
+export let allExcludedIngredients = [];
 export let nutritionPrefs = {
     minCarbs: '',
     maxCarbs: '',
@@ -38,7 +38,7 @@ $: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.ext
 $: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => step.step || '') : [];
 $: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.minutes}` : ($language === 'en' ? 'Not specified' : 'Non spécifié');
 $: cuisine = Array.isArray(recipeData?.cuisines) && recipeData.cuisines.length > 0 ? recipeData.cuisines.join(', ') : ($language === 'en' ? 'Not specified' : 'Non spécifié');
-$: formattedExcludedIngredients = excludedIngredients.length > 0 ? excludedIngredients.map(ing => t.ingredients[ing.replace(' ', '_')] || ing).join(', ') : ($language === 'en' ? 'None' : 'Aucun');
+$: formattedExcludedIngredients = allExcludedIngredients.length > 0 ? allExcludedIngredients.map(ing => t.ingredients[ing.replace(' ', '_')] || ing).join(', ') : ($language === 'en' ? 'None' : 'Aucun');
 
 $: t = translations[$language] || translations.en;
 
@@ -47,7 +47,7 @@ $: formattedDiets = diets.filter(d => d).map(d => t.diets[d] || d).join(', ');
 $: mealDescription = formattedDiets ? `${formattedMealType} (${formattedDiets})` : formattedMealType;
 
 $: recipeUrl = browser && recipeData && selectedType ? 
-    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}&excludeIngredients=${encodeURIComponent(excludedIngredients.join(','))}&minCarbs=${encodeURIComponent(nutritionPrefs.minCarbs || '')}&maxCarbs=${encodeURIComponent(nutritionPrefs.maxCarbs || '')}&minProtein=${encodeURIComponent(nutritionPrefs.minProtein || '')}&maxProtein=${encodeURIComponent(nutritionPrefs.maxProtein || '')}&minFat=${encodeURIComponent(nutritionPrefs.minFat || '')}&maxFat=${encodeURIComponent(nutritionPrefs.maxFat || '')}&minCalories=${encodeURIComponent(nutritionPrefs.minCalories || '')}&maxCalories=${encodeURIComponent(nutritionPrefs.maxCalories || '')}` : '';
+    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}&excludeIngredients=${encodeURIComponent(allExcludedIngredients.join(','))}&minCarbs=${encodeURIComponent(nutritionPrefs.minCarbs || '')}&maxCarbs=${encodeURIComponent(nutritionPrefs.maxCarbs || '')}&minProtein=${encodeURIComponent(nutritionPrefs.minProtein || '')}&maxProtein=${encodeURIComponent(nutritionPrefs.maxProtein || '')}&minFat=${encodeURIComponent(nutritionPrefs.minFat || '')}&maxFat=${encodeURIComponent(nutritionPrefs.maxFat || '')}&minCalories=${encodeURIComponent(nutritionPrefs.minCalories || '')}&maxCalories=${encodeURIComponent(nutritionPrefs.maxCalories || '')}` : '';
 
 function handleFindAnother() {
     dispatch('findAnother');
