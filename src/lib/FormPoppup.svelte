@@ -6,6 +6,7 @@ import { fade } from 'svelte/transition';
 import { language } from '../stores/language';
 import { translations } from '$lib/translations';
 import { browser } from '$app/environment';
+import { debounce } from 'lodash-es';
 
 export let urlParams = { 
     type: '', 
@@ -48,6 +49,18 @@ let loading = false;
 let errorMessage = '';
 let showErrorPopup = false;
 
+$: if (showOtherInput) {
+        otherIngredient = '';
+        ingredientSuggestions = [];
+    }
+
+let otherIngredient = '';
+let showOtherInput = false;
+let ingredientSuggestions = [];
+let loadingSuggestions = false;
+let manualIngredients = []; 
+
+$: allExcludedIngredients = [...excludedIngredients, ...manualIngredients];
 $: t = translations[$language] || translations.en;
 
 const commonIngredients = [
@@ -65,7 +78,7 @@ onMount(() => {
     if (browser && urlParams.type && urlParams.recipeId) {
         selectedType = urlParams.type;
         diet = urlParams.diet || '';
-        excludedIngredients = urlParams.excludeIngredients || [];
+        allExcludedIngredients = urlParams.allExcludedIngredients || [];
         showAdvanced = Boolean(urlParams.minCarbs || urlParams.maxCarbs || urlParams.minProtein || urlParams.maxProtein || urlParams.minFat || urlParams.maxFat || urlParams.minCalories || urlParams.maxCalories);
         console.log('onMount: showAdvanced set to', showAdvanced);
         nutritionPrefs = {
@@ -246,7 +259,7 @@ async function findIdea() {
             attempts++;
             const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
             const tags = diet ? `${diet},${selectedType}` : selectedType;
-            const excludeParams = excludedIngredients.length > 0 ? `&excludeIngredients=${encodeURIComponent(excludedIngredients.join(','))}` : '';
+            const excludeParams = allExcludedIngredients.length > 0 ? `&excludeIngredients=${encodeURIComponent(allExcludedIngredients.join(','))}` : '';
             const nutritionParams = [
                 nutritionPrefs.minCarbs ? `minCarbs=${nutritionPrefs.minCarbs}` : '',
                 nutritionPrefs.maxCarbs ? `maxCarbs=${nutritionPrefs.maxCarbs}` : '',
@@ -327,7 +340,7 @@ async function findIdea() {
                 type: selectedType,
                 diet: diet || '',
                 recipeId: recipeData.id || '',
-                excludeIngredients: excludedIngredients.join(','),
+                allExcludedIngredients: allExcludedIngredients.join(','),
                 minCarbs: nutritionPrefs.minCarbs || '',
                 maxCarbs: nutritionPrefs.maxCarbs || '',
                 minProtein: nutritionPrefs.minProtein || '',
@@ -357,6 +370,55 @@ async function findIdea() {
 
 function handleFindAnother() {
     findIdea();
+}
+
+async function fetchIngredientSuggestions(query) {
+    if (!query || query.length < 2) {
+        ingredientSuggestions = [];
+        return;
+    }
+
+    loadingSuggestions = true;
+    try {
+        const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
+        const url = `https://api.spoonacular.com/food/ingredients/autocomplete?apiKey=${apiKey}&query=${encodeURIComponent(query)}&number=5`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch suggestions');
+        const data = await res.json();
+        ingredientSuggestions = data.map(item => item.name);
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+        ingredientSuggestions = [];
+    } finally {
+        loadingSuggestions = false;
+    }
+}
+
+const debouncedFetchSuggestions = debounce(fetchIngredientSuggestions, 300);
+
+function handleOtherIngredientChange(e) {
+    otherIngredient = e.target.value;
+    debouncedFetchSuggestions(otherIngredient);
+}
+
+function selectSuggestion(suggestion) {
+    otherIngredient = suggestion;
+}
+
+function addOtherIngredient() {
+    if (otherIngredient.trim() && ![...excludedIngredients, ...manualIngredients].includes(otherIngredient.trim().toLowerCase())) {
+        manualIngredients = [...manualIngredients, otherIngredient.trim().toLowerCase()];
+        otherIngredient = '';
+        showOtherInput = false;
+    }
+}
+
+function removeManualIngredient(ingredient) {
+    manualIngredients = manualIngredients.filter(i => i !== ingredient);
+}
+
+function removePredefinedIngredient(ingredient) {
+    excludedIngredients = excludedIngredients.filter(i => i !== ingredient);
 }
 </script>
 
@@ -460,14 +522,98 @@ function handleFindAnother() {
                                 <input
                                     type="checkbox"
                                     class="hidden peer"
-                                    value={ingredient}
-                                    bind:group={excludedIngredients}
+                                    checked={excludedIngredients.includes(ingredient)}
+                                    on:change={() => {
+                                        if (excludedIngredients.includes(ingredient)) {
+                                            removePredefinedIngredient(ingredient);
+                                        } else {
+                                            excludedIngredients = [...excludedIngredients, ingredient];
+                                        }
+                                    }}
                                     aria-label={t.ingredientsEx[ingredient.replace(' ', '_')] || ingredient}
                                 />
                                 <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
                                 <span class="ml-2">{t.ingredientsEx[ingredient.replace(' ', '_')] || ingredient}</span>
                             </label>
                         {/each}
+
+                        <label class="inline-flex items-center cursor-pointer col-span-full">
+                            <input
+                                type="checkbox"
+                                class="hidden peer"
+                                bind:checked={showOtherInput}
+                                aria-label={t.otherIngredient || 'Other'}
+                            />
+                            <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                            <span class="ml-2">{t.otherIngredient || 'Other'}</span>
+                        </label>
+                    
+                        {#if showOtherInput}
+                            <div class="col-span-full relative">
+                                <div class="flex gap-2">
+                                    <input
+                                        type="text"
+                                        bind:value={otherIngredient}
+                                        on:input={handleOtherIngredientChange}
+                                        class="w-full p-2 border-2 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600"
+                                        placeholder={t.otherIngredientPlaceholder || 'Enter ingredient to exclude...'}
+                                    />
+                                    <button
+                                        on:click={addOtherIngredient}
+                                        class="bg-yellow-600 text-white dark:text-black px-3 rounded-md hover:bg-yellow-700 transition-colors flex items-center font-normal cursor-pointer"
+                                        disabled={!otherIngredient.trim()}
+                                    >
+                                        {t.add || 'Add'}
+                                        <Icon icon="material-symbols:add" class="ml-1" />
+                                    </button>
+                                </div>
+                                
+                                {#if loadingSuggestions}
+                                    <div class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 shadow-lg rounded-md p-2">
+                                        <div class="flex justify-center py-2">
+                                            <Icon icon="mdi:loading" class="animate-spin text-yellow-600" />
+                                        </div>
+                                    </div>
+                                {:else if ingredientSuggestions.length > 0}
+                                    <ul class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 shadow-lg rounded-md max-h-60 overflow-auto">
+                                        {#each ingredientSuggestions as suggestion}
+                                            <li
+                                                on:click={() => selectSuggestion(suggestion)}
+                                                class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                                            >
+                                                {suggestion}
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                {/if}
+                            </div>
+                        {/if}
+
+                        {#if allExcludedIngredients.length > 0}
+                            <div class="col-span-full mt-2">
+                                <p class="text-sm font-medium">{t.excludedIngredientsList || 'Excluded ingredients:'}</p>
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    {#each allExcludedIngredients as ingredient}
+                                        <span class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full text-sm flex items-center">
+                                            {ingredient}
+                                            <button
+                                                on:click={() => {
+                                                    if (commonIngredients.includes(ingredient)) {
+                                                        removePredefinedIngredient(ingredient);
+                                                    } else {
+                                                        removeManualIngredient(ingredient);
+                                                    }
+                                                }}
+                                                class="ml-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                                aria-label={t.removeIngredient || 'Remove ingredient'}
+                                            >
+                                                <Icon icon="mdi:close" />
+                                            </button>
+                                        </span>
+                                    {/each}
+                                </div>
+                            </div>
+                        {/if}
                     </div>
 
                     <label class="inline-flex items-center cursor-pointer mt-5 mb-5">
@@ -477,7 +623,7 @@ function handleFindAnother() {
                         bind:checked={showAdvanced}
                         aria-label={t.advancedPrefs || 'Advanced Nutrition Preferences'}
                         />
-                        <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                        <div class="w-4 h-4 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
                         <span class="ml-2 text-sm">{t.advancedPrefs || 'Advanced Nutrition Preferences'}</span>
                     </label>
 
@@ -530,7 +676,7 @@ function handleFindAnother() {
                 </div>
             </div>
         {:else}
-            <Result {recipeData} {selectedType} diets={[diet]} {excludedIngredients} {nutritionPrefs} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
+            <Result {recipeData} {selectedType} diets={[diet]} {allExcludedIngredients} {nutritionPrefs} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
         {/if}
     </div>
 </div>
