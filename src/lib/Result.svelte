@@ -19,6 +19,16 @@ export let recipeData;
 export let selectedType;
 export let diets;
 export let excludedIngredients = [];
+export let nutritionPrefs = {
+    minCarbs: '',
+    maxCarbs: '',
+    minProtein: '',
+    maxProtein: '',
+    minFat: '',
+    maxFat: '',
+    minCalories: '',
+    maxCalories: ''
+};
 export let loading;
 export let onBack;
 
@@ -37,7 +47,7 @@ $: formattedDiets = diets.filter(d => d).map(d => t.diets[d] || d).join(', ');
 $: mealDescription = formattedDiets ? `${formattedMealType} (${formattedDiets})` : formattedMealType;
 
 $: recipeUrl = browser && recipeData && selectedType ? 
-    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}&excludeIngredients=${encodeURIComponent(excludedIngredients.join(','))}` : '';
+    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}&excludeIngredients=${encodeURIComponent(excludedIngredients.join(','))}&minCarbs=${encodeURIComponent(nutritionPrefs.minCarbs || '')}&maxCarbs=${encodeURIComponent(nutritionPrefs.maxCarbs || '')}&minProtein=${encodeURIComponent(nutritionPrefs.minProtein || '')}&maxProtein=${encodeURIComponent(nutritionPrefs.maxProtein || '')}&minFat=${encodeURIComponent(nutritionPrefs.minFat || '')}&maxFat=${encodeURIComponent(nutritionPrefs.maxFat || '')}&minCalories=${encodeURIComponent(nutritionPrefs.minCalories || '')}&maxCalories=${encodeURIComponent(nutritionPrefs.maxCalories || '')}` : '';
 
 function handleFindAnother() {
     dispatch('findAnother');

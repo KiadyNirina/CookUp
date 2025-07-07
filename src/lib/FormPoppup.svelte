@@ -7,7 +7,20 @@ import { language } from '../stores/language';
 import { translations } from '$lib/translations';
 import { browser } from '$app/environment';
 
-export let urlParams = { type: '', diet: '', recipeId: '', excludeIngredients: [] };
+export let urlParams = { 
+    type: '', 
+    diet: '', 
+    recipeId: '', 
+    excludeIngredients: [], 
+    minCarbs: '', 
+    maxCarbs: '', 
+    minProtein: '', 
+    maxProtein: '', 
+    minFat: '', 
+    maxFat: '', 
+    minCalories: '', 
+    maxCalories: '' 
+};
 
 const dispatch = createEventDispatcher();
 
@@ -19,6 +32,17 @@ let idea = false;
 let selectedType = '';
 let diet = '';
 let excludedIngredients = [];
+let showAdvanced = false;
+let nutritionPrefs = {
+  minCarbs: '',
+  maxCarbs: '',
+  minProtein: '',
+  maxProtein: '',
+  minFat: '',
+  maxFat: '',
+  minCalories: '',
+  maxCalories: ''
+};
 let recipeData = null;
 let loading = false;
 let errorMessage = '';
@@ -42,6 +66,18 @@ onMount(() => {
         selectedType = urlParams.type;
         diet = urlParams.diet || '';
         excludedIngredients = urlParams.excludeIngredients || [];
+        showAdvanced = Boolean(urlParams.minCarbs || urlParams.maxCarbs || urlParams.minProtein || urlParams.maxProtein || urlParams.minFat || urlParams.maxFat || urlParams.minCalories || urlParams.maxCalories);
+        console.log('onMount: showAdvanced set to', showAdvanced);
+        nutritionPrefs = {
+            minCarbs: urlParams.minCarbs || '',
+            maxCarbs: urlParams.maxCarbs || '',
+            minProtein: urlParams.minProtein || '',
+            maxProtein: urlParams.maxProtein || '',
+            minFat: urlParams.minFat || '',
+            maxFat: urlParams.maxFat || '',
+            minCalories: urlParams.minCalories || '',
+            maxCalories: urlParams.maxCalories || ''
+        };
         idea = true;
         fetchRecipeById(urlParams.recipeId);
     }
@@ -211,7 +247,17 @@ async function findIdea() {
             const apiKey = import.meta.env.VITE_SPOONACULAR_API_KEY;
             const tags = diet ? `${diet},${selectedType}` : selectedType;
             const excludeParams = excludedIngredients.length > 0 ? `&excludeIngredients=${encodeURIComponent(excludedIngredients.join(','))}` : '';
-            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}${excludeParams}`;
+            const nutritionParams = [
+                nutritionPrefs.minCarbs ? `minCarbs=${nutritionPrefs.minCarbs}` : '',
+                nutritionPrefs.maxCarbs ? `maxCarbs=${nutritionPrefs.maxCarbs}` : '',
+                nutritionPrefs.minProtein ? `minProtein=${nutritionPrefs.minProtein}` : '',
+                nutritionPrefs.maxProtein ? `maxProtein=${nutritionPrefs.maxProtein}` : '',
+                nutritionPrefs.minFat ? `minFat=${nutritionPrefs.minFat}` : '',
+                nutritionPrefs.maxFat ? `maxFat=${nutritionPrefs.maxFat}` : '',
+                nutritionPrefs.minCalories ? `minCalories=${nutritionPrefs.minCalories}` : '',
+                nutritionPrefs.maxCalories ? `maxCalories=${nutritionPrefs.maxCalories}` : ''
+            ].filter(Boolean).join('&');
+            const url = `https://api.spoonacular.com/recipes/random?apiKey=${apiKey}&number=1&tags=${tags}${excludeParams}${nutritionParams ? `&${nutritionParams}` : ''}`;
             const res = await fetch(url);
             if (!res.ok) {
                 throw new Error(`Spoonacular Error: ${res.statusText}`);
@@ -281,7 +327,15 @@ async function findIdea() {
                 type: selectedType,
                 diet: diet || '',
                 recipeId: recipeData.id || '',
-                excludeIngredients: excludedIngredients.join(',')
+                excludeIngredients: excludedIngredients.join(','),
+                minCarbs: nutritionPrefs.minCarbs || '',
+                maxCarbs: nutritionPrefs.maxCarbs || '',
+                minProtein: nutritionPrefs.minProtein || '',
+                maxProtein: nutritionPrefs.maxProtein || '',
+                minFat: nutritionPrefs.minFat || '',
+                maxFat: nutritionPrefs.maxFat || '',
+                minCalories: nutritionPrefs.minCalories || '',
+                maxCalories: nutritionPrefs.maxCalories || ''
             });
             window.history.replaceState({}, '', `${window.location.pathname}?${params.toString()}`);
         }
@@ -416,6 +470,55 @@ function handleFindAnother() {
                         {/each}
                     </div>
 
+                    <label class="inline-flex items-center cursor-pointer mb-5">
+                        <input
+                        type="checkbox"
+                        class="hidden peer"
+                        bind:checked={showAdvanced}
+                        aria-label={t.advancedPrefs || 'Advanced Nutrition Preferences'}
+                        />
+                        <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
+                        <span class="ml-2 text-base">{t.advancedPrefs || 'Advanced Nutrition Preferences'}</span>
+                    </label>
+
+                    {#if showAdvanced}
+                    <hr class="mb-3 border-gray-300 dark:border-gray-700">
+                        <div transition:fade={{ duration: 300 }} class="mb-5">
+                            <label class="text-base">{t.nutritionPrefs || 'Nutrition Preferences'}</label>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-1 nutrition-prefs">
+                                {#each [
+                                { name: 'Carbs', key: 'Carbs', unit: 'g' },
+                                { name: 'Protein', key: 'Protein', unit: 'g' },
+                                { name: 'Fat', key: 'Fat', unit: 'g' },
+                                { name: 'Calories', key: 'Calories', unit: 'kcal' }
+                                ] as nutrient}
+                                    <div>
+                                        <label class="text-sm">{t[nutrient.name.toLowerCase()] || nutrient.name} ({t.min || 'Min'} {nutrient.unit})</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            bind:value={nutritionPrefs[`min${nutrient.key}`]}
+                                            class="w-full mt-1 p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600"
+                                            placeholder={t.minPlaceholder || 'Min'}
+                                            aria-label={`${t.min || 'Minimum'} ${t[nutrient.name.toLowerCase()] || nutrient.name}`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label class="text-sm">{t[nutrient.name.toLowerCase()] || nutrient.name} ({t.max || 'Max'} {nutrient.unit})</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            bind:value={nutritionPrefs[`max${nutrient.key}`]}
+                                            class="w-full mt-1 p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-600 dark:bg-black dark:text-white dark:border-gray-600"
+                                            placeholder={t.maxPlaceholder || 'Max'}
+                                            aria-label={`${t.max || 'Maximum'} ${t[nutrient.name.toLowerCase()] || nutrient.name}`}
+                                        />
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+                    {/if}
+
                     <button
                         class="bg-yellow-600 p-3 text-white dark:text-black rounded-2xl border-2 border-yellow-600 hover:bg-transparent hover:text-yellow-600 transition-all duration-300 ease-in-out hover:cursor-pointer font-bold flex ml-auto active:scale-70"
                         on:click={findIdea}
@@ -427,7 +530,7 @@ function handleFindAnother() {
                 </div>
             </div>
         {:else}
-            <Result {recipeData} {selectedType} diets={[diet]} {excludedIngredients} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
+            <Result {recipeData} {selectedType} diets={[diet]} {excludedIngredients} {nutritionPrefs} {loading} onBack={() => idea = false} on:findAnother={handleFindAnother}/>
         {/if}
     </div>
 </div>
@@ -437,7 +540,7 @@ function handleFindAnother() {
         .content-form h1 {
             font-size: 25px;
         }
-        .diet, .exclude-ingredients {
+        .diet, .exclude-ingredients, .nutrition-prefs {
             grid-template-columns: none;
         }
     }

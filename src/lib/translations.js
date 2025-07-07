@@ -100,6 +100,16 @@ export const translations = {
             shellfish: 'Shellfish',
             'tree nuts': 'Tree Nuts'
         },
+        advancedPrefs: 'Advanced Nutrition Preferences',
+        nutritionPrefs: "Nutrition Preferences :",
+        min: "Min",
+        max: "Max",
+        minPlaceholder: "Min",
+        maxPlaceholder: "Max",
+        carbs: "Carbs",
+        protein: "Protein",
+        fat: "Fat",
+        calories: "Calories",
     },
     fr: {
         // Page d'accueil
@@ -202,5 +212,15 @@ export const translations = {
             shellfish: 'Fruits de mer',
             'tree nuts': 'Noix'
         },
+        advancedPrefs: 'Préférences nutritionnelles avancées',
+        nutritionPrefs: "Préférences Nutritionnelles :",
+        min: "Min",
+        max: "Max",
+        minPlaceholder: "Min",
+        maxPlaceholder: "Max",
+        carbs: "Glucides",
+        protein: "Protéines",
+        fat: "Lipides",
+        calories: "Calories",
     }
 };

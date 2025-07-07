@@ -15,7 +15,20 @@
     let recipeCount = 0;
     let recipeCountInternational = 0;
     let recipeSection;
-    let urlParams = { type: '', diet: '', recipeId: '', excludeIngredients: [] };
+    let urlParams = { 
+        type: '', 
+        diet: '', 
+        recipeId: '', 
+        excludeIngredients: [],
+        minCarbs: '',
+        maxCarbs: '',
+        minProtein: '',
+        maxProtein: '',
+        minFat: '',
+        maxFat: '',
+        minCalories: '',
+        maxCalories: ''
+    };
 
     const availableLanguages = [
         { code: 'en', label: 'EN' },
@@ -73,9 +86,30 @@
             const diet = params.get('diet') || '';
             const recipeId = params.get('recipeId');
             const excludeIngredients = params.get('excludeIngredients')?.split(',').filter(Boolean) || [];
+            const minCarbs = params.get('minCarbs') || '';
+            const maxCarbs = params.get('maxCarbs') || '';
+            const minProtein = params.get('minProtein') || '';
+            const maxProtein = params.get('maxProtein') || '';
+            const minFat = params.get('minFat') || '';
+            const maxFat = params.get('maxFat') || '';
+            const minCalories = params.get('minCalories') || '';
+            const maxCalories = params.get('maxCalories') || '';
 
             if (type && recipeId) {
-                urlParams = { type, diet, recipeId, excludeIngredients };
+                urlParams = { 
+                    type, 
+                    diet, 
+                    recipeId, 
+                    excludeIngredients,
+                    minCarbs,
+                    maxCarbs,
+                    minProtein,
+                    maxProtein,
+                    minFat,
+                    maxFat,
+                    minCalories,
+                    maxCalories
+                };
                 poppup = true;
             }
         }
