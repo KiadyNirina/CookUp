@@ -470,7 +470,7 @@ function handleFindAnother() {
                         {/each}
                     </div>
 
-                    <label class="inline-flex items-center cursor-pointer mb-5">
+                    <label class="inline-flex items-center cursor-pointer mt-5 mb-5">
                         <input
                         type="checkbox"
                         class="hidden peer"
@@ -478,7 +478,7 @@ function handleFindAnother() {
                         aria-label={t.advancedPrefs || 'Advanced Nutrition Preferences'}
                         />
                         <div class="w-5 h-5 border-2 rounded border-gray-300 dark:border-gray-600 peer-checked:bg-yellow-600 peer-checked:border-yellow-600 transition-colors"></div>
-                        <span class="ml-2 text-base">{t.advancedPrefs || 'Advanced Nutrition Preferences'}</span>
+                        <span class="ml-2 text-sm">{t.advancedPrefs || 'Advanced Nutrition Preferences'}</span>
                     </label>
 
                     {#if showAdvanced}
