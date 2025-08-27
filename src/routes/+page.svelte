@@ -230,7 +230,7 @@
         </div>
     </div>
     {#if showAuthModal}
-        <div class="auth-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" transition:fade={{ duration: 150 }}>
+        <div transition:fade={{ duration: 150 }}>
             <Auth on:authSuccess={handleAuthSuccess} on:close={handleAuthClose} />
         </div>
     {/if}
