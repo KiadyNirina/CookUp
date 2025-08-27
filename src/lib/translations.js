@@ -114,7 +114,24 @@ export const translations = {
         otherIngredientPlaceholder: 'Enter ingredient to exclude...',
         add: 'Add',
         excludedIngredientsList: 'Excluded ingredients:',
-        removeIngredient: 'Remove ingredient'
+        removeIngredient: 'Remove ingredient',
+        auth: {
+            createAccount: 'Create Account',
+            welcomeBack: 'Welcome Back',
+            joinUs: 'Join us to explore delicious recipes!',
+            signInAccess: 'Sign in to access your personalized recipes.',
+            email: 'Email',
+            emailPlaceholder: 'your@email.com',
+            password: 'Password',
+            passwordPlaceholder: '••••••••',
+            signUp: 'Sign Up',
+            login: 'Login',
+            continueWithGoogle: 'Continue with Google',
+            orContinueWith: 'or continue with',
+            alreadyHaveAccount: 'Already have an account? Login',
+            dontHaveAccount: "Don't have an account? Sign Up"
+        },
+        loading: 'Loading...'
     },
     fr: {
         // Page d'accueil
@@ -231,6 +248,23 @@ export const translations = {
         otherIngredientPlaceholder: 'Entrez un ingrédient à exclure...',
         add: 'Ajouter',
         excludedIngredientsList: 'Ingrédients exclus:',
-        removeIngredient: 'Retirer l\'ingrédient'
+        removeIngredient: 'Retirer l\'ingrédient',
+        auth: {
+            createAccount: 'Créer un compte',
+            welcomeBack: 'Se Connecter',
+            joinUs: 'Rejoignez-nous pour explorer de délicieuses recettes !',
+            signInAccess: 'Connectez-vous pour accéder à vos recettes personnalisées.',
+            email: 'Email',
+            emailPlaceholder: 'votre@email.com',
+            password: 'Mot de passe',
+            passwordPlaceholder: '••••••••',
+            signUp: 'S\'inscrire',
+            login: 'Se connecter',
+            continueWithGoogle: 'Continuer avec Google',
+            orContinueWith: 'ou continuer avec',
+            alreadyHaveAccount: 'Vous avez déjà un compte ? Connectez-vous',
+            dontHaveAccount: 'Vous n\'avez pas de compte ? Inscrivez-vous'
+        },
+        loading: 'Chargement...'
     }
 };

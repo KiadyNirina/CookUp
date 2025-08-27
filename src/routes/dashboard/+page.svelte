@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
     import Icon from "@iconify/svelte";
     import ToggleTheme from "$lib/ThemeToggle.svelte";
     import FormPoppup from "$lib/FormPoppup.svelte";
@@ -9,8 +9,8 @@
     import { language } from "../stores/language";
     import { translations } from "$lib/translations";
     import { browser } from "$app/environment";
-    import { goto } from '$app/navigation';
     import { supabase } from '$lib/supabase';
+    import { goto } from '$app/navigation';
 
     let bottle;
     let poppup = false;
@@ -40,14 +40,13 @@
         { code: 'fr', label: 'FR' },
     ];
 
-    if (!browser) {
-        $language = 'en';
-    }
-
     onMount(async () => {
         // Check user session
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         user = currentUser;
+        if (!user) {
+            await goto('/');
+        }
 
         gsap.from(".breakfast", {
             y: 30,
@@ -131,15 +130,14 @@
     function togglePoppup() {
         poppup = !poppup;
         if (!poppup && browser) {
-            window.history.replaceState({}, document.title, '/');
-            poppup = false;
+            window.history.replaceState({}, document.title, '/dashboard');
         }
     }
 
     function closePoppup() {
         poppup = false;
         if (browser) {
-            window.history.replaceState({}, document.title, '/');
+            window.history.replaceState({}, document.title, '/dashboard');
         }
     }
 
@@ -160,6 +158,12 @@
         showAuthModal = !showAuthModal;
     }
 
+    async function handleLogout() {
+        await supabase.auth.signOut();
+        user = null;
+        await goto('/');
+    }
+
     function handleOutsideClick(event) {
         if (showLanguageDropdown && !event.target.closest('.language-dropdown')) {
             showLanguageDropdown = false;
@@ -171,11 +175,6 @@
 
     async function handleAuthSuccess(event) {
         user = event.detail.user;
-        showAuthModal = false;
-        await goto('/dashboard');
-    }
-
-    function handleAuthClose() {
         showAuthModal = false;
     }
 
@@ -217,11 +216,11 @@
                 {/if}
             </div>
             <button
-                on:click={toggleAuthModal}
+                on:click={user ? handleLogout : toggleAuthModal}
                 class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-600 transition-all duration-300 flex items-center"
             >
                 <Icon icon="mdi:account" class="mr-1" />
-                {user ? 'Profile' : 'Login/Signup'}
+                {user ? 'Logout' : 'Login/Signup'}
             </button>
             <a href="https://github.com/KiadyNirina/CookUp" target="_blank" class="p-2 rounded hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 text-xl active:scale-70">
                 <Icon icon="mdi:github" />
@@ -230,8 +229,8 @@
         </div>
     </div>
     {#if showAuthModal}
-        <div transition:fade={{ duration: 150 }}>
-            <Auth on:authSuccess={handleAuthSuccess} on:close={handleAuthClose} />
+        <div class="auth-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" transition:fade={{ duration: 150 }}>
+            <Auth on:authSuccess={handleAuthSuccess} on:close={() => showAuthModal = false} />
         </div>
     {/if}
     {#if poppup}
@@ -242,14 +241,14 @@
     <div class="h-[100vh] p-[20px]">
         <div class="header flex h-full items-center">
             <div class="sect1 w-1/2">
-                <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
-                <p class="dark:font-thin mt-5">{user ? t?.welcomeBack?.replace('{user}', user.email) || 'Welcome back!' : t?.subheadline || 'Loading...'}</p>
+                <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t.headline}</h1>
+                <p class="dark:font-thin mt-5">{t.welcomeBack.replace('{user}', user?.email || 'User')}</p>
                 <button
                     class="button mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-2xl transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600 active:scale-70"
                     on:click={togglePoppup}
                 >
                     <Icon icon="mdi:timer-outline" class="mr-1" />
-                    {t?.getStarted || 'Get Started'}
+                    {t.getStarted}
                 </button>
             </div>
             <div class="sect2 w-1/2 flex items-center">
@@ -269,10 +268,10 @@
     >
         <div class="max-w-7xl mx-auto text-center">
             <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
-                {t?.recipeCountTitle || 'Loading...'}
+                {t.recipeCountTitle}
             </h2>
             <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
-                {user ? t?.recipeCountSubtitlePersonalized || 'Loading...' : t?.recipeCountSubtitle || 'Loading...'}
+                {t.recipeCountSubtitlePersonalized}
             </p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-5">
                 <div class="recipe-count p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
@@ -281,7 +280,7 @@
                         {recipeCount.toLocaleString()} +
                     </p>
                     <p class="dark:font-thin mt-2">
-                        {t?.recipeCountTotal || 'Loading...'}
+                        {t.recipeCountTotal}
                     </p>
                 </div>
                 <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
@@ -290,14 +289,14 @@
                         {recipeCountInternational.toLocaleString()} +
                     </p>
                     <p class="dark:font-thin mt-2">
-                        {t?.recipeCountInternational || 'Loading...'}
+                        {t.recipeCountInternational}
                     </p>
                 </div>
                 <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
                     <Icon icon="mdi:calendar-refresh" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
                     <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">Daily</p>
                     <p class="dark:font-thin mt-2">
-                        {t?.recipeCountUpdates || 'Loading...'}
+                        {t.recipeCountUpdates}
                     </p>
                 </div>
             </div>
@@ -305,7 +304,7 @@
     </section>
 
     <div class="footer text-sm text-center p-2 text-gray-600 dark:text-gray-400">
-        {@html t?.footer || 'Loading...'}
+        {@html t.footer}
     </div>
 </div>
 
@@ -396,4 +395,4 @@
             font-size: 12px;
         }
     }
-</style>
+</style> -->
