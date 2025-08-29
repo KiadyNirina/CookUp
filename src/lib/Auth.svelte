@@ -5,6 +5,7 @@
     import Icon from '@iconify/svelte';
     import { language } from '../stores/language';
     import { translations } from '$lib/translations';
+    import { user } from '../stores/auth';
     
     export let onClose;
     const dispatch = createEventDispatcher();
@@ -28,7 +29,7 @@
                     email,
                     password,
                     options: {
-                        emailRedirectTo: `${window.location.origin}/dashboard`
+                        emailRedirectTo: `${window.location.origin}/`
                     }
                 });
             } else {
@@ -60,15 +61,12 @@
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/dashboard`
+                    redirectTo: `${window.location.origin}/`
                 }
             });
 
             if (error) {
                 errorMessage = error.message;
-            } else {
-                dispatch('close');
-                onClose();
             }
         } catch (error) {
             errorMessage = error.message;
