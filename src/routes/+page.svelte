@@ -313,7 +313,7 @@
                 <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
                 <p class="dark:font-thin mt-5">
                     {#if $user}
-                        {t?.welcomeBack?.replace('{user}', $user.email?.split('@')[0]) || `Welcome back, ${$user.email?.split('@')[0]}!`}
+                        {t?.auth.welcomeBack} , {$user.email?.split('@')[0]}
                     {:else}
                         {t?.subheadline || 'Loading...'}
                     {/if}
@@ -346,11 +346,7 @@
                 {t?.recipeCountTitle || 'Loading...'}
             </h2>
             <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
-                {#if $user}
-                    {t?.recipeCountSubtitlePersonalized?.replace('{user}', $user.email?.split('@')[0]) || `Hello ${$user.email?.split('@')[0]}, discover our recipes!`}
-                {:else}
-                    {t?.recipeCountSubtitle || 'Loading...'}
-                {/if}
+                {t?.recipeCountSubtitle || 'Loading...'}
             </p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-5">
                 <div class="recipe-count p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">

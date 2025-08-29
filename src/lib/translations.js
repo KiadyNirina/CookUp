@@ -251,7 +251,7 @@ export const translations = {
         removeIngredient: 'Retirer l\'ingrédient',
         auth: {
             createAccount: 'Créer un compte',
-            welcomeBack: 'Se Connecter',
+            welcomeBack: 'Bon retour',
             joinUs: 'Rejoignez-nous pour explorer de délicieuses recettes !',
             signInAccess: 'Connectez-vous pour accéder à vos recettes personnalisées.',
             email: 'Email',
