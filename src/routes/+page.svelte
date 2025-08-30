@@ -11,7 +11,7 @@
     import { browser } from "$app/environment";
     import { goto } from '$app/navigation';
     import { supabase } from '$lib/supabase';
-    import { user, initAuth } from '../stores/auth';
+    import { user, initAuth, upsertUserProfile } from '../stores/auth';
 
     let bottle;
     let poppup = false;
@@ -48,8 +48,15 @@
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
                 console.log('Auth event:', event, session?.user?.email);
+                
                 if (session?.user) {
                     user.set(session.user);
+                    
+                    // Créer ou mettre à jour le profil utilisateur
+                    const result = await upsertUserProfile(session.user);
+                    if (result.success) {
+                        console.log('Profile created/updated:', result.data);
+                    }
                 } else {
                     user.set(null);
                 }

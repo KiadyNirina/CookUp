@@ -5,7 +5,7 @@
     import Icon from '@iconify/svelte';
     import { language } from '../stores/language';
     import { translations } from '$lib/translations';
-    import { user } from '../stores/auth';
+    import { user, upsertUserProfile } from '../stores/auth';
     
     export let onClose;
     const dispatch = createEventDispatcher();
@@ -58,7 +58,7 @@
             loading = true;
             errorMessage = '';
             
-            const { error } = await supabase.auth.signInWithOAuth({
+            const { data, error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
                     redirectTo: `${window.location.origin}/`

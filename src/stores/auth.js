@@ -61,3 +61,50 @@ export function isAuthenticated() {
   user.subscribe(value => userValue = value)();
   return !!userValue;
 }
+
+// Fonction pour créer ou mettre à jour un profil utilisateur
+export async function upsertUserProfile(userData) {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .upsert({
+        id: userData.id,
+        email: userData.email,
+        username: userData.email?.split('@')[0] || 'user',
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error upserting profile:', error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Exception upserting profile:', error);
+    return { success: false, error };
+  }
+}
+
+// Fonction pour récupérer le profil utilisateur
+export async function getUserProfile(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Exception fetching profile:', error);
+    return { success: false, error };
+  }
+}
