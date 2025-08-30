@@ -35,6 +35,9 @@
         maxCalories: ''
     };
 
+    let showLogoutConfirm = false;
+    let logoutLoading = false;
+
     const availableLanguages = [
         { code: 'en', label: 'EN' },
         { code: 'fr', label: 'FR' },
@@ -150,17 +153,29 @@
         }
     });
 
+    function confirmLogout() {
+        showLogoutConfirm = true;
+    }
+
+    function cancelLogout() {
+        showLogoutConfirm = false;
+    }
+
     async function signOut() {
         try {
+            logoutLoading = true;
             const { error } = await supabase.auth.signOut();
             if (error) {
                 console.error('Error signing out:', error);
             } else {
                 user.set(null);
                 showAuthModal = false;
+                showLogoutConfirm = false;
             }
         } catch (error) {
             console.error('Sign out error:', error);
+        } finally {
+            logoutLoading = false;
         }
     }
 
@@ -276,11 +291,11 @@
                             Mon Profil
                         </button>
                         <button
-                            on:click={signOut}
+                            on:click={confirmLogout}
                             class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center text-red-600 dark:text-red-400"
                         >
                             <Icon icon="mdi:logout" class="mr-2" />
-                            Déconnexion
+                            {t?.auth.logout || 'Déconnexion'}
                         </button>
                     </div>
                 </div>
@@ -388,6 +403,52 @@
     <div class="footer text-sm text-center p-2 text-gray-600 dark:text-gray-400">
         {@html t?.footer || 'Loading...'}
     </div>
+
+    {#if showLogoutConfirm}
+        <div 
+            class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
+            transition:fade={{ duration: 150 }}
+        >
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700">
+                <div class="text-center mb-6">
+                    <Icon 
+                        icon="mdi:logout" 
+                        class="w-12 h-12 text-yellow-600 dark:text-yellow-400 mx-auto mb-4" 
+                    />
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                        {t?.auth.logoutConfirmTitle || 'Déconnexion'}
+                    </h2>
+                    <p class="mt-2 text-gray-600 dark:text-gray-300">
+                        {t?.auth.logoutConfirmMessage || 'Êtes-vous sûr de vouloir vous déconnecter ?'}
+                    </p>
+                </div>
+
+                <div class="flex gap-4 justify-center">
+                    <button
+                        on:click={cancelLogout}
+                        disabled={logoutLoading}
+                        class="px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300 disabled:opacity-50"
+                    >
+                        {t?.auth.cancel || 'Annuler'}
+                    </button>
+                    
+                    <button
+                        on:click={signOut}
+                        disabled={logoutLoading}
+                        class="px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                    >
+                        {#if logoutLoading}
+                            <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
+                            {t?.auth.loggingOut || 'Déconnexion...'}
+                        {:else}
+                            <Icon icon="mdi:logout" class="w-5 h-5 mr-2" />
+                            {t?.auth.confirmLogout || 'Se déconnecter'}
+                        {/if}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>
 
 <style>
