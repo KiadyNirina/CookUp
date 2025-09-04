@@ -12,6 +12,7 @@
     import { goto } from '$app/navigation';
     import { supabase } from '$lib/supabase';
     import { user, initAuth, upsertUserProfile } from '../stores/auth';
+    import LoginSuccess from "$lib/LoginSuccess.svelte";
 
     let bottle;
     let poppup = false;
@@ -37,6 +38,9 @@
 
     let showLogoutConfirm = false;
     let logoutLoading = false;
+
+    let showLoginSuccess = false;
+    let loginSuccessMessage = '';
 
     const availableLanguages = [
         { code: 'en', label: 'EN' },
@@ -226,6 +230,17 @@
 
     function handleAuthSuccess(event) {
         showAuthModal = false;
+        showLoginSuccess = true;
+        loginSuccessMessage = $language === 'fr' 
+            ? 'Connexion réussie ! Bienvenue ' + ($user.email?.split('@')[0] || '') 
+            : 'Login successful! Welcome ' + ($user.email?.split('@')[0] || '');
+
+        
+    }
+
+    function closeLoginSuccess() {
+        showLoginSuccess = false;
+        loginSuccessMessage = '';
     }
 
     function handleAuthClose() {
@@ -326,6 +341,12 @@
     {#if poppup}
         <div transition:fade={{ duration: 150 }}>
             <FormPoppup {urlParams} on:close={closePoppup} />
+        </div>
+    {/if}
+
+    {#if showLoginSuccess}
+        <div transition:fade={{ duration: 150 }}>
+            <LoginSuccess message={loginSuccessMessage} on:close={closeLoginSuccess} />
         </div>
     {/if}
     

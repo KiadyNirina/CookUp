@@ -67,6 +67,10 @@
 
             if (error) {
                 errorMessage = error.message;
+            } else {
+                dispatch('authSuccess', { user: null });
+                dispatch('close');
+                onClose();
             }
         } catch (error) {
             errorMessage = error.message;
