@@ -235,7 +235,9 @@
             ? 'Connexion réussie ! Bienvenue ' + ($user.email?.split('@')[0] || '') 
             : 'Login successful! Welcome ' + ($user.email?.split('@')[0] || '');
 
-        
+        setTimeout(() => {
+            showLoginSuccess = false;
+        }, 3000);
     }
 
     function closeLoginSuccess() {
