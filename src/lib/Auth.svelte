@@ -25,6 +25,18 @@
             
             let result;
             if (isSignUp) {
+                const { data: existingUsers } = await supabase
+                    .from('profiles')
+                    .select('email')
+                    .eq('email', email)
+                    .maybeSingle();
+
+                if (existingUsers) {
+                    errorMessage = t.auth.emailAlreadyExists;
+                    loading = false;
+                    return;
+                }
+
                 result = await supabase.auth.signUp({
                     email,
                     password,
@@ -32,6 +44,21 @@
                         emailRedirectTo: `${window.location.origin}/`
                     }
                 });
+
+                if (result.error) {
+                    if (result.error.message.includes('already registered') || 
+                        result.error.message.includes('User already registered') ||
+                        result.error.message.includes('email already exists')) {
+                        errorMessage = t.auth.emailAlreadyExists || 'This email is already registered.';
+                    } else {
+                        errorMessage = result.error.message;
+                    }
+                } else {
+                    dispatch('emailSent');
+                    
+                    email = '';
+                    password = '';
+                }
             } else {
                 result = await supabase.auth.signInWithPassword({
                     email,

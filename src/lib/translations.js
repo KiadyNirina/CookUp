@@ -135,7 +135,11 @@ export const translations = {
             continueWithGoogle: 'Continue with Google',
             orContinueWith: 'or continue with',
             alreadyHaveAccount: 'Already have an account? Login',
-            dontHaveAccount: "Don't have an account? Sign Up"
+            dontHaveAccount: "Don't have an account? Sign Up",
+            signupSuccess: 'Registration successful! Please check your email to confirm your account.',
+            emailAlreadyExists: 'This email is already registered. Please use a different email or try to login.',
+            checkEmail: 'Please check your email to confirm your account.',
+            emailSent: 'Confirmation email sent!'
         },
         loading: 'Loading...'
     },
@@ -275,7 +279,11 @@ export const translations = {
             continueWithGoogle: 'Continuer avec Google',
             orContinueWith: 'ou continuer avec',
             alreadyHaveAccount: 'Vous avez déjà un compte ? Connectez-vous',
-            dontHaveAccount: 'Vous n\'avez pas de compte ? Inscrivez-vous'
+            dontHaveAccount: 'Vous n\'avez pas de compte ? Inscrivez-vous',
+            signupSuccess: 'Inscription réussie ! Veuillez vérifier vos emails pour confirmer votre compte.',
+            emailAlreadyExists: 'Cet email est déjà inscrit. Veuillez utiliser un autre email ou vous connecter.',
+            checkEmail: 'Veuillez vérifier vos emails pour confirmer votre compte.',
+            emailSent: 'Email de confirmation envoyé !'
         },
         loading: 'Chargement...'
     }

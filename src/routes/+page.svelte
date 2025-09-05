@@ -42,6 +42,9 @@
     let showLoginSuccess = false;
     let loginSuccessMessage = '';
 
+    let showEmailSent = false;
+    let emailSentMessage = '';
+
     const availableLanguages = [
         { code: 'en', label: 'EN' },
         { code: 'fr', label: 'FR' },
@@ -249,6 +252,18 @@
         showAuthModal = false;
     }
 
+    function handleEmailSent() {
+        showAuthModal = false;
+        showEmailSent = true;
+        emailSentMessage = $language === 'fr' 
+            ? 'Email de confirmation envoyé ! Veuillez vérifier votre boîte mail.'
+            : 'Confirmation email sent! Please check your inbox.';
+    }
+
+    function closeEmailSent() {
+        showEmailSent = false;
+    }
+
     $: t = translations[$language] || translations.en;
 </script>
 
@@ -336,7 +351,7 @@
     
     {#if showAuthModal}
         <div transition:fade={{ duration: 150 }}>
-            <Auth on:authSuccess={handleAuthSuccess} on:close={handleAuthClose} />
+            <Auth on:authSuccess={handleAuthSuccess} on:emailSent={handleEmailSent} on:close={handleAuthClose} />
         </div>
     {/if}
     
@@ -349,6 +364,52 @@
     {#if showLoginSuccess}
         <div transition:fade={{ duration: 150 }}>
             <LoginSuccess message={loginSuccessMessage} on:close={closeLoginSuccess} />
+        </div>
+    {/if}
+
+    {#if showEmailSent}
+        <div 
+            class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
+            transition:fade={{ duration: 150 }}
+            on:click={closeEmailSent}
+        >
+            <div 
+                class="email-sent-modal bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
+                on:click|stopPropagation
+            >
+                <div class="text-center">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                            <Icon 
+                                icon="mdi:email-check" 
+                                class="w-10 h-10 text-blue-600 dark:text-blue-400" 
+                            />
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                        {$language === 'fr' ? 'Email envoyé !' : 'Email sent!'}
+                    </h2>
+                    
+                    <p class="text-blue-600 dark:text-blue-400 font-semibold mb-4">
+                        📧 {emailSentMessage}
+                    </p>
+                    
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-6">
+                        {$language === 'fr' 
+                            ? 'Vérifiez votre boîte de réception et vos spams.' 
+                            : 'Check your inbox and spam folder.'}
+                    </p>
+                    
+                    <button
+                        on:click={closeEmailSent}
+                        class="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-300 flex items-center justify-center mx-auto"
+                    >
+                        <Icon icon="mdi:check" class="w-5 h-5 mr-2" />
+                        {$language === 'fr' ? 'Compris' : 'Got it'}
+                    </button>
+                </div>
+            </div>
         </div>
     {/if}
     
