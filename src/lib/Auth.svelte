@@ -12,6 +12,7 @@
 
     let email = '';
     let password = '';
+    let confirmPassword = '';
     let isSignUp = false;
     let errorMessage = '';
     let loading = false;
@@ -25,6 +26,11 @@
             
             let result;
             if (isSignUp) {
+                if (password !== confirmPassword) {
+                    errorMessage = t.auth.passwordsDoNotMatch;
+                    loading = false;
+                    return;
+                }
                 const { data: existingUsers } = await supabase
                     .from('profiles')
                     .select('email')
@@ -169,6 +175,19 @@
                     required
                 />
             </div>
+            {#if isSignUp}
+            <div>
+                <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t.auth.confirmPassword}</label>
+                <input
+                    type="password"
+                    id="confirmPassword"
+                    bind:value={confirmPassword}
+                    class="mt-1 block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 px-4 py-3"
+                    placeholder={t.auth.confirmPasswordPlaceholder}
+                    required
+                />
+            </div>
+            {/if}
             <button
                 on:click={handleAuth}
                 disabled={loading}

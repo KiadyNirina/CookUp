@@ -141,7 +141,10 @@ export const translations = {
             signupSuccess: 'Registration successful! Please check your email to confirm your account.',
             emailAlreadyExists: 'This email is already registered. Please use a different email or try to login.',
             checkEmail: 'Please check your email to confirm your account.',
-            emailSent: 'Confirmation email sent!'
+            emailSent: 'Confirmation email sent!',
+            confirmPassword: 'Confirm Password',
+            passwordsDoNotMatch: 'Passwords do not match.',
+            confirmPasswordPlaceholder: 'Confirm Password'
         },
         loading: 'Loading...',
         admin: {
@@ -315,7 +318,10 @@ export const translations = {
             signupSuccess: 'Inscription réussie ! Veuillez vérifier vos emails pour confirmer votre compte.',
             emailAlreadyExists: 'Cet email est déjà inscrit. Veuillez utiliser un autre email ou vous connecter.',
             checkEmail: 'Veuillez vérifier vos emails pour confirmer votre compte.',
-            emailSent: 'Email de confirmation envoyé !'
+            emailSent: 'Email de confirmation envoyé !',
+            confirmPassword: 'Confirmer le mot de passe',
+            passwordsDoNotMatch: 'Les mots de passe ne correspondent pas.',
+            confirmPasswordPlaceholder: 'Confirmez le mot de passe'
         },
         loading: 'Chargement...',
         admin: {
