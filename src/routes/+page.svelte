@@ -14,7 +14,6 @@
     import LoginSuccess from "$lib/LoginSuccess.svelte";
 
     let poppup = false;
-    let showLanguageDropdown = false;
     let showAuthModal = false;
     let recipeCount = 0;
     let recipeCountInternational = 0;
@@ -155,11 +154,6 @@
             localStorage.setItem('language', langCode);
             window.location.reload();
         }
-        showLanguageDropdown = false;
-    }
-
-    function toggleLanguageDropdown() {
-        showLanguageDropdown = !showLanguageDropdown;
     }
 
     function toggleAuthModal() {
@@ -167,9 +161,6 @@
     }
 
     function handleOutsideClick(event) {
-        if (showLanguageDropdown && !event.target.closest('.language-dropdown')) {
-            showLanguageDropdown = false;
-        }
         if (showAuthModal && !event.target.closest('.auth-modal')) {
             showAuthModal = false;
         }
@@ -384,7 +375,7 @@
 
     <section
         bind:this={recipeSection}
-        class="recipe-count-section p-[20px] h-[100vh] mt-32 mb-32"
+        class="recipe-count-section p-[20px] mt-32 mb-32"
         style="opacity: 0;"
     >
         <div class="max-w-7xl mx-auto text-center">
