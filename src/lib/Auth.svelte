@@ -172,7 +172,7 @@
             <button
                 on:click={handleAuth}
                 disabled={loading}
-                class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3.5 px-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-500/30 disabled:opacity-70 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg"
+                class="w-full bg-yellow-500 hover:cursor-pointer dark:bg-yellow-600 dark:hover:bg-yellow-500 hover:bg-yellow-600 text-white py-3.5 px-4 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-500/30 disabled:opacity-70 transition-all duration-300 flex items-center justify-center shadow-md hover:shadow-lg"
             >
                 {#if loading}
                     <Icon icon="mdi:loading" class="w-5 h-5 animate-spin inline-block mr-2" />
@@ -191,7 +191,7 @@
             <button
                 on:click={handleGoogleAuth}
                 disabled={loading}
-                class="w-full bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-3 px-4 rounded-xl font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-750 focus:outline-none focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 flex items-center justify-center shadow-sm"
+                class="w-full bg-white hover:cursor-pointer dark:bg-gray-800 text-gray-700 dark:text-gray-200 py-3 px-4 rounded-xl font-medium border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 flex items-center justify-center shadow-sm"
             >
                 <Icon icon="mdi:google" class="w-5 h-5 mr-3 text-amber-600" />
                 {t.auth.continueWithGoogle}
@@ -200,7 +200,7 @@
             <div class="text-center pt-4">
                 <button
                     on:click={toggleAuthMode}
-                    class="text-sm text-yellow-600 dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-400 transition-colors font-medium"
+                    class="text-sm text-yellow-600 hover:cursor-pointer dark:text-yellow-500 hover:text-yellow-700 dark:hover:text-yellow-300 transition-colors font-medium"
                 >
                     {isSignUp ? t.auth.alreadyHaveAccount : t.auth.dontHaveAccount}
                 </button>

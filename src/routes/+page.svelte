@@ -223,7 +223,7 @@
             <div class="relative language-dropdown">
                 <button
                     on:click={toggleLanguageDropdown}
-                    class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-600 transition-all duration-300 flex items-center"
+                    class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-500 transition-all duration-300 flex items-center"
                     aria-label="Select language"
                 >
                     {availableLanguages.find(lang => lang.code === $language)?.label || 'English'}
@@ -237,7 +237,7 @@
                         {#each availableLanguages as lang}
                             <button
                                 on:click={() => toggleLanguage(lang.code)}
-                                class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 {$language === lang.code ? 'bg-gray-100 dark:bg-gray-700' : ''}"
+                                class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 {$language === lang.code ? 'bg-gray-100 dark:bg-gray-700' : ''}"
                             >
                                 {lang.label}
                             </button>
@@ -261,14 +261,14 @@
                     <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                         <button
                             on:click={goToProfile}
-                            class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                            class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                         >
                             <Icon icon="mdi:account-cog" class="mr-2" />
                             Mon Profil
                         </button>
                         <button
                             on:click={confirmLogout}
-                            class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center text-red-600 dark:text-red-400"
+                            class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center text-red-600 dark:text-red-400"
                         >
                             <Icon icon="mdi:logout" class="mr-2" />
                             {t?.auth.logout || 'Déconnexion'}
@@ -282,7 +282,7 @@
                     class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-500 transition-all duration-300 flex items-center"
                 >
                     <Icon icon="mdi:account" class="mr-1" />
-                    Login/Signup
+                    {t?.auth.login || 'Se connecter'} / {t?.auth.signUp || "S'inscrire"}
                 </button>
             {/if}
             
