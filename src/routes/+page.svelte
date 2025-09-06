@@ -49,6 +49,7 @@
     let showRatingSuccess = false;
     let ratingSuccessMessage = '';
     let ratingLoading = false;
+    let hoverRating = 0;
 
     const availableLanguages = [
         { code: 'en', label: 'EN' },
@@ -253,6 +254,49 @@
     function closeRatingSuccess() {
         showRatingSuccess = false;
         ratingSuccessMessage = '';
+    }
+
+    // Gestion du survol des étoiles
+    function handleStarHover(star, event) {
+        if (ratingLoading) return;
+        hoverRating = star;
+        gsap.to(`.star-${star}`, {
+            scale: 1.2,
+            color: document.documentElement.classList.contains('dark') ? '#facc15' : '#d97706',
+            duration: 0.2,
+            ease: 'power2.out'
+        });
+        for (let i = 1; i < star; i++) {
+            gsap.to(`.star-${i}`, {
+                color: document.documentElement.classList.contains('dark') ? '#facc15' : '#d97706',
+                scale: 1,
+                duration: 0.2,
+                ease: 'power2.out'
+            });
+        }
+        for (let i = star + 1; i <= 5; i++) {
+            gsap.to(`.star-${i}`, {
+                color: document.documentElement.classList.contains('dark') ? '#4b5563' : '#d1d5db',
+                scale: 1,
+                duration: 0.2,
+                ease: 'power2.out'
+            });
+        }
+    }
+
+    function handleStarLeave() {
+        if (ratingLoading) return;
+        hoverRating = 0;
+        for (let i = 1; i <= 5; i++) {
+            gsap.to(`.star-${i}`, {
+                scale: rating >= i ? 1 : 1,
+                color: rating >= i 
+                    ? (document.documentElement.classList.contains('dark') ? '#facc15' : '#d97706')
+                    : (document.documentElement.classList.contains('dark') ? '#4b5563' : '#d1d5db'),
+                duration: 0.2,
+                ease: 'power2.out'
+            });
+        }
     }
 
     $: t = translations[$language] || translations.en;
@@ -534,7 +578,9 @@
                     {#each [1, 2, 3, 4, 5] as star}
                         <button
                             on:click={() => setRating(star)}
-                            class="text-3xl mx-1 transition-colors duration-200 {rating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
+                            on:mouseenter={(event) => handleStarHover(star, event)}
+                            on:mouseleave={handleStarLeave}
+                            class="star-{star} text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
                             disabled={ratingLoading}
                         >
                             <Icon icon="mdi:star" />
@@ -550,7 +596,7 @@
                 <button
                     on:click={submitRating}
                     disabled={ratingLoading || rating < 1}
-                    class="mt-4 w-full bg-yellow-600 text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                    class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
                 >
                     {#if ratingLoading}
                         <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
