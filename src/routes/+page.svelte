@@ -386,9 +386,6 @@
                 </button>
             {/if}
             
-            <a href="https://github.com/KiadyNirina/CookUp" target="_blank" class="p-2 rounded hover:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 text-xl active:scale-70">
-                <Icon icon="mdi:github" />
-            </a>
             <ToggleTheme />
         </div>
     </div>
