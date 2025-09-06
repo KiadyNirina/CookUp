@@ -12,6 +12,8 @@
 
     let users = [];
     let userCount = 0;
+    let confirmedCount = 0;
+    let unconfirmedCount = 0;
     let errorMessage = '';
     let loading = true;
     let userListSection;
@@ -52,6 +54,22 @@
                                 userCount = Math.round(this.targets()[0].count);
                             }
                         });
+                        gsap.to({ count: 0 }, {
+                            count: confirmedCount,
+                            duration: 2,
+                            ease: 'power1.out',
+                            onUpdate: function () {
+                                confirmedCount = Math.round(this.targets()[0].count);
+                            }
+                        });
+                        gsap.to({ count: 0 }, {
+                            count: unconfirmedCount,
+                            duration: 2,
+                            ease: 'power1.out',
+                            onUpdate: function () {
+                                unconfirmedCount = Math.round(this.targets()[0].count);
+                            }
+                        });
                         observer.disconnect();
                     }
                 },
@@ -75,6 +93,8 @@
 
             users = data;
             userCount = data.length;
+            confirmedCount = data.filter(user => user.email_confirmed).length;
+            unconfirmedCount = data.filter(user => !user.email_confirmed).length;
         } catch (error) {
             errorMessage = t?.admin?.errorLoadingUsers || 'Erreur lors du chargement des utilisateurs';
             console.error('Exception fetching users:', error);
@@ -200,11 +220,34 @@
             {/if}
 
             <section bind:this={userListSection} class="mb-12" style="opacity: 0;">
-                <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 mb-8">
-                    <h2 class="text-2xl font-bold mb-4">
-                        {t?.admin?.totalUsers || 'Nombre total d\'utilisateurs'} : 
-                        <span class="text-yellow-600 dark:text-yellow-400">{userCount.toLocaleString()}</span>
-                    </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 mb-8">
+                    <div class="p-4 text-center">
+                        <Icon icon="mdi:account-group" class="text-3xl text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
+                        <h2 class="text-xl font-bold mb-2">
+                            {t?.admin?.totalUsers || 'Nombre total d\'utilisateurs'}
+                        </h2>
+                        <p class="text-2xl font-semibold text-yellow-600 dark:text-yellow-400">
+                            {userCount.toLocaleString()}
+                        </p>
+                    </div>
+                    <div class="p-4 text-center">
+                        <Icon icon="mdi:email-check" class="text-3xl text-green-600 dark:text-green-400 mx-auto mb-2" />
+                        <h2 class="text-xl font-bold mb-2">
+                            {t?.admin?.confirmedUsers || 'Utilisateurs confirmés'}
+                        </h2>
+                        <p class="text-2xl font-semibold text-green-600 dark:text-green-400">
+                            {confirmedCount.toLocaleString()}
+                        </p>
+                    </div>
+                    <div class="p-4 text-center">
+                        <Icon icon="mdi:email-remove" class="text-3xl text-red-600 dark:text-red-400 mx-auto mb-2" />
+                        <h2 class="text-xl font-bold mb-2">
+                            {t?.admin?.unconfirmedUsers || 'Utilisateurs non confirmés'}
+                        </h2>
+                        <p class="text-2xl font-semibold text-red-600 dark:text-red-400">
+                            {unconfirmedCount.toLocaleString()}
+                        </p>
+                    </div>
                 </div>
 
                 {#if loading}
