@@ -220,19 +220,16 @@
             <img src="img/white.png" alt="Logo light" class="hidden dark:block h-12" />
         </p>
         <div class="flex ml-auto items-center gap-2">
-            <div class="relative language-dropdown">
+            <div class="relative group">
                 <button
-                    on:click={toggleLanguageDropdown}
                     class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-500 transition-all duration-300 flex items-center"
                     aria-label="Select language"
                 >
                     {availableLanguages.find(lang => lang.code === $language)?.label || 'English'}
                     <Icon icon="mdi:chevron-down" class="ml-1" />
                 </button>
-                {#if showLanguageDropdown}
                     <div
-                        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-10"
-                        transition:fade={{ duration: 150 }}
+                        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
                     >
                         {#each availableLanguages as lang}
                             <button
@@ -243,7 +240,6 @@
                             </button>
                         {/each}
                     </div>
-                {/if}
             </div>
             
             {#if $user}
