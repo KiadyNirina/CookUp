@@ -12,6 +12,7 @@
     import { goto } from '$app/navigation';
     import { user, initAuth, upsertUserProfile, signOut as signOutAuth } from '../stores/auth';
     import LoginSuccess from "$lib/LoginSuccess.svelte";
+    import { supabase } from '$lib/supabase';
 
     let poppup = false;
     let showAuthModal = false;
@@ -41,6 +42,13 @@
 
     let showEmailSent = false;
     let emailSentMessage = '';
+
+    // Variables pour la section de notation
+    let rating = 0;
+    let comment = '';
+    let showRatingSuccess = false;
+    let ratingSuccessMessage = '';
+    let ratingLoading = false;
 
     const availableLanguages = [
         { code: 'en', label: 'EN' },
@@ -199,6 +207,59 @@
         showEmailSent = false;
     }
 
+    // Fonctions pour la notation
+    async function submitRating() {
+        if (!$user) {
+            showAuthModal = true;
+            return;
+        }
+
+        if (rating < 1 || rating > 5) {
+            return;
+        }
+
+        try {
+            ratingLoading = true;
+            const { error } = await supabase
+                .from('ratings')
+                .insert({
+                    user_id: $user.id,
+                    rating,
+                    comment: comment.trim() || null
+                });
+
+            if (error) {
+                console.error('Error submitting rating:', error);
+                return;
+            }
+
+            showRatingSuccess = true;
+            ratingSuccessMessage = $language === 'fr'
+                ? 'Votre note a été enregistrée avec succès !'
+                : 'Your rating has been submitted successfully!';
+            rating = 0;
+            comment = '';
+
+            setTimeout(() => {
+                showRatingSuccess = false;
+                ratingSuccessMessage = '';
+            }, 3000);
+        } catch (error) {
+            console.error('Exception submitting rating:', error);
+        } finally {
+            ratingLoading = false;
+        }
+    }
+
+    function setRating(value) {
+        rating = value;
+    }
+
+    function closeRatingSuccess() {
+        showRatingSuccess = false;
+        ratingSuccessMessage = '';
+    }
+
     $: t = translations[$language] || translations.en;
 </script>
 
@@ -219,18 +280,18 @@
                     {availableLanguages.find(lang => lang.code === $language)?.label || 'English'}
                     <Icon icon="mdi:chevron-down" class="ml-1" />
                 </button>
-                    <div
-                        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
-                    >
-                        {#each availableLanguages as lang}
-                            <button
-                                on:click={() => toggleLanguage(lang.code)}
-                                class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 {$language === lang.code ? 'bg-gray-100 dark:bg-gray-700' : ''}"
-                            >
-                                {lang.label}
-                            </button>
-                        {/each}
-                    </div>
+                <div
+                    class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+                >
+                    {#each availableLanguages as lang}
+                        <button
+                            on:click={() => toggleLanguage(lang.code)}
+                            class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 {$language === lang.code ? 'bg-gray-100 dark:bg-gray-700' : ''}"
+                        >
+                            {lang.label}
+                        </button>
+                    {/each}
+                </div>
             </div>
             
             {#if $user}
@@ -251,7 +312,7 @@
                             class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                         >
                             <Icon icon="mdi:account-cog" class="mr-2" />
-                            Mon Profil
+                            {t?.auth.profile || 'Mon Profil'}
                         </button>
                         {#if $user?.email === 'kiady142ram@gmail.com'}
                             <button
@@ -352,6 +413,46 @@
             </div>
         </div>
     {/if}
+
+    {#if showRatingSuccess}
+        <div 
+            class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
+            transition:fade={{ duration: 150 }}
+            on:click={closeRatingSuccess}
+        >
+            <div 
+                class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
+                on:click|stopPropagation
+            >
+                <div class="text-center">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                            <Icon 
+                                icon="mdi:star" 
+                                class="w-10 h-10 text-green-600 dark:text-green-400" 
+                            />
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                        {$language === 'fr' ? 'Note enregistrée !' : 'Rating saved!'}
+                    </h2>
+                    
+                    <p class="text-green-600 dark:text-green-400 font-semibold mb-4">
+                        {ratingSuccessMessage}
+                    </p>
+                    
+                    <button
+                        on:click={closeRatingSuccess}
+                        class="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-all duration-300 flex items-center justify-center mx-auto"
+                    >
+                        <Icon icon="mdi:check" class="w-5 h-5 mr-2" />
+                        {$language === 'fr' ? 'Compris' : 'Got it'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
     
     <div class="h-[100vh] p-[20px] pt-16">
         <div class="header flex h-full items-center">
@@ -420,6 +521,50 @@
                         {t?.recipeCountUpdates || 'Loading...'}
                     </p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section de notation -->
+    <section class="rating-section p-[20px] mb-32">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
+                {t?.rating?.title || 'Donnez votre avis'}
+            </h2>
+            <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
+                {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
+            </p>
+            <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 max-w-md mx-auto">
+                <div class="flex justify-center mb-4">
+                    {#each [1, 2, 3, 4, 5] as star}
+                        <button
+                            on:click={() => setRating(star)}
+                            class="text-3xl mx-1 transition-colors duration-200 {rating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
+                            disabled={ratingLoading}
+                        >
+                            <Icon icon="mdi:star" />
+                        </button>
+                    {/each}
+                </div>
+                <textarea
+                    bind:value={comment}
+                    placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
+                    class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none"
+                    disabled={ratingLoading}
+                ></textarea>
+                <button
+                    on:click={submitRating}
+                    disabled={ratingLoading || rating < 1}
+                    class="mt-4 w-full bg-yellow-600 text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                >
+                    {#if ratingLoading}
+                        <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
+                        {t?.loading || 'Chargement...'}
+                    {:else}
+                        <Icon icon="mdi:send" class="w-5 h-5 mr-2" />
+                        {t?.rating?.submit || 'Envoyer'}
+                    {/if}
+                </button>
             </div>
         </div>
     </section>
@@ -546,6 +691,12 @@
         .recipe-count-section .grid > div p:last-child {
             font-size: 12px;
         }   
+        .rating-section h2 {
+            font-size: 1.8rem;
+        }
+        .rating-section p {
+            font-size: 12px;
+        }   
         .relative.group .absolute {
             right: auto;
             left: 0;
@@ -571,6 +722,9 @@
         }
         .recipe-count-section .grid > div p:last-child {
             font-size: 12px;
+        }
+        .rating-section h2 {
+            font-size: 2rem;
         }
     }
 </style>

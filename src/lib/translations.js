@@ -116,6 +116,7 @@ export const translations = {
         excludedIngredientsList: 'Excluded ingredients:',
         removeIngredient: 'Remove ingredient',
         auth: {
+            profile: 'My Profile',
             createAccount: 'Create Account',
             welcomeBack: 'Welcome Back',
             joinUs: 'Join us to explore delicious recipes!',
@@ -156,6 +157,12 @@ export const translations = {
             noUsers: 'No users found',
             unauthorized: 'Unauthorized access',
             errorLoadingUsers: 'Error loading users'
+        },
+        rating: {
+            title: 'Share Your Feedback',
+            subtitle: 'Let us know your experience!',
+            commentPlaceholder: 'Leave a comment...',
+            submit: 'Submit'
         }
     },
     fr: {
@@ -275,6 +282,7 @@ export const translations = {
         excludedIngredientsList: 'Ingrédients exclus:',
         removeIngredient: 'Retirer l\'ingrédient',
         auth: {
+            profile: 'Mon Profil',
             createAccount: 'Créer un compte',
             welcomeBack: 'Bon retour',
             joinUs: 'Rejoignez-nous pour explorer de délicieuses recettes !',
@@ -315,6 +323,12 @@ export const translations = {
             noUsers: 'Aucun utilisateur trouvé',
             unauthorized: 'Accès non autorisé',
             errorLoadingUsers: 'Erreur lors du chargement des utilisateurs'
+        },
+        rating: {
+            title: 'Donnez votre avis',
+            subtitle: 'Partagez votre expérience avec nous !',
+            commentPlaceholder: 'Laissez un commentaire...',
+            submit: 'Envoyer'
         }
     }
 };
