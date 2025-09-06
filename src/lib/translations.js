@@ -116,6 +116,7 @@ export const translations = {
         excludedIngredientsList: 'Excluded ingredients:',
         removeIngredient: 'Remove ingredient',
         auth: {
+            loginBeforeStart: 'Log in to start',
             profile: 'My Profile',
             createAccount: 'Create Account',
             welcomeBack: 'Welcome Back',
@@ -289,6 +290,7 @@ export const translations = {
         excludedIngredientsList: 'Ingrédients exclus:',
         removeIngredient: 'Retirer l\'ingrédient',
         auth: {
+            loginBeforeStart: 'Connectez-vous pour commencer',
             profile: 'Mon Profil',
             createAccount: 'Créer un compte',
             welcomeBack: 'Bon retour',

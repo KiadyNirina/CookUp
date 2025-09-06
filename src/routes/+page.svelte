@@ -143,6 +143,10 @@
     }
 
     function togglePoppup() {
+        if (!$user) {
+            showAuthModal = true;
+            return;
+        }
         poppup = !poppup;
         if (!poppup && browser) {
             window.history.replaceState({}, document.title, '/');
@@ -509,7 +513,11 @@
                     on:click={togglePoppup}
                 >
                     <Icon icon="mdi:timer-outline" class="mr-1" />
-                    {t?.getStarted || 'Get Started'}
+                    {#if $user}
+                        {t?.getStarted || 'Get Started'}
+                    {:else}
+                        {t?.auth.loginBeforeStart || 'Log in'}
+                    {/if}
                 </button>
             </div>
             <div class="sect2 w-1/2 flex items-center">
