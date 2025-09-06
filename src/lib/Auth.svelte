@@ -70,14 +70,14 @@
                     email,
                     password
                 });
+
+                dispatch('authSuccess', { user: result.data.user });
+                dispatch('close');
+                onClose();
             }
 
             if (result.error) {
                 errorMessage = result.error.message;
-            } else {
-                dispatch('authSuccess', { user: result.data.user });
-                dispatch('close');
-                onClose();
             }
         } catch (error) {
             errorMessage = error.message;
@@ -101,7 +101,6 @@
             if (error) {
                 errorMessage = error.message;
             } else {
-                dispatch('authSuccess', { user: null });
                 dispatch('close');
                 onClose();
             }
