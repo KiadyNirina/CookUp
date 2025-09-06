@@ -14,9 +14,12 @@
     let userCount = 0;
     let confirmedCount = 0;
     let unconfirmedCount = 0;
+    let ratings = [];
+    let ratingCount = 0;
     let errorMessage = '';
     let loading = true;
     let userListSection;
+    let ratingListSection;
     let showLogoutConfirm = false;
     let logoutLoading = false;
 
@@ -35,7 +38,8 @@
             return;
         }
 
-        await fetchUsers();
+        // Charger les utilisateurs et les notes depuis Supabase
+        await Promise.all([fetchUsers(), fetchRatings()]);
 
         if (userListSection) {
             const observer = new IntersectionObserver(
@@ -77,6 +81,31 @@
             );
             observer.observe(userListSection);
         }
+
+        if (ratingListSection) {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    if (entries[0].isIntersecting) {
+                        gsap.fromTo(
+                            ratingListSection,
+                            { opacity: 0, y: 30 },
+                            { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }
+                        );
+                        gsap.to({ count: 0 }, {
+                            count: ratingCount,
+                            duration: 2,
+                            ease: 'power1.out',
+                            onUpdate: function () {
+                                ratingCount = Math.round(this.targets()[0].count);
+                            }
+                        });
+                        observer.disconnect();
+                    }
+                },
+                { threshold: 0.5 }
+            );
+            observer.observe(ratingListSection);
+        }
     });
 
     async function fetchUsers() {
@@ -98,6 +127,25 @@
         } catch (error) {
             errorMessage = t?.admin?.errorLoadingUsers || 'Erreur lors du chargement des utilisateurs';
             console.error('Exception fetching users:', error);
+        }
+    }
+
+    async function fetchRatings() {
+        try {
+            const { data, error } = await supabase
+                .rpc('get_ratings_with_profiles');
+
+            if (error) {
+                errorMessage = t?.admin?.errorLoadingRatings || 'Erreur lors du chargement des notes';
+                console.error('Error fetching ratings:', error);
+                return;
+            }
+
+            ratings = data;
+            ratingCount = data.length;
+        } catch (error) {
+            errorMessage = t?.admin?.errorLoadingRatings || 'Erreur lors du chargement des notes';
+            console.error('Exception fetching ratings:', error);
         } finally {
             loading = false;
         }
@@ -303,6 +351,75 @@
                 {:else}
                     <p class="text-center text-gray-600 dark:text-gray-300">
                         {t?.admin?.noUsers || 'Aucun utilisateur trouvé'}
+                    </p>
+                {/if}
+            </section>
+
+            <!-- Section des notes -->
+            <section bind:this={ratingListSection} class="mb-12" style="opacity: 0;">
+                <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-4">
+                        {t?.admin?.totalRatings || 'Nombre total de notes'} : 
+                        <span class="text-yellow-600 dark:text-yellow-400">{ratingCount.toLocaleString()}</span>
+                    </h2>
+                </div>
+
+                {#if loading}
+                    <div class="text-center">
+                        <Icon icon="mdi:loading" class="w-8 h-8 animate-spin text-yellow-600 dark:text-yellow-400 mx-auto" />
+                        <p class="mt-2 text-gray-600 dark:text-gray-300">{t?.loading || 'Chargement...'}</p>
+                    </div>
+                {:else if ratings.length > 0}
+                    <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 overflow-hidden">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-800">
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                        {t?.admin?.username || 'Nom d\'utilisateur'}
+                                    </th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                        {t?.admin?.email || 'Email'}
+                                    </th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                        {t?.admin?.rating || 'Note'}
+                                    </th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                        {t?.admin?.comment || 'Commentaire'}
+                                    </th>
+                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                        {t?.admin?.createdAt || 'Date de création'}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {#each ratings as rating}
+                                    <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200">
+                                        <td class="p-4 text-sm">{rating.username}</td>
+                                        <td class="p-4 text-sm">{rating.email}</td>
+                                        <td class="p-4 text-sm">
+                                            <div class="flex">
+                                                {#each [1, 2, 3, 4, 5] as star}
+                                                    <Icon
+                                                        icon="mdi:star"
+                                                        class="w-5 h-5 {star <= rating.rating ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
+                                                    />
+                                                {/each}
+                                            </div>
+                                        </td>
+                                        <td class="p-4 text-sm">
+                                            {rating.comment || t?.admin?.noComment || 'Aucun commentaire'}
+                                        </td>
+                                        <td class="p-4 text-sm">
+                                            {new Date(rating.created_at).toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')}
+                                        </td>
+                                    </tr>
+                                {/each}
+                            </tbody>
+                        </table>
+                    </div>
+                {:else}
+                    <p class="text-center text-gray-600 dark:text-gray-300">
+                        {t?.admin?.noRatings || 'Aucune note trouvée'}
                     </p>
                 {/if}
             </section>

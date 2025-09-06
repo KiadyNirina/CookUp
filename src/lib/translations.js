@@ -156,7 +156,14 @@ export const translations = {
             lastUpdated: 'Last Updated',
             noUsers: 'No users found',
             unauthorized: 'Unauthorized access',
-            errorLoadingUsers: 'Error loading users'
+            errorLoadingUsers: 'Error loading users',
+            totalRatings: 'Total Ratings',
+            rating: 'Rating',
+            comment: 'Comment',
+            createdAt: 'Created At',
+            noRatings: 'No ratings found',
+            noComment: 'No comment',
+            errorLoadingRatings: 'Error loading ratings'
         },
         rating: {
             title: 'Share Your Feedback',
@@ -322,7 +329,14 @@ export const translations = {
             lastUpdated: 'Dernière mise à jour',
             noUsers: 'Aucun utilisateur trouvé',
             unauthorized: 'Accès non autorisé',
-            errorLoadingUsers: 'Erreur lors du chargement des utilisateurs'
+            errorLoadingUsers: 'Erreur lors du chargement des utilisateurs',
+            totalRatings: 'Nombre total de notes',
+            rating: 'Note',
+            comment: 'Commentaire',
+            createdAt: 'Date de création',
+            noRatings: 'Aucune note trouvée',
+            noComment: 'Aucun commentaire',
+            errorLoadingRatings: 'Erreur lors du chargement des notes'
         },
         rating: {
             title: 'Donnez votre avis',
