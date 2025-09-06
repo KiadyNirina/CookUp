@@ -239,11 +239,6 @@
                 : 'Your rating has been submitted successfully!';
             rating = 0;
             comment = '';
-
-            setTimeout(() => {
-                showRatingSuccess = false;
-                ratingSuccessMessage = '';
-            }, 3000);
         } catch (error) {
             console.error('Exception submitting rating:', error);
         } finally {

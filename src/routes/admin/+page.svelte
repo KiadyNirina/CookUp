@@ -18,8 +18,8 @@
     let ratingCount = 0;
     let errorMessage = '';
     let loading = true;
-    let userListSection;
-    let ratingListSection;
+    let activeTab = 'users';
+    let tabContent;
     let showLogoutConfirm = false;
     let logoutLoading = false;
 
@@ -41,70 +41,56 @@
         // Charger les utilisateurs et les notes depuis Supabase
         await Promise.all([fetchUsers(), fetchRatings()]);
 
-        if (userListSection) {
+        if (tabContent) {
             const observer = new IntersectionObserver(
                 (entries) => {
                     if (entries[0].isIntersecting) {
                         gsap.fromTo(
-                            userListSection,
+                            tabContent,
                             { opacity: 0, y: 30 },
                             { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }
                         );
-                        gsap.to({ count: 0 }, {
-                            count: userCount,
-                            duration: 2,
-                            ease: 'power1.out',
-                            onUpdate: function () {
-                                userCount = Math.round(this.targets()[0].count);
-                            }
-                        });
-                        gsap.to({ count: 0 }, {
-                            count: confirmedCount,
-                            duration: 2,
-                            ease: 'power1.out',
-                            onUpdate: function () {
-                                confirmedCount = Math.round(this.targets()[0].count);
-                            }
-                        });
-                        gsap.to({ count: 0 }, {
-                            count: unconfirmedCount,
-                            duration: 2,
-                            ease: 'power1.out',
-                            onUpdate: function () {
-                                unconfirmedCount = Math.round(this.targets()[0].count);
-                            }
-                        });
+                        if (activeTab === 'users') {
+                            gsap.to({ count: 0 }, {
+                                count: userCount,
+                                duration: 2,
+                                ease: 'power1.out',
+                                onUpdate: function () {
+                                    userCount = Math.round(this.targets()[0].count);
+                                }
+                            });
+                            gsap.to({ count: 0 }, {
+                                count: confirmedCount,
+                                duration: 2,
+                                ease: 'power1.out',
+                                onUpdate: function () {
+                                    confirmedCount = Math.round(this.targets()[0].count);
+                                }
+                            });
+                            gsap.to({ count: 0 }, {
+                                count: unconfirmedCount,
+                                duration: 2,
+                                ease: 'power1.out',
+                                onUpdate: function () {
+                                    unconfirmedCount = Math.round(this.targets()[0].count);
+                                }
+                            });
+                        } else if (activeTab === 'ratings') {
+                            gsap.to({ count: 0 }, {
+                                count: ratingCount,
+                                duration: 2,
+                                ease: 'power1.out',
+                                onUpdate: function () {
+                                    ratingCount = Math.round(this.targets()[0].count);
+                                }
+                            });
+                        }
                         observer.disconnect();
                     }
                 },
                 { threshold: 0.5 }
             );
-            observer.observe(userListSection);
-        }
-
-        if (ratingListSection) {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    if (entries[0].isIntersecting) {
-                        gsap.fromTo(
-                            ratingListSection,
-                            { opacity: 0, y: 30 },
-                            { opacity: 1, y: 0, duration: 1, ease: 'power2.out' }
-                        );
-                        gsap.to({ count: 0 }, {
-                            count: ratingCount,
-                            duration: 2,
-                            ease: 'power1.out',
-                            onUpdate: function () {
-                                ratingCount = Math.round(this.targets()[0].count);
-                            }
-                        });
-                        observer.disconnect();
-                    }
-                },
-                { threshold: 0.5 }
-            );
-            observer.observe(ratingListSection);
+            observer.observe(tabContent);
         }
     });
 
@@ -178,6 +164,17 @@
 
     function goToProfile() {
         goto('/profile');
+    }
+
+    function setActiveTab(tab) {
+        activeTab = tab;
+        if (tabContent) {
+            gsap.fromTo(
+                tabContent,
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+            );
+        }
     }
 </script>
 
@@ -267,162 +264,188 @@
                 </div>
             {/if}
 
-            <section bind:this={userListSection} class="mb-12" style="opacity: 0;">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 mb-8">
-                    <div class="p-4 text-center">
-                        <Icon icon="mdi:account-group" class="text-3xl text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
-                        <h2 class="text-xl font-bold mb-2">
-                            {t?.admin?.totalUsers || 'Nombre total d\'utilisateurs'}
-                        </h2>
-                        <p class="text-2xl font-semibold text-yellow-600 dark:text-yellow-400">
-                            {userCount.toLocaleString()}
-                        </p>
-                    </div>
-                    <div class="p-4 text-center">
-                        <Icon icon="mdi:email-check" class="text-3xl text-green-600 dark:text-green-400 mx-auto mb-2" />
-                        <h2 class="text-xl font-bold mb-2">
-                            {t?.admin?.confirmedUsers || 'Utilisateurs confirmés'}
-                        </h2>
-                        <p class="text-2xl font-semibold text-green-600 dark:text-green-400">
-                            {confirmedCount.toLocaleString()}
-                        </p>
-                    </div>
-                    <div class="p-4 text-center">
-                        <Icon icon="mdi:email-remove" class="text-3xl text-red-600 dark:text-red-400 mx-auto mb-2" />
-                        <h2 class="text-xl font-bold mb-2">
-                            {t?.admin?.unconfirmedUsers || 'Utilisateurs non confirmés'}
-                        </h2>
-                        <p class="text-2xl font-semibold text-red-600 dark:text-red-400">
-                            {unconfirmedCount.toLocaleString()}
-                        </p>
-                    </div>
+            <!-- Onglets -->
+            <div class="mb-8">
+                <div class="flex border-b border-gray-200 dark:border-gray-700">
+                    <button
+                        on:click={() => setActiveTab('users')}
+                        class="px-4 py-2 text-sm font-medium {activeTab === 'users' ? 'border-b-2 border-yellow-600 text-yellow-600 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'} transition-all duration-300"
+                    >
+                        <Icon icon="mdi:account-group" class="inline-block w-5 h-5 mr-2" />
+                        {t?.admin?.usersTab || 'Utilisateurs'}
+                    </button>
+                    <button
+                        on:click={() => setActiveTab('ratings')}
+                        class="px-4 py-2 text-sm font-medium {activeTab === 'ratings' ? 'border-b-2 border-yellow-600 text-yellow-600 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400'} transition-all duration-300"
+                    >
+                        <Icon icon="mdi:star" class="inline-block w-5 h-5 mr-2" />
+                        {t?.admin?.ratingsTab || 'Notes'}
+                    </button>
                 </div>
+            </div>
 
-                {#if loading}
-                    <div class="text-center">
-                        <Icon icon="mdi:loading" class="w-8 h-8 animate-spin text-yellow-600 dark:text-yellow-400 mx-auto" />
-                        <p class="mt-2 text-gray-600 dark:text-gray-300">{t?.loading || 'Chargement...'}</p>
+            <!-- Contenu des onglets -->
+            <div bind:this={tabContent} style="opacity: 0;">
+                {#if activeTab === 'users'}
+                    <!-- Section des utilisateurs -->
+                    <div transition:fade={{ duration: 300 }}>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 mb-8">
+                            <div class="p-4 text-center">
+                                <Icon icon="mdi:account-group" class="text-3xl text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
+                                <h2 class="text-xl font-bold mb-2">
+                                    {t?.admin?.totalUsers || 'Nombre total d\'utilisateurs'}
+                                </h2>
+                                <p class="text-2xl font-semibold text-yellow-600 dark:text-yellow-400">
+                                    {userCount.toLocaleString()}
+                                </p>
+                            </div>
+                            <div class="p-4 text-center">
+                                <Icon icon="mdi:email-check" class="text-3xl text-green-600 dark:text-green-400 mx-auto mb-2" />
+                                <h2 class="text-xl font-bold mb-2">
+                                    {t?.admin?.confirmedUsers || 'Utilisateurs confirmés'}
+                                </h2>
+                                <p class="text-2xl font-semibold text-green-600 dark:text-green-400">
+                                    {confirmedCount.toLocaleString()}
+                                </p>
+                            </div>
+                            <div class="p-4 text-center">
+                                <Icon icon="mdi:email-remove" class="text-3xl text-red-600 dark:text-red-400 mx-auto mb-2" />
+                                <h2 class="text-xl font-bold mb-2">
+                                    {t?.admin?.unconfirmedUsers || 'Utilisateurs non confirmés'}
+                                </h2>
+                                <p class="text-2xl font-semibold text-red-600 dark:text-red-400">
+                                    {unconfirmedCount.toLocaleString()}
+                                </p>
+                            </div>
+                        </div>
+
+                        {#if loading}
+                            <div class="text-center">
+                                <Icon icon="mdi:loading" class="w-8 h-8 animate-spin text-yellow-600 dark:text-yellow-400 mx-auto" />
+                                <p class="mt-2 text-gray-600 dark:text-gray-300">{t?.loading || 'Chargement...'}</p>
+                            </div>
+                        {:else if users.length > 0}
+                            <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 overflow-hidden">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-800">
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.username || 'Nom d\'utilisateur'}
+                                            </th>
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.email || 'Email'}
+                                            </th>
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.emailConfirmed || 'Email confirmé'}
+                                            </th>
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.lastUpdated || 'Dernière mise à jour'}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {#each users as user}
+                                            <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200">
+                                                <td class="p-4 text-sm">{user.username}</td>
+                                                <td class="p-4 text-sm">{user.email}</td>
+                                                <td class="p-4 text-sm">
+                                                    {#if user.email_confirmed}
+                                                        <span class="text-green-600 dark:text-green-400 flex items-center">
+                                                            <Icon icon="mdi:check-circle" class="w-5 h-5 mr-1" />
+                                                            {t?.admin?.confirmed || 'Confirmé'}
+                                                        </span>
+                                                    {:else}
+                                                        <span class="text-red-600 dark:text-red-400 flex items-center">
+                                                            <Icon icon="mdi:close-circle" class="w-5 h-5 mr-1" />
+                                                            {t?.admin?.notConfirmed || 'Non confirmé'}
+                                                        </span>
+                                                    {/if}
+                                                </td>
+                                                <td class="p-4 text-sm">
+                                                    {new Date(user.updated_at).toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')}
+                                                </td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {:else}
+                            <p class="text-center text-gray-600 dark:text-gray-300">
+                                {t?.admin?.noUsers || 'Aucun utilisateur trouvé'}
+                            </p>
+                        {/if}
                     </div>
-                {:else if users.length > 0}
-                    <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 overflow-hidden">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-800">
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.username || 'Nom d\'utilisateur'}
-                                    </th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.email || 'Email'}
-                                    </th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.emailConfirmed || 'Email confirmé'}
-                                    </th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.lastUpdated || 'Dernière mise à jour'}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#each users as user}
-                                    <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200">
-                                        <td class="p-4 text-sm">{user.username}</td>
-                                        <td class="p-4 text-sm">{user.email}</td>
-                                        <td class="p-4 text-sm">
-                                            {#if user.email_confirmed}
-                                                <span class="text-green-600 dark:text-green-400 flex items-center">
-                                                    <Icon icon="mdi:check-circle" class="w-5 h-5 mr-1" />
-                                                    {t?.admin?.confirmed || 'Confirmé'}
-                                                </span>
-                                            {:else}
-                                                <span class="text-red-600 dark:text-red-400 flex items-center">
-                                                    <Icon icon="mdi:close-circle" class="w-5 h-5 mr-1" />
-                                                    {t?.admin?.notConfirmed || 'Non confirmé'}
-                                                </span>
-                                            {/if}
-                                        </td>
-                                        <td class="p-4 text-sm">
-                                            {new Date(user.updated_at).toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')}
-                                        </td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                        </table>
+                {:else if activeTab === 'ratings'}
+                    <!-- Section des notes -->
+                    <div transition:fade={{ duration: 300 }}>
+                        <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 mb-8">
+                            <h2 class="text-2xl font-bold mb-4">
+                                {t?.admin?.totalRatings || 'Nombre total de notes'} : 
+                                <span class="text-yellow-600 dark:text-yellow-400">{ratingCount.toLocaleString()}</span>
+                            </h2>
+                        </div>
+
+                        {#if loading}
+                            <div class="text-center">
+                                <Icon icon="mdi:loading" class="w-8 h-8 animate-spin text-yellow-600 dark:text-yellow-400 mx-auto" />
+                                <p class="mt-2 text-gray-600 dark:text-gray-300">{t?.loading || 'Chargement...'}</p>
+                            </div>
+                        {:else if ratings.length > 0}
+                            <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 overflow-hidden">
+                                <table class="w-full">
+                                    <thead>
+                                        <tr class="bg-gray-100 dark:bg-gray-800">
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.username || 'Nom d\'utilisateur'}
+                                            </th>
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.email || 'Email'}
+                                            </th>
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.rating || 'Note'}
+                                            </th>
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.comment || 'Commentaire'}
+                                            </th>
+                                            <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                                {t?.admin?.createdAt || 'Date de création'}
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {#each ratings as rating}
+                                            <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200">
+                                                <td class="p-4 text-sm">{rating.username}</td>
+                                                <td class="p-4 text-sm">{rating.email}</td>
+                                                <td class="p-4 text-sm">
+                                                    <div class="flex">
+                                                        {#each [1, 2, 3, 4, 5] as star}
+                                                            <Icon
+                                                                icon="mdi:star"
+                                                                class="w-5 h-5 {star <= rating.rating ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
+                                                            />
+                                                        {/each}
+                                                    </div>
+                                                </td>
+                                                <td class="p-4 text-sm">
+                                                    {rating.comment || t?.admin?.noComment || 'Aucun commentaire'}
+                                                </td>
+                                                <td class="p-4 text-sm">
+                                                    {new Date(rating.created_at).toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')}
+                                                </td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {:else}
+                            <p class="text-center text-gray-600 dark:text-gray-300">
+                                {t?.admin?.noRatings || 'Aucune note trouvée'}
+                            </p>
+                        {/if}
                     </div>
-                {:else}
-                    <p class="text-center text-gray-600 dark:text-gray-300">
-                        {t?.admin?.noUsers || 'Aucun utilisateur trouvé'}
-                    </p>
                 {/if}
-            </section>
-
-            <!-- Section des notes -->
-            <section bind:this={ratingListSection} class="mb-12" style="opacity: 0;">
-                <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 mb-8">
-                    <h2 class="text-2xl font-bold mb-4">
-                        {t?.admin?.totalRatings || 'Nombre total de notes'} : 
-                        <span class="text-yellow-600 dark:text-yellow-400">{ratingCount.toLocaleString()}</span>
-                    </h2>
-                </div>
-
-                {#if loading}
-                    <div class="text-center">
-                        <Icon icon="mdi:loading" class="w-8 h-8 animate-spin text-yellow-600 dark:text-yellow-400 mx-auto" />
-                        <p class="mt-2 text-gray-600 dark:text-gray-300">{t?.loading || 'Chargement...'}</p>
-                    </div>
-                {:else if ratings.length > 0}
-                    <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 overflow-hidden">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="bg-gray-100 dark:bg-gray-800">
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.username || 'Nom d\'utilisateur'}
-                                    </th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.email || 'Email'}
-                                    </th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.rating || 'Note'}
-                                    </th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.comment || 'Commentaire'}
-                                    </th>
-                                    <th class="p-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                        {t?.admin?.createdAt || 'Date de création'}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#each ratings as rating}
-                                    <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200">
-                                        <td class="p-4 text-sm">{rating.username}</td>
-                                        <td class="p-4 text-sm">{rating.email}</td>
-                                        <td class="p-4 text-sm">
-                                            <div class="flex">
-                                                {#each [1, 2, 3, 4, 5] as star}
-                                                    <Icon
-                                                        icon="mdi:star"
-                                                        class="w-5 h-5 {star <= rating.rating ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
-                                                    />
-                                                {/each}
-                                            </div>
-                                        </td>
-                                        <td class="p-4 text-sm">
-                                            {rating.comment || t?.admin?.noComment || 'Aucun commentaire'}
-                                        </td>
-                                        <td class="p-4 text-sm">
-                                            {new Date(rating.created_at).toLocaleString($language === 'fr' ? 'fr-FR' : 'en-US')}
-                                        </td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                        </table>
-                    </div>
-                {:else}
-                    <p class="text-center text-gray-600 dark:text-gray-300">
-                        {t?.admin?.noRatings || 'Aucune note trouvée'}
-                    </p>
-                {/if}
-            </section>
+            </div>
         </div>
     {:else}
         <div class="text-center p-4 pt-20" transition:fade={{ duration: 150 }}>
