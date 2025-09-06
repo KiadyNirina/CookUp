@@ -125,7 +125,7 @@
 
 <div class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4">
     <div
-        class="auth-modal bg-white dark:bg-black p-8 rounded-2xl shadow-2xl max-w-md w-full relative border border-gray-200 dark:border-gray-700"
+        class="auth-modal bg-white dark:bg-black p-8 rounded-2xl shadow-2xl max-w-md w-full relative border border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-y-auto"
         transition:fade={{ duration: 150 }}
     >
         <button
