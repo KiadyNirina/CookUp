@@ -532,10 +532,10 @@
 
     <section
         bind:this={recipeSection}
-        class="recipe-count-section p-[20px] mt-32 mb-32"
+        class="recipe-count-section p-[20px] mt-32 mb-32 h-[100vh] flex items-center"
         style="opacity: 0;"
     >
-        <div class="max-w-7xl mx-auto text-center">
+        <div class="w-full text-center">
             <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
                 {t?.recipeCountTitle || 'Loading...'}
             </h2>
