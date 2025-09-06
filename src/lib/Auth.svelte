@@ -71,13 +71,13 @@
                     password
                 });
 
-                dispatch('authSuccess', { user: result.data.user });
-                dispatch('close');
-                onClose();
-            }
-
-            if (result.error) {
-                errorMessage = result.error.message;
+                if (result.error) {
+                    errorMessage = result.error.message;
+                } else {
+                    dispatch('authSuccess', { user: result.data.user });
+                    dispatch('close');
+                    onClose();
+                }
             }
         } catch (error) {
             errorMessage = error.message;
