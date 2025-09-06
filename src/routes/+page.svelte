@@ -5,16 +5,14 @@
     import Auth from "$lib/Auth.svelte";
     import { fade } from "svelte/transition";
     import { gsap } from "gsap";
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
     import { language } from "../stores/language";
     import { translations } from "$lib/translations";
     import { browser } from "$app/environment";
     import { goto } from '$app/navigation';
-    import { supabase } from '$lib/supabase';
-    import { user, initAuth, upsertUserProfile } from '../stores/auth';
+    import { user, initAuth, upsertUserProfile, signOut as signOutAuth } from '../stores/auth';
     import LoginSuccess from "$lib/LoginSuccess.svelte";
 
-    let bottle;
     let poppup = false;
     let showLanguageDropdown = false;
     let showAuthModal = false;
@@ -50,30 +48,22 @@
         { code: 'fr', label: 'FR' },
     ];
 
-    let authSubscription;
-
     onMount(async () => {
         await initAuth();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (event, session) => {
-                console.log('Auth event:', event, session?.user?.email);
-                
-                if (session?.user) {
-                    user.set(session.user);
-                    
-                    // Créer ou mettre à jour le profil utilisateur
-                    const result = await upsertUserProfile(session.user);
-                    if (result.success) {
-                        console.log('Profile created/updated:', result.data);
-                    }
-                } else {
-                    user.set(null);
-                }
-            }
-        );
+        // Récupérer langue sauvegardée
+        if (browser) {
+            const savedLanguage = localStorage.getItem('language');
+            if (savedLanguage) $language = savedLanguage;
+        }
 
-        authSubscription = subscription;
+        // Observer quand on revient sur l'onglet
+        const handleVisibilityChange = async () => {
+            if (document.visibilityState === 'visible') {
+                await initAuth();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
 
         gsap.from(".breakfast", {
             y: 30,
@@ -115,51 +105,12 @@
             observer.observe(recipeSection);
         }
 
-        if (browser) {
-            const savedLanguage = localStorage.getItem('language');
-            if (savedLanguage) {
-                $language = savedLanguage;
-            }
-            const params = new URLSearchParams(window.location.search);
-            const type = params.get('type');
-            const diet = params.get('diet') || '';
-            const recipeId = params.get('recipeId');
-            const excludeIngredients = params.get('excludeIngredients')?.split(',').filter(Boolean) || [];
-            const minCarbs = params.get('minCarbs') || '';
-            const maxCarbs = params.get('maxCarbs') || '';
-            const minProtein = params.get('minProtein') || '';
-            const maxProtein = params.get('maxProtein') || '';
-            const minFat = params.get('minFat') || '';
-            const maxFat = params.get('maxFat') || '';
-            const minCalories = params.get('minCalories') || '';
-            const maxCalories = params.get('maxCalories') || '';
-
-            if (type && recipeId) {
-                urlParams = { 
-                    type, 
-                    diet, 
-                    recipeId, 
-                    excludeIngredients,
-                    minCarbs,
-                    maxCarbs,
-                    minProtein,
-                    maxProtein,
-                    minFat,
-                    maxFat,
-                    minCalories,
-                    maxCalories
-                };
-                poppup = true;
-            }
-        }
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     });
 
-    onDestroy(() => {
-        if (authSubscription?.unsubscribe) {
-            authSubscription.unsubscribe();
-        }
-    });
-
+    // Fonctions
     function confirmLogout() {
         showLogoutConfirm = true;
     }
@@ -169,21 +120,14 @@
     }
 
     async function signOut() {
-        try {
-            logoutLoading = true;
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Error signing out:', error);
-            } else {
-                user.set(null);
-                showAuthModal = false;
-                showLogoutConfirm = false;
-            }
-        } catch (error) {
-            console.error('Sign out error:', error);
-        } finally {
-            logoutLoading = false;
-        }
+        logoutLoading = true;
+        const result = await signOutAuth();
+        if (!result.success) console.error(result.error);
+        logoutLoading = false;
+        showLogoutConfirm = false;
+        showAuthModal = false;
+        
+        window.location.reload();
     }
 
     function goToProfile() {
