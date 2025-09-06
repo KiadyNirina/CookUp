@@ -253,6 +253,15 @@
                             <Icon icon="mdi:account-cog" class="mr-2" />
                             Mon Profil
                         </button>
+                        {#if $user?.email === 'kiady142ram@gmail.com'}
+                            <button
+                                on:click={() => goto('/admin')}
+                                class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+                            >
+                                <Icon icon="mdi:shield-account" class="mr-2" />
+                                {t?.admin?.title || 'Administration'}
+                            </button>
+                        {/if}
                         <button
                             on:click={confirmLogout}
                             class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center text-red-600 dark:text-red-400"

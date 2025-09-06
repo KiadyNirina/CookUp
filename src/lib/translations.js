@@ -141,7 +141,17 @@ export const translations = {
             checkEmail: 'Please check your email to confirm your account.',
             emailSent: 'Confirmation email sent!'
         },
-        loading: 'Loading...'
+        loading: 'Loading...',
+        admin: {
+            title: 'Administration',
+            totalUsers: 'Total Users',
+            username: 'Username',
+            email: 'Email',
+            lastUpdated: 'Last Updated',
+            noUsers: 'No users found',
+            unauthorized: 'Unauthorized access',
+            errorLoadingUsers: 'Error loading users'
+        }
     },
     fr: {
         // Page d'accueil
@@ -285,6 +295,16 @@ export const translations = {
             checkEmail: 'Veuillez vérifier vos emails pour confirmer votre compte.',
             emailSent: 'Email de confirmation envoyé !'
         },
-        loading: 'Chargement...'
+        loading: 'Chargement...',
+        admin: {
+            title: 'Administration',
+            totalUsers: 'Nombre total d\'utilisateurs',
+            username: 'Nom d\'utilisateur',
+            email: 'Email',
+            lastUpdated: 'Dernière mise à jour',
+            noUsers: 'Aucun utilisateur trouvé',
+            unauthorized: 'Accès non autorisé',
+            errorLoadingUsers: 'Erreur lors du chargement des utilisateurs'
+        }
     }
 };
