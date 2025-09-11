@@ -116,6 +116,8 @@ export const translations = {
         excludedIngredientsList: 'Excluded ingredients:',
         removeIngredient: 'Remove ingredient',
         auth: {
+            loginBeforeStart: 'Log in to start',
+            profile: 'My Profile',
             createAccount: 'Create Account',
             welcomeBack: 'Welcome Back',
             joinUs: 'Join us to explore delicious recipes!',
@@ -126,12 +128,53 @@ export const translations = {
             passwordPlaceholder: '••••••••',
             signUp: 'Sign Up',
             login: 'Login',
+            logoutConfirmTitle: 'Logout',
+            logoutConfirmMessage: 'Are you sure you want to logout?',
+            confirmLogout: 'Logout',
+            cancel: 'Cancel',
+            loggingOut: 'Logging out...',
+            logout: 'Logout',
             continueWithGoogle: 'Continue with Google',
             orContinueWith: 'or continue with',
             alreadyHaveAccount: 'Already have an account? Login',
-            dontHaveAccount: "Don't have an account? Sign Up"
+            dontHaveAccount: "Don't have an account? Sign Up",
+            signupSuccess: 'Registration successful! Please check your email to confirm your account.',
+            emailAlreadyExists: 'This email is already registered. Please use a different email or try to login.',
+            checkEmail: 'Please check your email to confirm your account.',
+            emailSent: 'Confirmation email sent!',
+            confirmPassword: 'Confirm Password',
+            passwordsDoNotMatch: 'Passwords do not match.',
+            confirmPasswordPlaceholder: 'Confirm Password'
         },
-        loading: 'Loading...'
+        loading: 'Loading...',
+        admin: {
+            title: 'Administration',
+            totalUsers: 'Total Users',
+            confirmedUsers: 'Confirmed Users',
+            unconfirmedUsers: 'Unconfirmed Users',
+            username: 'Username',
+            email: 'Email',
+            emailConfirmed: 'Email Confirmed',
+            confirmed: 'Confirmed',
+            notConfirmed: 'Not Confirmed',
+            lastUpdated: 'Last Updated',
+            noUsers: 'No users found',
+            unauthorized: 'Unauthorized access',
+            errorLoadingUsers: 'Error loading users',
+            totalRatings: 'Total Ratings',
+            rating: 'Rating',
+            comment: 'Comment',
+            createdAt: 'Created At',
+            noRatings: 'No ratings found',
+            noComment: 'No comment',
+            errorLoadingRatings: 'Error loading ratings'
+        },
+        rating: {
+            title: 'Share Your Feedback',
+            subtitle: 'Let us know your experience!',
+            commentPlaceholder: 'Leave a comment...',
+            submit: 'Submit'
+        }
     },
     fr: {
         // Page d'accueil
@@ -250,8 +293,10 @@ export const translations = {
         excludedIngredientsList: 'Ingrédients exclus:',
         removeIngredient: 'Retirer l\'ingrédient',
         auth: {
+            loginBeforeStart: 'Connectez-vous pour commencer',
+            profile: 'Mon Profil',
             createAccount: 'Créer un compte',
-            welcomeBack: 'Se Connecter',
+            welcomeBack: 'Bon retour',
             joinUs: 'Rejoignez-nous pour explorer de délicieuses recettes !',
             signInAccess: 'Connectez-vous pour accéder à vos recettes personnalisées.',
             email: 'Email',
@@ -260,11 +305,52 @@ export const translations = {
             passwordPlaceholder: '••••••••',
             signUp: 'S\'inscrire',
             login: 'Se connecter',
+            logoutConfirmTitle: 'Déconnexion',
+            logoutConfirmMessage: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+            confirmLogout: 'Se déconnecter',
+            cancel: 'Annuler',
+            loggingOut: 'Déconnexion...',
+            logout: 'Déconnexion',
             continueWithGoogle: 'Continuer avec Google',
             orContinueWith: 'ou continuer avec',
             alreadyHaveAccount: 'Vous avez déjà un compte ? Connectez-vous',
-            dontHaveAccount: 'Vous n\'avez pas de compte ? Inscrivez-vous'
+            dontHaveAccount: 'Vous n\'avez pas de compte ? Inscrivez-vous',
+            signupSuccess: 'Inscription réussie ! Veuillez vérifier vos emails pour confirmer votre compte.',
+            emailAlreadyExists: 'Cet email est déjà inscrit. Veuillez utiliser un autre email ou vous connecter.',
+            checkEmail: 'Veuillez vérifier vos emails pour confirmer votre compte.',
+            emailSent: 'Email de confirmation envoyé !',
+            confirmPassword: 'Confirmer le mot de passe',
+            passwordsDoNotMatch: 'Les mots de passe ne correspondent pas.',
+            confirmPasswordPlaceholder: 'Confirmez le mot de passe'
         },
-        loading: 'Chargement...'
+        loading: 'Chargement...',
+        admin: {
+            title: 'Administration',
+            totalUsers: 'Nombre total d\'utilisateurs',
+            confirmedUsers: 'Utilisateurs confirmés',
+            unconfirmedUsers: 'Utilisateurs non confirmés',
+            username: 'Nom d\'utilisateur',
+            email: 'Email',
+            emailConfirmed: 'Email confirmé',
+            confirmed: 'Confirmé',
+            notConfirmed: 'Non confirmé',
+            lastUpdated: 'Dernière mise à jour',
+            noUsers: 'Aucun utilisateur trouvé',
+            unauthorized: 'Accès non autorisé',
+            errorLoadingUsers: 'Erreur lors du chargement des utilisateurs',
+            totalRatings: 'Nombre total de notes',
+            rating: 'Note',
+            comment: 'Commentaire',
+            createdAt: 'Date de création',
+            noRatings: 'Aucune note trouvée',
+            noComment: 'Aucun commentaire',
+            errorLoadingRatings: 'Erreur lors du chargement des notes'
+        },
+        rating: {
+            title: 'Donnez votre avis',
+            subtitle: 'Partagez votre expérience avec nous !',
+            commentPlaceholder: 'Laissez un commentaire...',
+            submit: 'Envoyer'
+        }
     }
 };
