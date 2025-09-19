@@ -78,9 +78,16 @@ onMount(() => {
     if (browser && urlParams.type && urlParams.recipeId) {
         selectedType = urlParams.type;
         diet = urlParams.diet || '';
-        allExcludedIngredients = urlParams.allExcludedIngredients || [];
-        showAdvanced = Boolean(urlParams.minCarbs || urlParams.maxCarbs || urlParams.minProtein || urlParams.maxProtein || urlParams.minFat || urlParams.maxFat || urlParams.minCalories || urlParams.maxCalories);
-        console.log('onMount: showAdvanced set to', showAdvanced);
+        excludedIngredients = urlParams.excludeIngredients || [];
+        manualIngredients = [];
+        
+        showAdvanced = Boolean(
+            urlParams.minCarbs || urlParams.maxCarbs || 
+            urlParams.minProtein || urlParams.maxProtein || 
+            urlParams.minFat || urlParams.maxFat || 
+            urlParams.minCalories || urlParams.maxCalories
+        );
+        
         nutritionPrefs = {
             minCarbs: urlParams.minCarbs || '',
             maxCarbs: urlParams.maxCarbs || '',

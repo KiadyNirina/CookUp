@@ -19,6 +19,9 @@
     let recipeCount = 0;
     let recipeCountInternational = 0;
     let recipeSection;
+
+    let pendingUrlParams = null;
+
     let urlParams = { 
         type: '', 
         diet: '', 
@@ -63,6 +66,8 @@
         if (browser) {
             const savedLanguage = localStorage.getItem('language');
             if (savedLanguage) $language = savedLanguage;
+            
+            checkUrlParams();
         }
 
         // Observer quand on revient sur l'onglet
@@ -118,6 +123,57 @@
         };
     });
 
+    function checkUrlParams() {
+        if (!browser) return;
+        
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const hasRecipeParams = urlSearchParams.has('recipeId') || 
+                              (urlSearchParams.has('type') && urlSearchParams.has('diet'));
+        
+        if (hasRecipeParams) {
+            pendingUrlParams = {
+                type: urlSearchParams.get('type') || '',
+                diet: urlSearchParams.get('diet') || '',
+                recipeId: urlSearchParams.get('recipeId') || '',
+                excludeIngredients: urlSearchParams.get('excludeIngredients')?.split(',') || [],
+                minCarbs: urlSearchParams.get('minCarbs') || '',
+                maxCarbs: urlSearchParams.get('maxCarbs') || '',
+                minProtein: urlSearchParams.get('minProtein') || '',
+                maxProtein: urlSearchParams.get('maxProtein') || '',
+                minFat: urlSearchParams.get('minFat') || '',
+                maxFat: urlSearchParams.get('maxFat') || '',
+                minCalories: urlSearchParams.get('minCalories') || '',
+                maxCalories: urlSearchParams.get('maxCalories') || ''
+            };
+            
+            // Si l'utilisateur est déjà connecté, ouvrir directement le popup
+            if ($user) {
+                openRecipePopup();
+            } else {
+                // Sinon, ouvrir le modal d'authentification
+                showAuthModal = true;
+            }
+        }
+    }
+
+    // Fonction pour ouvrir le popup de recette avec les paramètres
+    function openRecipePopup() {
+        if (pendingUrlParams) {
+            urlParams = pendingUrlParams;
+            poppup = true;
+            pendingUrlParams = null;
+
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+
+    $: {
+        if ($user && pendingUrlParams) {
+            openRecipePopup();
+            showAuthModal = false;
+        }
+    }
+
     // Fonctions
     function confirmLogout() {
         showLogoutConfirm = true;
@@ -156,6 +212,7 @@
 
     function closePoppup() {
         poppup = false;
+        pendingUrlParams = null;
         if (browser) {
             window.history.replaceState({}, document.title, '/');
         }
@@ -189,6 +246,10 @@
         setTimeout(() => {
             showLoginSuccess = false;
         }, 3000);
+        
+        if (pendingUrlParams) {
+            setTimeout(openRecipePopup, 500);
+        }
     }
 
     function closeLoginSuccess() {
