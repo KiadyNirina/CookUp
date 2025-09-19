@@ -16,6 +16,7 @@
 
     let poppup = false;
     let showAuthModal = false;
+    let showProfilePopup = false; // Nouvelle variable pour le popup de profil
     let recipeCount = 0;
     let recipeCountInternational = 0;
     let recipeSection;
@@ -194,8 +195,14 @@
         window.location.reload();
     }
 
-    function goToProfile() {
-        goto('/profile');
+    function openProfilePopup() {
+        if ($user) {
+            showProfilePopup = true;
+        }
+    }
+
+    function closeProfilePopup() {
+        showProfilePopup = false;
     }
 
     function togglePoppup() {
@@ -233,6 +240,9 @@
     function handleOutsideClick(event) {
         if (showAuthModal && !event.target.closest('.auth-modal')) {
             showAuthModal = false;
+        }
+        if (showProfilePopup && !event.target.closest('.profile-popup')) {
+            showProfilePopup = false;
         }
     }
 
@@ -412,7 +422,7 @@
                     <!-- Menu déroulant profil -->
                     <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                         <button
-                            on:click={goToProfile}
+                            on:click={openProfilePopup}
                             class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                         >
                             <Icon icon="mdi:account-cog" class="mr-2" />
@@ -446,7 +456,7 @@
                     {t?.auth.login || 'Se connecter'} / {t?.auth.signUp || "S'inscrire"}
                 </button>
             {/if}
-            
+
             <ToggleTheme />
         </div>
     </div>
@@ -509,6 +519,49 @@
                     >
                         <Icon icon="mdi:check" class="w-5 h-5 mr-2" />
                         {$language === 'fr' ? 'Compris' : 'Got it'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    {#if showProfilePopup}
+        <div 
+            class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
+            transition:fade={{ duration: 150 }}
+            on:click={closeProfilePopup}
+        >
+            <div 
+                class="profile-popup bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
+                on:click|stopPropagation
+            >
+                <div class="text-center">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                            <Icon 
+                                icon="mdi:account" 
+                                class="w-10 h-10 text-blue-600 dark:text-blue-400" 
+                            />
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                        {t?.auth.profile || 'My Profile'}
+                    </h2>
+                    
+                    <p class="text-gray-600 dark:text-gray-300 mb-2">
+                        <strong>{t?.auth.email || 'Email'}:</strong> {$user?.email || 'N/A'}
+                    </p>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        <strong>{t?.auth.username || 'Username'}:</strong> {$user?.email?.split('@')[0] || 'N/A'}
+                    </p>
+                    
+                    <button
+                        on:click={closeProfilePopup}
+                        class="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-300 flex items-center justify-center mx-auto"
+                    >
+                        <Icon icon="mdi:close" class="w-5 h-5 mr-2" />
+                        {$language === 'fr' ? 'Fermer' : 'Close'}
                     </button>
                 </div>
             </div>
