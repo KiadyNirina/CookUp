@@ -12,13 +12,14 @@ export async function initAuth() {
   try {
     const { data: { session: currentSession } } = await supabase.auth.getSession();
     const { data: { user: currentUser } } = await supabase.auth.getUser();
-    
-    console.log('Initial session:', currentSession);
-    console.log('Initial user:', currentUser);
-    
+      
     session.set(currentSession);
     user.set(currentUser);
-    
+      
+    if (currentUser) {
+        handleAuthRedirect();
+    }
+      
     return { user: currentUser, session: currentSession };
   } catch (error) {
     console.error('Error initializing auth:', error);
@@ -106,5 +107,18 @@ export async function getUserProfile(userId) {
   } catch (error) {
     console.error('Exception fetching profile:', error);
     return { success: false, error };
+  }
+}
+
+export async function handleAuthRedirect() {
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('recipeId')) {
+      // Garder les paramètres pour qu'ils soient traités après connexion
+      return;
+    }
+    
+    // Redirection normale après connexion
+    window.history.replaceState({}, document.title, window.location.pathname);
   }
 }

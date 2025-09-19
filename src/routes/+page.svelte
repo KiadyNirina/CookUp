@@ -16,9 +16,13 @@
 
     let poppup = false;
     let showAuthModal = false;
+    let showProfilePopup = false; // Nouvelle variable pour le popup de profil
     let recipeCount = 0;
     let recipeCountInternational = 0;
     let recipeSection;
+
+    let pendingUrlParams = null;
+
     let urlParams = { 
         type: '', 
         diet: '', 
@@ -63,6 +67,8 @@
         if (browser) {
             const savedLanguage = localStorage.getItem('language');
             if (savedLanguage) $language = savedLanguage;
+            
+            checkUrlParams();
         }
 
         // Observer quand on revient sur l'onglet
@@ -118,6 +124,57 @@
         };
     });
 
+    function checkUrlParams() {
+        if (!browser) return;
+        
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const hasRecipeParams = urlSearchParams.has('recipeId') || 
+                              (urlSearchParams.has('type') && urlSearchParams.has('diet'));
+        
+        if (hasRecipeParams) {
+            pendingUrlParams = {
+                type: urlSearchParams.get('type') || '',
+                diet: urlSearchParams.get('diet') || '',
+                recipeId: urlSearchParams.get('recipeId') || '',
+                excludeIngredients: urlSearchParams.get('excludeIngredients')?.split(',') || [],
+                minCarbs: urlSearchParams.get('minCarbs') || '',
+                maxCarbs: urlSearchParams.get('maxCarbs') || '',
+                minProtein: urlSearchParams.get('minProtein') || '',
+                maxProtein: urlSearchParams.get('maxProtein') || '',
+                minFat: urlSearchParams.get('minFat') || '',
+                maxFat: urlSearchParams.get('maxFat') || '',
+                minCalories: urlSearchParams.get('minCalories') || '',
+                maxCalories: urlSearchParams.get('maxCalories') || ''
+            };
+            
+            // Si l'utilisateur est déjà connecté, ouvrir directement le popup
+            if ($user) {
+                openRecipePopup();
+            } else {
+                // Sinon, ouvrir le modal d'authentification
+                showAuthModal = true;
+            }
+        }
+    }
+
+    // Fonction pour ouvrir le popup de recette avec les paramètres
+    function openRecipePopup() {
+        if (pendingUrlParams) {
+            urlParams = pendingUrlParams;
+            poppup = true;
+            pendingUrlParams = null;
+
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+
+    $: {
+        if ($user && pendingUrlParams) {
+            openRecipePopup();
+            showAuthModal = false;
+        }
+    }
+
     // Fonctions
     function confirmLogout() {
         showLogoutConfirm = true;
@@ -138,8 +195,14 @@
         window.location.reload();
     }
 
-    function goToProfile() {
-        goto('/profile');
+    function openProfilePopup() {
+        if ($user) {
+            showProfilePopup = true;
+        }
+    }
+
+    function closeProfilePopup() {
+        showProfilePopup = false;
     }
 
     function togglePoppup() {
@@ -156,6 +219,7 @@
 
     function closePoppup() {
         poppup = false;
+        pendingUrlParams = null;
         if (browser) {
             window.history.replaceState({}, document.title, '/');
         }
@@ -177,6 +241,9 @@
         if (showAuthModal && !event.target.closest('.auth-modal')) {
             showAuthModal = false;
         }
+        if (showProfilePopup && !event.target.closest('.profile-popup')) {
+            showProfilePopup = false;
+        }
     }
 
     function handleAuthSuccess(event) {
@@ -189,6 +256,10 @@
         setTimeout(() => {
             showLoginSuccess = false;
         }, 3000);
+        
+        if (pendingUrlParams) {
+            setTimeout(openRecipePopup, 500);
+        }
     }
 
     function closeLoginSuccess() {
@@ -351,7 +422,7 @@
                     <!-- Menu déroulant profil -->
                     <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                         <button
-                            on:click={goToProfile}
+                            on:click={openProfilePopup}
                             class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
                         >
                             <Icon icon="mdi:account-cog" class="mr-2" />
@@ -385,7 +456,7 @@
                     {t?.auth.login || 'Se connecter'} / {t?.auth.signUp || "S'inscrire"}
                 </button>
             {/if}
-            
+
             <ToggleTheme />
         </div>
     </div>
@@ -454,6 +525,49 @@
         </div>
     {/if}
 
+    {#if showProfilePopup}
+        <div 
+            class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
+            transition:fade={{ duration: 150 }}
+            on:click={closeProfilePopup}
+        >
+            <div 
+                class="profile-popup bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
+                on:click|stopPropagation
+            >
+                <div class="text-center">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                            <Icon 
+                                icon="mdi:account" 
+                                class="w-10 h-10 text-blue-600 dark:text-blue-400" 
+                            />
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                        {t?.auth.profile || 'My Profile'}
+                    </h2>
+                    
+                    <p class="text-gray-600 dark:text-gray-300 mb-2">
+                        <strong>{t?.auth.email || 'Email'}:</strong> {$user?.email || 'N/A'}
+                    </p>
+                    <p class="text-gray-600 dark:text-gray-300 mb-4">
+                        <strong>{t?.auth.username || 'Username'}:</strong> {$user?.email?.split('@')[0] || 'N/A'}
+                    </p>
+                    
+                    <button
+                        on:click={closeProfilePopup}
+                        class="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-300 flex items-center justify-center mx-auto"
+                    >
+                        <Icon icon="mdi:close" class="w-5 h-5 mr-2" />
+                        {$language === 'fr' ? 'Fermer' : 'Close'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
+
     {#if showRatingSuccess}
         <div 
             class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
@@ -494,8 +608,8 @@
         </div>
     {/if}
     
-    <div class="h-[100vh] p-[20px] pt-16">
-        <div class="header flex h-full items-center">
+    <div class="py-28 md:py-36">
+        <div class="header flex items-center">
             <div class="sect1 w-1/2">
                 <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
                 <p class="dark:font-thin mt-5">
@@ -529,7 +643,7 @@
 
     <section
         bind:this={recipeSection}
-        class="recipe-count-section p-[20px] mt-32 mb-32 h-[100vh] flex items-center"
+        class="recipe-count-section py-28 md:py-36 flex items-center"
         style="opacity: 0;"
     >
         <div class="w-full text-center">
@@ -570,47 +684,55 @@
     </section>
 
     <!-- Section de notation -->
-    <section class="rating-section p-[20px] mb-32">
+    <section class="rating-section py-28 md:py-36">
         <div class="max-w-7xl mx-auto text-center">
-            <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
-                {t?.rating?.title || 'Donnez votre avis'}
-            </h2>
-            <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
-                {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
-            </p>
-            <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 max-w-md mx-auto">
-                <div class="flex justify-center mb-4">
-                    {#each [1, 2, 3, 4, 5] as star}
-                        <button
-                            on:click={() => setRating(star)}
-                            on:mouseenter={(event) => handleStarHover(star, event)}
-                            on:mouseleave={handleStarLeave}
-                            class="star-{star} text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
-                            disabled={ratingLoading}
-                        >
-                            <Icon icon="mdi:star" />
-                        </button>
-                    {/each}
+            <div class="flex flex-col md:flex-row items-center justify-center">
+                <div class="w-1/2 md:w-1/3 p-4">
+                    <img src="img/undraw_reviews_ukai.svg" alt="">
                 </div>
-                <textarea
-                    bind:value={comment}
-                    placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
-                    class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none"
-                    disabled={ratingLoading}
-                ></textarea>
-                <button
-                    on:click={submitRating}
-                    disabled={ratingLoading || rating < 1}
-                    class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
-                >
-                    {#if ratingLoading}
-                        <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
-                        {t?.loading || 'Chargement...'}
-                    {:else}
-                        <Icon icon="mdi:send" class="w-5 h-5 mr-2" />
-                        {t?.rating?.submit || 'Envoyer'}
-                    {/if}
-                </button>
+                <div class="w-auto md:w-2/3">
+                    <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
+                        {t?.rating?.title || 'Donnez votre avis'}
+                    </h2>
+                    <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
+                        {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
+                    </p>
+                    <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 max-w-md mx-auto">
+                        <div class="flex justify-center mb-4">
+                            {#each [1, 2, 3, 4, 5] as star}
+                                <button
+                                    on:click={() => setRating(star)}
+                                    on:mouseenter={(event) => handleStarHover(star, event)}
+                                    on:mouseleave={handleStarLeave}
+                                    class="star-{star} text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
+                                    disabled={ratingLoading}
+                                >
+                                    <Icon icon="mdi:star" />
+                                </button>
+                            {/each}
+                        </div>
+                        <textarea
+                            bind:value={comment}
+                            placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
+                            class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none"
+                            disabled={ratingLoading}
+                        ></textarea>
+                        <button
+                            on:click={submitRating}
+                            disabled={ratingLoading || rating < 1}
+                            class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                        >
+                            {#if ratingLoading}
+                                <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
+                                {t?.loading || 'Chargement...'}
+                            {:else}
+                                <Icon icon="mdi:send" class="w-5 h-5 mr-2" />
+                                {t?.rating?.submit || 'Envoyer'}
+                            {/if}
+                        </button>
+                    </div>
+                </div>
+            
             </div>
         </div>
     </section>

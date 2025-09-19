@@ -47,7 +47,20 @@ $: formattedDiets = diets.filter(d => d).map(d => t.diets[d] || d).join(', ');
 $: mealDescription = formattedDiets ? `${formattedMealType} (${formattedDiets})` : formattedMealType;
 
 $: recipeUrl = browser && recipeData && selectedType ? 
-    `${window.location.origin}/?type=${encodeURIComponent(selectedType)}&diet=${encodeURIComponent(diets[0] || '')}&recipeId=${encodeURIComponent(recipeData.id || '')}&excludeIngredients=${encodeURIComponent(allExcludedIngredients.join(','))}&minCarbs=${encodeURIComponent(nutritionPrefs.minCarbs || '')}&maxCarbs=${encodeURIComponent(nutritionPrefs.maxCarbs || '')}&minProtein=${encodeURIComponent(nutritionPrefs.minProtein || '')}&maxProtein=${encodeURIComponent(nutritionPrefs.maxProtein || '')}&minFat=${encodeURIComponent(nutritionPrefs.minFat || '')}&maxFat=${encodeURIComponent(nutritionPrefs.maxFat || '')}&minCalories=${encodeURIComponent(nutritionPrefs.minCalories || '')}&maxCalories=${encodeURIComponent(nutritionPrefs.maxCalories || '')}` : '';
+    `${window.location.origin}${window.location.pathname}?` + new URLSearchParams({
+        type: selectedType,
+        diet: diets[0] || '',
+        recipeId: recipeData.id || '',
+        excludeIngredients: allExcludedIngredients.join(','),
+        minCarbs: nutritionPrefs.minCarbs || '',
+        maxCarbs: nutritionPrefs.maxCarbs || '',
+        minProtein: nutritionPrefs.minProtein || '',
+        maxProtein: nutritionPrefs.maxProtein || '',
+        minFat: nutritionPrefs.minFat || '',
+        maxFat: nutritionPrefs.maxFat || '',
+        minCalories: nutritionPrefs.minCalories || '',
+        maxCalories: nutritionPrefs.maxCalories || ''
+    }).toString() : '';
 
 function handleFindAnother() {
     dispatch('findAnother');
