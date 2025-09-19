@@ -144,7 +144,7 @@ export const translations = {
             emailSent: 'Confirmation email sent!',
             confirmPassword: 'Confirm Password',
             passwordsDoNotMatch: 'Passwords do not match.',
-            confirmPasswordPlaceholder: 'Confirm Password'
+            confirmPasswordPlaceholder: '••••••••'
         },
         loading: 'Loading...',
         admin: {
@@ -321,7 +321,7 @@ export const translations = {
             emailSent: 'Email de confirmation envoyé !',
             confirmPassword: 'Confirmer le mot de passe',
             passwordsDoNotMatch: 'Les mots de passe ne correspondent pas.',
-            confirmPasswordPlaceholder: 'Confirmez le mot de passe'
+            confirmPasswordPlaceholder: '••••••••'
         },
         loading: 'Chargement...',
         admin: {
