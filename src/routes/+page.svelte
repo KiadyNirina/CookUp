@@ -555,8 +555,8 @@
         </div>
     {/if}
     
-    <div class="h-[100vh] p-[20px] pt-16">
-        <div class="header flex h-full items-center">
+    <div class="py-28 md:py-36">
+        <div class="header flex items-center">
             <div class="sect1 w-1/2">
                 <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
                 <p class="dark:font-thin mt-5">
@@ -590,7 +590,7 @@
 
     <section
         bind:this={recipeSection}
-        class="recipe-count-section p-[20px] mt-32 mb-32 h-[100vh] flex items-center"
+        class="recipe-count-section py-28 md:py-36 flex items-center"
         style="opacity: 0;"
     >
         <div class="w-full text-center">
@@ -631,47 +631,55 @@
     </section>
 
     <!-- Section de notation -->
-    <section class="rating-section p-[20px] mb-32">
+    <section class="rating-section py-28 md:py-36">
         <div class="max-w-7xl mx-auto text-center">
-            <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
-                {t?.rating?.title || 'Donnez votre avis'}
-            </h2>
-            <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
-                {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
-            </p>
-            <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 max-w-md mx-auto">
-                <div class="flex justify-center mb-4">
-                    {#each [1, 2, 3, 4, 5] as star}
-                        <button
-                            on:click={() => setRating(star)}
-                            on:mouseenter={(event) => handleStarHover(star, event)}
-                            on:mouseleave={handleStarLeave}
-                            class="star-{star} text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
-                            disabled={ratingLoading}
-                        >
-                            <Icon icon="mdi:star" />
-                        </button>
-                    {/each}
+            <div class="flex flex-col md:flex-row items-center justify-center">
+                <div class="w-1/2 md:w-1/3 p-4">
+                    <img src="img/undraw_reviews_ukai.svg" alt="">
                 </div>
-                <textarea
-                    bind:value={comment}
-                    placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
-                    class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none"
-                    disabled={ratingLoading}
-                ></textarea>
-                <button
-                    on:click={submitRating}
-                    disabled={ratingLoading || rating < 1}
-                    class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
-                >
-                    {#if ratingLoading}
-                        <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
-                        {t?.loading || 'Chargement...'}
-                    {:else}
-                        <Icon icon="mdi:send" class="w-5 h-5 mr-2" />
-                        {t?.rating?.submit || 'Envoyer'}
-                    {/if}
-                </button>
+                <div class="w-auto md:w-2/3">
+                    <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
+                        {t?.rating?.title || 'Donnez votre avis'}
+                    </h2>
+                    <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
+                        {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
+                    </p>
+                    <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 max-w-md mx-auto">
+                        <div class="flex justify-center mb-4">
+                            {#each [1, 2, 3, 4, 5] as star}
+                                <button
+                                    on:click={() => setRating(star)}
+                                    on:mouseenter={(event) => handleStarHover(star, event)}
+                                    on:mouseleave={handleStarLeave}
+                                    class="star-{star} text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
+                                    disabled={ratingLoading}
+                                >
+                                    <Icon icon="mdi:star" />
+                                </button>
+                            {/each}
+                        </div>
+                        <textarea
+                            bind:value={comment}
+                            placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
+                            class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none"
+                            disabled={ratingLoading}
+                        ></textarea>
+                        <button
+                            on:click={submitRating}
+                            disabled={ratingLoading || rating < 1}
+                            class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                        >
+                            {#if ratingLoading}
+                                <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
+                                {t?.loading || 'Chargement...'}
+                            {:else}
+                                <Icon icon="mdi:send" class="w-5 h-5 mr-2" />
+                                {t?.rating?.submit || 'Envoyer'}
+                            {/if}
+                        </button>
+                    </div>
+                </div>
+            
             </div>
         </div>
     </section>
