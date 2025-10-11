@@ -608,8 +608,8 @@
         </div>
     {/if}
     
-    <div class="py-28 md:py-36">
-        <div class="header flex items-center">
+    <div class="h-screen flex items-center">
+        <div class="header flex items-center px-10">
             <div class="sect1 w-1/2">
                 <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
                 <p class="dark:font-thin mt-5">
@@ -687,10 +687,10 @@
     <section class="rating-section py-28 md:py-36">
         <div class="max-w-7xl mx-auto text-center">
             <div class="flex flex-col md:flex-row items-center justify-center">
-                <div class="w-1/2 md:w-1/3 p-4">
+                <div class="w-1/2 md:w-1/3 p-4 mr-16">
                     <img src="img/undraw_reviews_ukai.svg" alt="">
                 </div>
-                <div class="w-auto md:w-2/3">
+                <div class="w-auto md:w-1/3">
                     <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
                         {t?.rating?.title || 'Donnez votre avis'}
                     </h2>
