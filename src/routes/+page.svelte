@@ -609,7 +609,7 @@
     {/if}
     
     <div class="h-screen flex items-center">
-        <div class="header flex items-center px-10">
+        <div class="header flex items-center mr-auto ml-auto px-10">
             <div class="sect1 w-1/2">
                 <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
                 <p class="dark:font-thin mt-5">
