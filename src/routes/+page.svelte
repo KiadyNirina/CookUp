@@ -646,14 +646,14 @@
         class="recipe-count-section py-28 md:py-36 flex items-center"
         style="opacity: 0;"
     >
-        <div class="w-full text-center">
+        <div class="px-10 w-full text-center">
             <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
                 {t?.recipeCountTitle || 'Loading...'}
             </h2>
             <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
                 {t?.recipeCountSubtitle || 'Loading...'}
             </p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-5">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-10">
                 <div class="recipe-count p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
                     <Icon icon="mdi:food-fork-drink" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
                     <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
