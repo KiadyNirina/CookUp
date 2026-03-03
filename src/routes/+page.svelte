@@ -641,6 +641,188 @@
         </div>
     </div>
 
+<!-- Section Fonctionnalités minimaliste -->
+<section class="features-section py-28 md:py-36">
+    <div class="max-w-7xl mx-auto px-10">
+        <!-- En-tête -->
+        <div class="text-center mb-20">
+            <h2 class="text-5xl md:text-6xl font-extrabold mb-6 edu-vic-wa-nt-hand-pre-test">
+                {t?.features?.title || 'Comment ça marche'}
+            </h2>
+            <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                {t?.features?.subtitle || 'Trois étapes simples pour des repas personnalisés'}
+            </p>
+        </div>
+
+        <!-- Grille fonctionnalités -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <!-- Colonne texte -->
+            <div class="space-y-12">
+                <!-- Feature 1 -->
+                <div class="flex gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                        <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">1</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">{t?.features?.step1Title || 'Choisissez vos préférences'}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            {t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="flex gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                        <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">2</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">{t?.features?.step2Title || 'Obtenez une recette'}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            {t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="flex gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                        <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">3</span>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">{t?.features?.step3Title || 'Cuisinez et savourez'}</h3>
+                        <p class="text-gray-600 dark:text-gray-400">
+                            {t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Colonne image - GRANDE image vectorielle -->
+            <div class="relative">
+                <img 
+                    src="/img/cooking-process.svg" 
+                    alt="Cooking process illustration"
+                    class="w-full h-auto"
+                    on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Illustration'}
+                />
+                
+                <!-- Badge optionnel (très discret) -->
+                <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-yellow-600/5 dark:bg-yellow-400/5 rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- Deuxième ligne avec alternance image/texte -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+            <!-- Colonne image -->
+            <div class="relative order-2 lg:order-1">
+                <img 
+                    src="/img/meal-planning.svg" 
+                    alt="Meal planning illustration"
+                    class="w-full h-auto"
+                    on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Illustration'}
+                />
+            </div>
+
+            <!-- Colonne texte -->
+            <div class="order-1 lg:order-2">
+                <h3 class="text-3xl font-bold mb-6">{t?.features?.advancedTitle || 'Fonctionnalités avancées'}</h3>
+                
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                        <span class="text-gray-600 dark:text-gray-400">{t?.features?.feature1 || 'Filtres nutritionnels avancés'}</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                        <span class="text-gray-600 dark:text-gray-400">{t?.features?.feature2 || 'Export PDF des recettes'}</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                        <span class="text-gray-600 dark:text-gray-400">{t?.features?.feature3 || 'Traduction automatique'}</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                        <span class="text-gray-600 dark:text-gray-400">{t?.features?.feature4 || 'Sauvegarde des préférences'}</span>
+                    </li>
+                </ul>
+
+                <!-- Lien discret -->
+                <a href="/features" class="inline-flex items-center mt-8 text-yellow-600 dark:text-yellow-400 font-medium hover:gap-2 transition-all">
+                    {t?.features?.discoverMore || 'Découvrir toutes les fonctionnalités'}
+                    <Icon icon="mdi:arrow-right" class="ml-1" />
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section alternative si vous préférez 3 grandes images côte à côte -->
+<section class="features-alt-section py-28 md:py-36">
+    <div class="max-w-7xl mx-auto px-10">
+        <!-- En-tête -->
+        <div class="text-center mb-20">
+            <h2 class="text-5xl md:text-6xl font-extrabold mb-6 edu-vic-wa-nt-hand-pre-test">
+                {t?.featuresAlt?.title || 'Pourquoi nous choisir'}
+            </h2>
+            <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                {t?.featuresAlt?.subtitle || 'Une expérience culinaire simplifiée'}
+            </p>
+        </div>
+
+        <!-- Grille 3 colonnes avec grandes images -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <!-- Feature 1 -->
+            <div class="text-center">
+                <div class="mb-8">
+                    <img 
+                        src="/img/personalized.svg" 
+                        alt="Personalized recipes"
+                        class="w-64 h-64 mx-auto object-contain"
+                        on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=🎯'}
+                    />
+                </div>
+                <h3 class="text-2xl font-bold mb-3">{t?.featuresAlt?.personalized || 'Personnalisé'}</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    {t?.featuresAlt?.personalizedDesc || 'Des recettes adaptées à vos goûts et restrictions'}
+                </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="text-center">
+                <div class="mb-8">
+                    <img 
+                        src="/img/quick.svg" 
+                        alt="Quick & easy"
+                        class="w-64 h-64 mx-auto object-contain"
+                        on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=⚡'}
+                    />
+                </div>
+                <h3 class="text-2xl font-bold mb-3">{t?.featuresAlt?.quick || 'Rapide & simple'}</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    {t?.featuresAlt?.quickDesc || 'Obtenez une idée de recette en un clic'}
+                </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="text-center">
+                <div class="mb-8">
+                    <img 
+                        src="/img/nutritious.svg" 
+                        alt="Nutritious"
+                        class="w-64 h-64 mx-auto object-contain"
+                        on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=🥗'}
+                    />
+                </div>
+                <h3 class="text-2xl font-bold mb-3">{t?.featuresAlt?.nutritious || 'Équilibré'}</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    {t?.featuresAlt?.nutritiousDesc || 'Suivez vos apports nutritionnels'}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+    
     <section
         bind:this={recipeSection}
         class="recipe-count-section py-28 md:py-36 flex items-center"
@@ -893,6 +1075,33 @@
         }
         .rating-section h2 {
             font-size: 2rem;
+        }
+    }
+
+    @media screen and (max-width: 640px) {
+        .features-section h2,
+        .features-alt-section h2 {
+            font-size: 2.5rem;
+        }
+        
+        .features-section .grid {
+            gap: 3rem;
+        }
+        
+        .features-alt-section .grid > div {
+            margin-bottom: 2rem;
+        }
+        
+        .features-alt-section img {
+            width: 180px;
+            height: 180px;
+        }
+    }
+    
+    @media screen and (min-width: 641px) and (max-width: 768px) {
+        .features-section h2,
+        .features-alt-section h2 {
+            font-size: 3rem;
         }
     }
 </style>
