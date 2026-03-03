@@ -895,7 +895,7 @@
 
     <!-- Footer -->
     <div class="text-xs sm:text-sm text-center p-2 dark:font-thin">
-        {@html t?.footer || 'Loading...'}
+        {t?.footer || 'Loading...'}
     </div>
 
     <!-- Modal de confirmation de déconnexion -->

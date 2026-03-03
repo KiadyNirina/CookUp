@@ -4,7 +4,7 @@ export const translations = {
         headline: 'No more meal planning headaches.',
         subheadline: 'Choose a criterion, we handle the rest.',
         getStarted: 'Get started!',
-        footer: '© 2025 by <a href="https://kiadynirina.netlify.app/" target="_blank">KiadyN</a>. All rights reserved.',
+        footer: '© 2026 CookUp, All rights reserved.',
         
         // Section Features
         features: {
@@ -222,7 +222,7 @@ export const translations = {
         headline: 'Fini le casse-tête des repas.',
         subheadline: 'Choisissez un critère, on s\'occupe du reste.',
         getStarted: 'C\'est parti !',
-        footer: '© 2025 par <a href="https://kiadynirina.netlify.app/" target="_blank">KiadyN</a>. Tous droits réservés.',
+        footer: '© 2026 CookUp, Tous droits réservés.',
         
         // Section Features
         features: {
