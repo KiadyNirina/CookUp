@@ -804,7 +804,7 @@
         class="py-28 md:py-36 flex items-center opacity-0"
     >
         <div class="px-10 w-full text-center">
-            <h2 class="text-3xl sm:text-4xl font-['Permanent_Marker'] font-extrabold mb-4">
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-4">
                 {t?.recipeCountTitle || 'Loading...'}
             </h2>
             <p class="dark:font-thin mb-12 max-w-2xl mx-auto text-sm sm:text-base">
