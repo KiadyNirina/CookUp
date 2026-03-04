@@ -16,7 +16,7 @@
 
     let poppup = false;
     let showAuthModal = false;
-    let showProfilePopup = false; // Nouvelle variable pour le popup de profil
+    let showProfilePopup = false;
     let recipeCount = 0;
     let recipeCountInternational = 0;
     let recipeSection;
@@ -47,7 +47,6 @@
     let showEmailSent = false;
     let emailSentMessage = '';
 
-    // Variables pour la section de notation
     let rating = 0;
     let comment = '';
     let showRatingSuccess = false;
@@ -63,7 +62,6 @@
     onMount(async () => {
         await initAuth();
 
-        // Récupérer langue sauvegardée
         if (browser) {
             const savedLanguage = localStorage.getItem('language');
             if (savedLanguage) $language = savedLanguage;
@@ -71,7 +69,6 @@
             checkUrlParams();
         }
 
-        // Observer quand on revient sur l'onglet
         const handleVisibilityChange = async () => {
             if (document.visibilityState === 'visible') {
                 await initAuth();
@@ -147,17 +144,14 @@
                 maxCalories: urlSearchParams.get('maxCalories') || ''
             };
             
-            // Si l'utilisateur est déjà connecté, ouvrir directement le popup
             if ($user) {
                 openRecipePopup();
             } else {
-                // Sinon, ouvrir le modal d'authentification
                 showAuthModal = true;
             }
         }
     }
 
-    // Fonction pour ouvrir le popup de recette avec les paramètres
     function openRecipePopup() {
         if (pendingUrlParams) {
             urlParams = pendingUrlParams;
@@ -175,7 +169,6 @@
         }
     }
 
-    // Fonctions
     function confirmLogout() {
         showLogoutConfirm = true;
     }
@@ -283,7 +276,6 @@
         showEmailSent = false;
     }
 
-    // Fonctions pour la notation
     async function submitRating() {
         if (!$user) {
             showAuthModal = true;
@@ -331,7 +323,6 @@
         ratingSuccessMessage = '';
     }
 
-    // Gestion du survol des étoiles
     function handleStarHover(star, event) {
         if (ratingLoading) return;
         hoverRating = star;
@@ -379,13 +370,15 @@
 
 <svelte:window on:mousedown={handleOutsideClick} />
 
-<div class="text-black dark:text-white max-w-7xl ml-auto mr-auto">
-    <div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl mx-auto flex items-center bg-white dark:bg-black p-2" style="z-index: 1;">
+<div class="font-['NunitoSans'] text-black dark:text-white max-w-7xl mx-auto">
+    <!-- Header fixe -->
+    <div class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl mx-auto flex items-center bg-white dark:bg-black p-2 z-10">
         <p class="text-xl flex items-end">
             <img src="img/black.png" alt="Logo dark" class="block dark:hidden h-12" />
             <img src="img/white.png" alt="Logo light" class="hidden dark:block h-12" />
         </p>
         <div class="flex ml-auto items-center gap-2">
+            <!-- Sélecteur de langue -->
             <div class="relative group">
                 <button
                     class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-500 transition-all duration-300 flex items-center"
@@ -395,7 +388,7 @@
                     <Icon icon="mdi:chevron-down" class="ml-1" />
                 </button>
                 <div
-                    class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+                    class="absolute right-0 sm:right-auto sm:left-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
                 >
                     {#each availableLanguages as lang}
                         <button
@@ -419,8 +412,7 @@
                         <Icon icon="mdi:chevron-down" class="ml-1" />
                     </button>
                     
-                    <!-- Menu déroulant profil -->
-                    <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div class="absolute right-0 sm:right-auto sm:left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                         <button
                             on:click={openProfilePopup}
                             class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
@@ -486,7 +478,7 @@
             on:click={closeEmailSent}
         >
             <div 
-                class="email-sent-modal bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
+                class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
                 on:click|stopPropagation
             >
                 <div class="text-center">
@@ -532,7 +524,7 @@
             on:click={closeProfilePopup}
         >
             <div 
-                class="profile-popup bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
+                class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
                 on:click|stopPropagation
             >
                 <div class="text-center">
@@ -608,11 +600,12 @@
         </div>
     {/if}
     
+    <!-- Hero section -->
     <div class="h-screen flex items-center">
-        <div class="header flex items-center mr-auto ml-auto px-10">
-            <div class="sect1 w-1/2">
-                <h1 class="edu-vic-wa-nt-hand-pre-test text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
-                <p class="dark:font-thin mt-5">
+        <div class="flex flex-col sm:flex-row items-center mx-auto px-10">
+            <div class="w-full sm:w-1/2 text-center sm:text-left">
+                <h1 class="font-['Permanent_Marker'] text-4xl sm:text-5xl md:text-7xl font-extrabold">{t?.headline || 'Loading...'}</h1>
+                <p class="dark:font-thin mt-5 text-sm sm:text-base">
                     {#if $user}
                         {t?.auth.welcomeBack} , {$user.email?.split('@')[0]}
                     {:else}
@@ -620,7 +613,7 @@
                     {/if}
                 </p>
                 <button
-                    class="button mt-5 flex items-center bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-2xl transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600 active:scale-70"
+                    class="button mt-5 flex items-center justify-center sm:justify-start bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-2xl transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600 active:scale-70 mx-auto sm:mx-0 text-sm sm:text-base"
                     on:click={togglePoppup}
                 >
                     <Icon icon="mdi:timer-outline" class="mr-1" />
@@ -631,51 +624,215 @@
                     {/if}
                 </button>
             </div>
-            <div class="sect2 w-1/2 flex items-center">
+            <div class="w-full sm:w-1/2 flex items-center mt-5 sm:mt-0">
                 <img
                     src="/img/ramen-96.svg"
                     alt={$language === 'en' ? 'Breakfast' : 'Petit déjeuner'}
-                    class="breakfast ml-auto"
+                    class="breakfast w-1/2 sm:w-auto mx-auto sm:ml-auto"
                 />
             </div>
         </div>
     </div>
 
+    <!-- Section Fonctionnalités -->
+    <section class="py-28 md:py-36">
+        <div class="max-w-7xl mx-auto px-10">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-6">
+                    {t?.features?.title || 'Comment ça marche'}
+                </h2>
+                <p class="dark:font-thin text-base sm:text-lg max-w-2xl mx-auto">
+                    {t?.features?.subtitle || 'Trois étapes simples pour des repas personnalisés'}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-12">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                            <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">1</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-2">{t?.features?.step1Title || 'Choisissez vos préférences'}</h3>
+                            <p class="text-sm sm:text-base dark:font-thin">
+                                {t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                            <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">2</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-2">{t?.features?.step2Title || 'Obtenez une recette'}</h3>
+                            <p class="text-sm sm:text-base dark:font-thin">
+                                {t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                            <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">3</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-2">{t?.features?.step3Title || 'Cuisinez et savourez'}</h3>
+                            <p class="text-sm sm:text-base dark:font-thin">
+                                {t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <img 
+                        src="/img/cooking-process.svg" 
+                        alt="Cooking process illustration"
+                        class="w-full h-auto"
+                        on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Illustration'}
+                    />
+                    <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-yellow-600/5 dark:bg-yellow-400/5 rounded-full"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+                <div class="relative order-2 lg:order-1">
+                    <img 
+                        src="/img/meal-planning.svg" 
+                        alt="Meal planning illustration"
+                        class="w-full h-auto"
+                        on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Illustration'}
+                    />
+                </div>
+
+                <div class="order-1 lg:order-2">
+                    <h3 class="text-2xl sm:text-3xl font-bold mb-6">{t?.features?.advancedTitle || 'Fonctionnalités avancées'}</h3>
+                    
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                            <span class="text-sm sm:text-base dark:font-thin">{t?.features?.feature1 || 'Filtres nutritionnels avancés'}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                            <span class="text-sm sm:text-base dark:font-thin">{t?.features?.feature2 || 'Export PDF des recettes'}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                            <span class="text-sm sm:text-base dark:font-thin">{t?.features?.feature3 || 'Traduction automatique'}</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
+                            <span class="text-sm sm:text-base dark:font-thin">{t?.features?.feature4 || 'Sauvegarde des préférences'}</span>
+                        </li>
+                    </ul>
+
+                    <a href="/features" class="inline-flex items-center mt-8 text-yellow-600 dark:text-yellow-400 font-medium hover:gap-2 transition-all text-sm sm:text-base">
+                        {t?.features?.discoverMore || 'Découvrir toutes les fonctionnalités'}
+                        <Icon icon="mdi:arrow-right" class="ml-1" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section alternative -->
+    <section class="py-28 md:py-36">
+        <div class="max-w-7xl mx-auto px-10">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-6">
+                    {t?.featuresAlt?.title || 'Pourquoi nous choisir'}
+                </h2>
+                <p class="text-base sm:text-lg dark:font-thin max-w-2xl mx-auto">
+                    {t?.featuresAlt?.subtitle || 'Une expérience culinaire simplifiée'}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="text-center mb-8 md:mb-0">
+                    <div class="mb-8">
+                        <img 
+                            src="/img/personalized.svg" 
+                            alt="Personalized recipes"
+                            class="w-48 h-48 sm:w-64 sm:h-64 mx-auto object-contain"
+                            on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=🎯'}
+                        />
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-3">{t?.featuresAlt?.personalized || 'Personnalisé'}</h3>
+                    <p class="text-sm sm:text-base dark:font-thin">
+                        {t?.featuresAlt?.personalizedDesc || 'Des recettes adaptées à vos goûts et restrictions'}
+                    </p>
+                </div>
+
+                <div class="text-center mb-8 md:mb-0">
+                    <div class="mb-8">
+                        <img 
+                            src="/img/quick.svg" 
+                            alt="Quick & easy"
+                            class="w-48 h-48 sm:w-64 sm:h-64 mx-auto object-contain"
+                            on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=⚡'}
+                        />
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-3">{t?.featuresAlt?.quick || 'Rapide & simple'}</h3>
+                    <p class="text-sm sm:text-base dark:font-thin">
+                        {t?.featuresAlt?.quickDesc || 'Obtenez une idée de recette en un clic'}
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="mb-8">
+                        <img 
+                            src="/img/nutritious.svg" 
+                            alt="Nutritious"
+                            class="w-48 h-48 sm:w-64 sm:h-64 mx-auto object-contain"
+                            on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=🥗'}
+                        />
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-3">{t?.featuresAlt?.nutritious || 'Équilibré'}</h3>
+                    <p class="text-sm sm:text-base dark:font-thin">
+                        {t?.featuresAlt?.nutritiousDesc || 'Suivez vos apports nutritionnels'}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Section compteur de recettes -->
     <section
         bind:this={recipeSection}
-        class="recipe-count-section py-28 md:py-36 flex items-center"
-        style="opacity: 0;"
+        class="py-28 md:py-36 flex items-center opacity-0"
     >
-        <div class="w-full text-center">
-            <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
+        <div class="px-10 w-full text-center">
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-4">
                 {t?.recipeCountTitle || 'Loading...'}
             </h2>
-            <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
+            <p class="dark:font-thin mb-12 max-w-2xl mx-auto text-sm sm:text-base">
                 {t?.recipeCountSubtitle || 'Loading...'}
             </p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-5">
-                <div class="recipe-count p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
-                    <Icon icon="mdi:food-fork-drink" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
-                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-5 sm:px-10">
+                <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
+                    <Icon icon="mdi:food-fork-drink" class="text-3xl sm:text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
+                    <p class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                         {recipeCount.toLocaleString()} +
                     </p>
-                    <p class="dark:font-thin mt-2">
+                    <p class="dark:font-thin mt-2 text-xs sm:text-sm">
                         {t?.recipeCountTotal || 'Loading...'}
                     </p>
                 </div>
                 <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
-                    <Icon icon="mdi:earth" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
-                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+                    <Icon icon="mdi:earth" class="text-3xl sm:text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
+                    <p class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                         {recipeCountInternational.toLocaleString()} +
                     </p>
-                    <p class="dark:font-thin mt-2">
+                    <p class="dark:font-thin mt-2 text-xs sm:text-sm">
                         {t?.recipeCountInternational || 'Loading...'}
                     </p>
                 </div>
                 <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
-                    <Icon icon="mdi:calendar-refresh" class="text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
-                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">Daily</p>
-                    <p class="dark:font-thin mt-2">
+                    <Icon icon="mdi:calendar-refresh" class="text-3xl sm:text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
+                    <p class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">Daily</p>
+                    <p class="dark:font-thin mt-2 text-xs sm:text-sm">
                         {t?.recipeCountUpdates || 'Loading...'}
                     </p>
                 </div>
@@ -684,17 +841,17 @@
     </section>
 
     <!-- Section de notation -->
-    <section class="rating-section py-28 md:py-36">
+    <section class="py-28 md:py-36">
         <div class="max-w-7xl mx-auto text-center">
             <div class="flex flex-col md:flex-row items-center justify-center">
-                <div class="w-1/2 md:w-1/3 p-4 mr-16">
-                    <img src="img/undraw_reviews_ukai.svg" alt="">
+                <div class="w-full md:w-1/3 p-4 md:mr-16 mb-8 md:mb-0">
+                    <img src="img/undraw_reviews_ukai.svg" alt="" class="max-w-xs mx-auto">
                 </div>
-                <div class="w-auto md:w-1/3">
-                    <h2 class="text-4xl font-extrabold mb-4 edu-vic-wa-nt-hand-pre-test">
+                <div class="w-full md:w-1/3">
+                    <h2 class="text-3xl sm:text-4xl font-['Permanent_Marker'] font-extrabold mb-4">
                         {t?.rating?.title || 'Donnez votre avis'}
                     </h2>
-                    <p class="dark:font-thin mb-12 max-w-2xl mx-auto">
+                    <p class="dark:font-thin mb-12 max-w-2xl mx-auto text-sm sm:text-base">
                         {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
                     </p>
                     <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 max-w-md mx-auto">
@@ -704,7 +861,7 @@
                                     on:click={() => setRating(star)}
                                     on:mouseenter={(event) => handleStarHover(star, event)}
                                     on:mouseleave={handleStarLeave}
-                                    class="star-{star} text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
+                                    class="star-{star} text-2xl sm:text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
                                     disabled={ratingLoading}
                                 >
                                     <Icon icon="mdi:star" />
@@ -714,13 +871,13 @@
                         <textarea
                             bind:value={comment}
                             placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
-                            class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none"
+                            class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none text-sm sm:text-base"
                             disabled={ratingLoading}
                         ></textarea>
                         <button
                             on:click={submitRating}
                             disabled={ratingLoading || rating < 1}
-                            class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                            class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center text-sm sm:text-base"
                         >
                             {#if ratingLoading}
                                 <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
@@ -732,15 +889,16 @@
                         </button>
                     </div>
                 </div>
-            
             </div>
         </div>
     </section>
 
-    <div class="footer text-sm text-center p-2 text-gray-600 dark:text-gray-400">
-        {@html t?.footer || 'Loading...'}
+    <!-- Footer -->
+    <div class="text-xs sm:text-sm text-center p-2 dark:font-thin">
+        {t?.footer || 'Loading...'}
     </div>
 
+    <!-- Modal de confirmation de déconnexion -->
     {#if showLogoutConfirm}
         <div 
             class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
@@ -750,21 +908,21 @@
                 <div class="text-center mb-6">
                     <Icon 
                         icon="mdi:logout" 
-                        class="w-12 h-12 text-yellow-600 dark:text-yellow-400 mx-auto mb-4" 
+                        class="w-10 h-10 sm:w-12 sm:h-12 text-yellow-600 dark:text-yellow-400 mx-auto mb-4" 
                     />
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100">
                         {t?.auth.logoutConfirmTitle || 'Déconnexion'}
                     </h2>
-                    <p class="mt-2 text-gray-600 dark:text-gray-300">
+                    <p class="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
                         {t?.auth.logoutConfirmMessage || 'Êtes-vous sûr de vouloir vous déconnecter ?'}
                     </p>
                 </div>
 
-                <div class="flex gap-4 justify-center">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <button
                         on:click={cancelLogout}
                         disabled={logoutLoading}
-                        class="px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300 disabled:opacity-50"
+                        class="px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300 disabled:opacity-50 text-sm sm:text-base"
                     >
                         {t?.auth.cancel || 'Annuler'}
                     </button>
@@ -772,7 +930,7 @@
                     <button
                         on:click={signOut}
                         disabled={logoutLoading}
-                        class="px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                        class="px-6 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-all duration-300 disabled:opacity-50 flex items-center justify-center text-sm sm:text-base"
                     >
                         {#if logoutLoading}
                             <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
@@ -801,98 +959,5 @@
         font-family: 'Pacifico';
         src: url('/fonts/Pacifico-Regular.ttf') format('truetype');
         font-style: normal;
-    }
-    * {
-        font-family: "NunitoSans";
-    }
-    .edu-vic-wa-nt-hand-pre-test {
-        font-family: "Permanent Marker", cursive;
-        font-weight: 400;
-        font-style: normal;
-    }
-    .group:hover .group-hover\:visible {
-        visibility: visible;
-    }
-    .group:hover .group-hover\:opacity-100 {
-        opacity: 1;
-    }
-    @media screen and (max-width: 640px) {
-        .header {
-            flex-direction: column;
-            justify-content: center;
-        }
-        .sect1 {
-            width: 100%;
-            text-align: center;
-        }
-        .sect2 {
-            margin-top: 20px;
-            width: 100%;
-            text-align: center;
-        }
-        .sect2 img {
-            width: 50%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .sect1 h1 {
-            font-size: 2rem;
-        }
-        .sect1 p {
-            font-size: 12px;
-        }
-        .button {
-            margin-left: auto;
-            margin-right: auto;
-            font-size: 12px;
-        }
-        .recipe-count-section h2 {
-            font-size: 1.8rem;
-        }
-        .recipe-count-section p {
-            font-size: 12px;
-        }
-        .recipe-count p:first-child,
-        .recipe-count-section .grid > div p:first-child {
-            font-size: 1.5rem;
-        }
-        .recipe-count-section .grid > div p:last-child {
-            font-size: 12px;
-        }   
-        .rating-section h2 {
-            font-size: 1.8rem;
-        }
-        .rating-section p {
-            font-size: 12px;
-        }   
-        .relative.group .absolute {
-            right: auto;
-            left: 0;
-            width: 100%;
-        }
-    }
-    @media screen and (min-width: 641px) and (max-width: 768px) {
-        .sect1 h1 {
-            font-size: 3rem;
-        }
-        .sect1 p {
-            font-size: 15px;
-        }
-        .button {
-            font-size: 12px;
-        }
-        .recipe-count-section h2 {
-            font-size: 2rem;
-        }
-        .recipe-count p:first-child,
-        .recipe-count-section .grid > div p:first-child {
-            font-size: 1.8rem;
-        }
-        .recipe-count-section .grid > div p:last-child {
-            font-size: 12px;
-        }
-        .rating-section h2 {
-            font-size: 2rem;
-        }
     }
 </style>

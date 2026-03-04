@@ -4,7 +4,36 @@ export const translations = {
         headline: 'No more meal planning headaches.',
         subheadline: 'Choose a criterion, we handle the rest.',
         getStarted: 'Get started!',
-        footer: '© 2025 by <a href="https://kiadynirina.netlify.app/" target="_blank">KiadyN</a>. All rights reserved.',
+        footer: '© 2026 CookUp, All rights reserved.',
+        
+        // Section Features
+        features: {
+            title: 'How it works',
+            subtitle: 'Three simple steps for personalized meals',
+            step1Title: 'Choose your preferences',
+            step1Desc: 'Meal type, diet, ingredients to exclude',
+            step2Title: 'Get a recipe',
+            step2Desc: 'Our AI generates a recipe tailored to your needs',
+            step3Title: 'Cook and enjoy',
+            step3Desc: 'Detailed instructions, preparation time, nutritional values',
+            advancedTitle: 'Advanced features',
+            feature1: 'Advanced nutritional filters',
+            feature2: 'PDF recipe export',
+            feature3: 'Automatic translation',
+            feature4: 'Save preferences',
+            discoverMore: 'Discover all features'
+        },
+        featuresAlt: {
+            title: 'Why choose us',
+            subtitle: 'A simplified culinary experience',
+            personalized: 'Personalized',
+            personalizedDesc: 'Recipes adapted to your tastes and restrictions',
+            quick: 'Quick & easy',
+            quickDesc: 'Get a recipe idea in one click',
+            nutritious: 'Nutritious',
+            nutritiousDesc: 'Track your nutritional intake'
+        },
+        
         // FormPoppup
         customize: 'Customize your suggestion',
         gourmet: 'Gourmet suggestion',
@@ -19,6 +48,7 @@ export const translations = {
         noRecipeError: 'No recipes found for these criteria. Try other preferences.',
         networkError: 'Network connection issue. Check your connection and try again.',
         translationError: 'Error during retrieval or translation. Data displayed in English.',
+        
         // Result
         suggestion: 'Here’s an idea for your',
         dishName: 'Dish name:',
@@ -31,6 +61,7 @@ export const translations = {
         minutes: 'minutes',
         recipeImageAlt: 'Recipe image',
         loadingIdea: 'Loading a new idea...',
+        
         // Types de repas
         mealTypes: {
             'main_course': 'Main Course',
@@ -48,6 +79,7 @@ export const translations = {
             snack: 'Snack',
             drink: 'Drink'
         },
+        
         // Diets
         diets: {
             'gluten_free': 'Gluten Free',
@@ -62,6 +94,7 @@ export const translations = {
             'low_fodmap': 'Low FODMAP',
             whole30: 'Whole30'
         },
+        
         prepTimeWarning: 'Warning: Recipe exceeds selected preparation time of',
         prepTimeWarning2: 'but takes',
         exportPDF: 'Export to PDF',
@@ -83,11 +116,13 @@ export const translations = {
         removeFavorite: 'Remove from favorites',
         instagramShareInstructions: 'The recipe link has been copied to your clipboard. Paste it into an Instagram Story or message to share with your followers. To share with a specific list of followers, use Instagram\'s "Close Friends" feature or send a direct message to your selected contacts.',
         close: 'Close',
+        
         recipeCountTitle: 'Explore Our Recipe Collection',
         recipeCountSubtitle: 'Dive into a world of flavors with over 365,000 recipes from around the globe.',
         recipeCountTotal: 'Total Recipes',
         recipeCountInternational: 'International Cuisines',
         recipeCountUpdates: 'Daily Updates',
+        
         cuisine: 'Cuisine :',
         excludeIngredients: 'Exclude Ingredients :',
         ingredientsEx: {
@@ -100,6 +135,7 @@ export const translations = {
             shellfish: 'Shellfish',
             'tree nuts': 'Tree Nuts'
         },
+        
         advancedPrefs: 'Advanced Nutrition Preferences',
         nutritionPrefs: "Nutrition Preferences :",
         min: "Min",
@@ -115,6 +151,7 @@ export const translations = {
         add: 'Add',
         excludedIngredientsList: 'Excluded ingredients:',
         removeIngredient: 'Remove ingredient',
+        
         auth: {
             loginBeforeStart: 'Log in to start',
             profile: 'My Profile',
@@ -146,7 +183,9 @@ export const translations = {
             passwordsDoNotMatch: 'Passwords do not match.',
             confirmPasswordPlaceholder: '••••••••'
         },
+        
         loading: 'Loading...',
+        
         admin: {
             title: 'Administration',
             totalUsers: 'Total Users',
@@ -169,6 +208,7 @@ export const translations = {
             noComment: 'No comment',
             errorLoadingRatings: 'Error loading ratings'
         },
+        
         rating: {
             title: 'Share Your Feedback',
             subtitle: 'Let us know your experience!',
@@ -176,12 +216,42 @@ export const translations = {
             submit: 'Submit'
         }
     },
+    
     fr: {
         // Page d'accueil
         headline: 'Fini le casse-tête des repas.',
-        subheadline: 'Choisissez un critère, on s’occupe du reste.',
-        getStarted: 'C’est parti !',
-        footer: '© 2025 par <a href="https://kiadynirina.netlify.app/" target="_blank">KiadyN</a>. Tous droits réservés.',
+        subheadline: 'Choisissez un critère, on s\'occupe du reste.',
+        getStarted: 'C\'est parti !',
+        footer: '© 2026 CookUp, Tous droits réservés.',
+        
+        // Section Features
+        features: {
+            title: 'Comment ça marche',
+            subtitle: 'Trois étapes simples pour des repas personnalisés',
+            step1Title: 'Choisissez vos préférences',
+            step1Desc: 'Type de repas, régime alimentaire, ingrédients à exclure',
+            step2Title: 'Obtenez une recette',
+            step2Desc: 'Notre IA génère une recette adaptée à vos besoins',
+            step3Title: 'Cuisinez et savourez',
+            step3Desc: 'Instructions détaillées, temps de préparation, valeurs nutritionnelles',
+            advancedTitle: 'Fonctionnalités avancées',
+            feature1: 'Filtres nutritionnels avancés',
+            feature2: 'Export PDF des recettes',
+            feature3: 'Traduction automatique',
+            feature4: 'Sauvegarde des préférences',
+            discoverMore: 'Découvrir toutes les fonctionnalités'
+        },
+        featuresAlt: {
+            title: 'Pourquoi nous choisir',
+            subtitle: 'Une expérience culinaire simplifiée',
+            personalized: 'Personnalisé',
+            personalizedDesc: 'Des recettes adaptées à vos goûts et restrictions',
+            quick: 'Rapide & simple',
+            quickDesc: 'Obtenez une idée de recette en un clic',
+            nutritious: 'Équilibré',
+            nutritiousDesc: 'Suivez vos apports nutritionnels'
+        },
+        
         // FormPoppup
         customize: 'Personnalisez votre suggestion',
         gourmet: 'Suggestion gourmande',
@@ -193,9 +263,10 @@ export const translations = {
         findIdeas: 'Trouver des idées',
         loading: 'Chargement...',
         selectMealTypeError: 'Veuillez sélectionner un type de repas.',
-        noRecipeError: 'Aucune recette trouvée pour ces critères. Essayez d’autres préférences.',
+        noRecipeError: 'Aucune recette trouvée pour ces critères. Essayez d\'autres préférences.',
         networkError: 'Problème de connexion réseau. Vérifiez votre connexion et réessayez.',
         translationError: 'Erreur lors de la récupération ou traduction. Les données sont affichées en anglais.',
+        
         // Result
         suggestion: 'Voici une idée pour votre',
         dishName: 'Nom du plat :',
@@ -208,6 +279,7 @@ export const translations = {
         minutes: 'minutes',
         recipeImageAlt: 'Image de la recette',
         loadingIdea: 'Chargement d\'une nouvelle idée...',
+        
         // Types de repas
         mealTypes: {
             'main_course': 'Plat Principal',
@@ -225,6 +297,7 @@ export const translations = {
             snack: 'Collation',
             drink: 'Boisson'
         },
+        
         // Diets
         diets: {
             'gluten_free': 'Sans Gluten',
@@ -239,6 +312,7 @@ export const translations = {
             'low_fodmap': 'Faible en FODMAP',
             whole30: 'Whole30'
         },
+        
         prepTimeWarning: 'Attention : La recette dépasse le temps de préparation choisi de',
         prepTimeWarning2: 'mais prend',
         exportPDF: 'Exporter en PDF',
@@ -258,13 +332,15 @@ export const translations = {
         share: 'Partager',
         addFavorite: 'Ajouter aux favoris',
         removeFavorite: 'Retirer des favoris',
-        instagramShareInstructions: 'Le lien de la recette a été copié dans votre presse-papiers. Collez-le dans une story Instagram ou un message pour le partager avec vos abonnés. Pour partager avec une liste spécifique d’abonnés, utilisez la fonctionnalité "Amis proches" d’Instagram ou envoyez un message direct à vos contacts sélectionnés.',
+        instagramShareInstructions: 'Le lien de la recette a été copié dans votre presse-papiers. Collez-le dans une story Instagram ou un message pour le partager avec vos abonnés. Pour partager avec une liste spécifique d\'abonnés, utilisez la fonctionnalité "Amis proches" d\'Instagram ou envoyez un message direct à vos contacts sélectionnés.',
         close: 'Fermer',
+        
         recipeCountTitle: 'Explorez notre collection de recettes',
         recipeCountSubtitle: 'Plongez dans un univers de saveurs avec plus de 365 000 recettes du monde entier.',
         recipeCountTotal: 'Recettes totales',
         recipeCountInternational: 'Cuisines internationales',
         recipeCountUpdates: 'Mises à jour quotidiennes',
+        
         cuisine: 'Cuisine :',
         excludeIngredients: 'Exclure les ingrédients :',
         ingredientsEx: {
@@ -277,6 +353,7 @@ export const translations = {
             shellfish: 'Fruits de mer',
             'tree nuts': 'Noix'
         },
+        
         advancedPrefs: 'Préférences nutritionnelles avancées',
         nutritionPrefs: "Préférences Nutritionnelles :",
         min: "Min",
@@ -292,6 +369,7 @@ export const translations = {
         add: 'Ajouter',
         excludedIngredientsList: 'Ingrédients exclus:',
         removeIngredient: 'Retirer l\'ingrédient',
+        
         auth: {
             loginBeforeStart: 'Connectez-vous pour commencer',
             profile: 'Mon Profil',
@@ -323,7 +401,9 @@ export const translations = {
             passwordsDoNotMatch: 'Les mots de passe ne correspondent pas.',
             confirmPasswordPlaceholder: '••••••••'
         },
+        
         loading: 'Chargement...',
+        
         admin: {
             title: 'Administration',
             totalUsers: 'Nombre total d\'utilisateurs',
@@ -346,6 +426,7 @@ export const translations = {
             noComment: 'Aucun commentaire',
             errorLoadingRatings: 'Erreur lors du chargement des notes'
         },
+        
         rating: {
             title: 'Donnez votre avis',
             subtitle: 'Partagez votre expérience avec nous !',
