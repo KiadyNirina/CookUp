@@ -722,10 +722,6 @@
                             <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
                             <span class="text-sm sm:text-base dark:font-thin">{t?.features?.feature3 || 'Traduction automatique'}</span>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
-                            <span class="text-sm sm:text-base dark:font-thin">{t?.features?.feature4 || 'Sauvegarde des préférences'}</span>
-                        </li>
                     </ul>
 
                     <a href="/features" class="inline-flex items-center mt-8 text-yellow-600 dark:text-yellow-400 font-medium hover:gap-2 transition-all text-sm sm:text-base">
