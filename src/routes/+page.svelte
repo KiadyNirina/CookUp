@@ -10,6 +10,7 @@
   import { browser } from "$app/environment";
   import { user, initAuth, upsertUserProfile } from '../stores/auth';
   import { supabase } from '$lib/supabase';
+  import { triggerAuthOpen } from '$lib/stores/ui';
 
   let poppup = false;
   let recipeCount = 0;
@@ -145,7 +146,7 @@
 
   function togglePoppup() {
     if (!$user) {
-      // Header will show auth modal
+      $triggerAuthOpen += 1;
       return;
     }
     poppup = !poppup;
