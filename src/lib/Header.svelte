@@ -13,6 +13,7 @@
 
   const dispatch = createEventDispatcher();
 
+  // État local au header
   let showAuthModal = false;
   let showProfilePopup = false;
   let showLogoutConfirm = false;
@@ -21,6 +22,9 @@
   let loginSuccessMessage = '';
   let showEmailSent = false;
   let emailSentMessage = '';
+  
+  let showLanguageDropdown = false;
+  let showUserDropdown = false;
 
   const availableLanguages = [
     { code: 'en', label: 'EN' },
@@ -29,6 +33,7 @@
 
   function toggleLanguage(langCode) {
     $language = langCode;
+    showLanguageDropdown = false;
     if (browser) {
       localStorage.setItem('language', langCode);
       window.location.reload();
@@ -46,6 +51,15 @@
     if (showProfilePopup && !event.target.closest('.profile-popup')) {
       showProfilePopup = false;
     }
+    if (showLogoutConfirm && !event.target.closest('.logout-modal')) {
+      showLogoutConfirm = false;
+    }
+    if (!event.target.closest('.language-dropdown')) {
+      showLanguageDropdown = false;
+    }
+    if (!event.target.closest('.user-dropdown')) {
+      showUserDropdown = false;
+    }
   }
 
   function handleAuthSuccess(event) {
@@ -54,9 +68,7 @@
     loginSuccessMessage = $language === 'fr'
       ? 'Connexion réussie ! Bienvenue ' + ($user.email?.split('@')[0] || '')
       : 'Login successful! Welcome ' + ($user.email?.split('@')[0] || '');
-    setTimeout(() => {
-      showLoginSuccess = false;
-    }, 3000);
+    setTimeout(() => { showLoginSuccess = false; }, 3000);
     dispatch('authSuccess', event);
   }
 
@@ -85,6 +97,7 @@
 
   function confirmLogout() {
     showLogoutConfirm = true;
+    showUserDropdown = false; // ✅ Fermer le dropdown utilisateur
   }
 
   function cancelLogout() {
@@ -105,6 +118,7 @@
   function openProfilePopup() {
     if ($user) {
       showProfilePopup = true;
+      showUserDropdown = false;
       dispatch('profileOpen');
     }
   }
@@ -113,75 +127,99 @@
     showProfilePopup = false;
   }
 
+  function toggleLanguageDropdown() {
+    showLanguageDropdown = !showLanguageDropdown;
+    showUserDropdown = false;
+  }
+
+  function toggleUserDropdown() {
+    showUserDropdown = !showUserDropdown;
+    showLanguageDropdown = false;
+  }
+
   $: t = translations[$language] || translations.en;
 </script>
 
 <svelte:window on:mousedown={handleOutsideClick} />
 
-<header class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl mx-auto flex items-center bg-white dark:bg-black p-2 z-10">
-  <p class="text-xl flex items-end">
-    <img src="img/black.png" alt="Logo dark" class="block dark:hidden h-12" />
-    <img src="img/white.png" alt="Logo light" class="hidden dark:block h-12" />
-  </p>
+<header class="transition-all duration-500 ease-in-out fixed w-full max-w-7xl mx-auto flex items-center bg-white dark:bg-black p-2 z-50">
+  <a href="/" class="text-xl flex items-end">
+    <img src="/img/black.png" alt="Logo dark" class="block dark:hidden h-12" />
+    <img src="/img/white.png" alt="Logo light" class="hidden dark:block h-12" />
+  </a>
+  
   <div class="flex ml-auto items-center gap-2">
-    <!-- Language Selector -->
-    <div class="relative group">
+    
+    <!-- ✅ Language Selector -->
+    <div class="relative language-dropdown">
       <button
+        on:click={toggleLanguageDropdown}
         class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-500 transition-all duration-300 flex items-center"
         aria-label="Select language"
+        aria-expanded={showLanguageDropdown}
       >
         {availableLanguages.find(lang => lang.code === $language)?.label || 'English'}
-        <Icon icon="mdi:chevron-down" class="ml-1" />
+        <Icon icon="mdi:chevron-down" class="ml-1 transition-transform duration-200 {showLanguageDropdown ? 'rotate-180' : ''}" />
       </button>
-      <div
-        class="absolute right-0 sm:right-auto sm:left-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
-      >
-        {#each availableLanguages as lang}
-          <button
-            on:click={() => toggleLanguage(lang.code)}
-            class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 {$language === lang.code ? 'bg-gray-100 dark:bg-gray-700' : ''}"
-          >
-            {lang.label}
-          </button>
-        {/each}
-      </div>
+      
+      <!-- Dropdown visible uniquement si showLanguageDropdown = true -->
+      {#if showLanguageDropdown}
+        <div
+          class="absolute right-0 sm:right-auto sm:left-0 mt-2 w-32 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 border border-gray-200 dark:border-gray-700"
+        >
+          {#each availableLanguages as lang}
+            <button
+              on:click={() => toggleLanguage(lang.code)}
+              class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 {$language === lang.code ? 'bg-gray-100 dark:bg-gray-700 font-semibold' : ''}"
+            >
+              {lang.label}
+            </button>
+          {/each}
+        </div>
+      {/if}
     </div>
 
     {#if $user}
-      <!-- Authenticated User Menu -->
-      <div class="relative group">
+      <!-- ✅ Authenticated User Menu -->
+      <div class="relative user-dropdown">
         <button
+          on:click={toggleUserDropdown}
           class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-500 transition-all duration-300 flex items-center"
+          aria-expanded={showUserDropdown}
         >
           <Icon icon="mdi:account" class="mr-1" />
           {$user.email?.split('@')[0] || 'Profile'}
-          <Icon icon="mdi:chevron-down" class="ml-1" />
+          <Icon icon="mdi:chevron-down" class="ml-1 transition-transform duration-200 {showLanguageDropdown ? 'rotate-180' : ''}" />
         </button>
-        <div class="absolute right-0 sm:right-auto sm:left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-          <button
-            on:click={openProfilePopup}
-            class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
-          >
-            <Icon icon="mdi:account-cog" class="mr-2" />
-            {t?.auth.profile || 'Mon Profil'}
-          </button>
-          {#if $user?.email === 'kiady142ram@gmail.com'}
+        
+        <!-- Dropdown visible uniquement si showUserDropdown = true -->
+        {#if showUserDropdown}
+          <div class="absolute right-0 sm:right-auto sm:left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-md py-1 z-50 border border-gray-200 dark:border-gray-700">
             <button
-              on:click={() => goto('/admin')}
+              on:click={openProfilePopup}
               class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
             >
-              <Icon icon="mdi:shield-account" class="mr-2" />
-              {t?.admin?.title || 'Administration'}
+              <Icon icon="mdi:account-cog" class="mr-2" />
+              {t?.auth?.profile || 'Mon Profil'}
             </button>
-          {/if}
-          <button
-            on:click={confirmLogout}
-            class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center text-red-600 dark:text-red-400"
-          >
-            <Icon icon="mdi:logout" class="mr-2" />
-            {t?.auth.logout || 'Déconnexion'}
-          </button>
-        </div>
+            {#if $user?.email === 'kiady142ram@gmail.com'}
+              <button
+                on:click={() => { goto('/admin'); showUserDropdown = false; }}
+                class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+              >
+                <Icon icon="mdi:shield-account" class="mr-2" />
+                {t?.admin?.title || 'Administration'}
+              </button>
+            {/if}
+            <button
+              on:click={confirmLogout}
+              class="w-full text-left px-4 py-2 text-sm hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center text-red-600 dark:text-red-400"
+            >
+              <Icon icon="mdi:logout" class="mr-2" />
+              {t?.auth?.logout || 'Déconnexion'}
+            </button>
+          </div>
+        {/if}
       </div>
     {:else}
       <!-- Guest User -->
@@ -190,9 +228,10 @@
         class="bg-yellow-600 text-white dark:text-black px-3 py-1 rounded text-sm font-semibold hover:cursor-pointer hover:bg-yellow-500 transition-all duration-300 flex items-center"
       >
         <Icon icon="mdi:account" class="mr-1" />
-        {t?.auth.login || 'Se connecter'} / {t?.auth.signUp || "S'inscrire"}
+        {t?.auth?.login || 'Se connecter'} / {t?.auth?.signUp || "S'inscrire"}
       </button>
     {/if}
+    
     <ToggleTheme />
   </div>
 </header>
@@ -219,7 +258,7 @@
 <!-- Email Sent Modal -->
 {#if showEmailSent}
   <div
-    class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
+    class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-[60] p-4"
     transition:fade={{ duration: 150 }}
     on:click={closeEmailSent}
   >
@@ -260,7 +299,7 @@
     on:click={closeProfilePopup}
   >
     <div
-      class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
+      class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700 profile-popup"
       on:click|stopPropagation
     >
       <div class="text-center">
@@ -270,13 +309,13 @@
           </div>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          {t?.auth.profile || 'My Profile'}
+          {t?.auth?.profile || 'My Profile'}
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-2">
-          <strong>{t?.auth.email || 'Email'}:</strong> {$user?.email || 'N/A'}
+          <strong>{t?.auth?.email || 'Email'}:</strong> {$user?.email || 'N/A'}
         </p>
         <p class="text-gray-600 dark:text-gray-300 mb-4">
-          <strong>{t?.auth.username || 'Username'}:</strong> {$user?.email?.split('@')[0] || 'N/A'}
+          <strong>{t?.auth?.username || 'Username'}:</strong> {$user?.email?.split('@')[0] || 'N/A'}
         </p>
         <button
           on:click={closeProfilePopup}
@@ -293,17 +332,17 @@
 <!-- Logout Confirmation Modal -->
 {#if showLogoutConfirm}
   <div
-    class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
+    class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-[60] p-4 logout-modal"
     transition:fade={{ duration: 150 }}
   >
     <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700">
       <div class="text-center mb-6">
         <Icon icon="mdi:logout" class="w-10 h-10 sm:w-12 sm:h-12 text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
         <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100">
-          {t?.auth.logoutConfirmTitle || 'Déconnexion'}
+          {t?.auth?.logoutConfirmTitle || 'Déconnexion'}
         </h2>
         <p class="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-300">
-          {t?.auth.logoutConfirmMessage || 'Êtes-vous sûr de vouloir vous déconnecter ?'}
+          {t?.auth?.logoutConfirmMessage || 'Êtes-vous sûr de vouloir vous déconnecter ?'}
         </p>
       </div>
       <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -312,7 +351,7 @@
           disabled={logoutLoading}
           class="px-6 py-3 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-medium hover:bg-gray-400 dark:hover:bg-gray-500 transition-all duration-300 disabled:opacity-50 text-sm sm:text-base"
         >
-          {t?.auth.cancel || 'Annuler'}
+          {t?.auth?.cancel || 'Annuler'}
         </button>
         <button
           on:click={signOut}
@@ -321,10 +360,10 @@
         >
           {#if logoutLoading}
             <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
-            {t?.auth.loggingOut || 'Déconnexion...'}
+            {t?.auth?.loggingOut || 'Déconnexion...'}
           {:else}
             <Icon icon="mdi:logout" class="w-5 h-5 mr-2" />
-            {t?.auth.confirmLogout || 'Se déconnecter'}
+            {t?.auth?.confirmLogout || 'Se déconnecter'}
           {/if}
         </button>
       </div>
