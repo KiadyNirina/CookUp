@@ -23,7 +23,7 @@
   <title>{$language === 'fr' ? 'Page non trouvée' : 'Page not found'} - CookUp</title>
 </svelte:head>
 
-<div class="font-['NunitoSans'] text-black dark:text-white min-h-screen flex flex-col">
+<div class="font-['NunitoSans'] text-black dark:text-white min-h-screen flex flex-col max-w-7xl mx-auto">
   
   <!-- Header Component -->
   <Header 
