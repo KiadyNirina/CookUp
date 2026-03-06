@@ -612,9 +612,9 @@
   </section>
 
   <!-- Footer -->
-  <div class="text-xs sm:text-sm text-center p-2 dark:font-thin">
-    {t?.footer || 'Loading...'}
-  </div>
+  <footer class="w-full py-4 text-center text-sm text-gray-500 dark:text-gray-600">
+    {t?.footer}
+  </footer>
 </div>
 
 <style>
