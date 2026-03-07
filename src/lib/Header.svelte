@@ -10,6 +10,16 @@
   import { goto } from '$app/navigation';
   import { user, signOut as signOutAuth } from '../stores/auth';
   import { createEventDispatcher } from 'svelte';
+  import { triggerAuthOpen } from '$lib/stores/ui';
+
+let authOpenTrigger = 0;
+
+$: if ($triggerAuthOpen !== authOpenTrigger) {
+  authOpenTrigger = $triggerAuthOpen;
+  if ($triggerAuthOpen > 0) {
+    showAuthModal = true;
+  }
+}
 
   const dispatch = createEventDispatcher();
 
