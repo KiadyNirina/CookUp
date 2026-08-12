@@ -11,6 +11,7 @@
   import { user, initAuth, upsertUserProfile } from '../stores/auth';
   import { supabase } from '$lib/supabase';
   import { triggerAuthOpen } from '$lib/stores/ui';
+  import { scrollReveal } from '$lib/actions/scrollReveal.js';
 
   let poppup = false;
   let recipeCount = 0;
@@ -62,8 +63,9 @@
       ease: "power2.out"
     });
 
+    // Compteurs séparés du fade-in de section (géré par scrollReveal)
     if (browser && recipeSection) {
-      const observer = new IntersectionObserver(
+      const counterObserver = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting) {
             gsap.to({ count: 0 }, {
@@ -82,17 +84,12 @@
                 recipeCountInternational = Math.round(this.targets()[0].count);
               }
             });
-            gsap.fromTo(
-              recipeSection,
-              { opacity: 0, y: 30 },
-              { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
-            );
-            observer.disconnect();
+            counterObserver.disconnect();
           }
         },
         { threshold: 0.5 }
       );
-      observer.observe(recipeSection);
+      counterObserver.observe(recipeSection);
     }
 
     return () => {
@@ -265,7 +262,7 @@
   <title>{$language === 'fr' ? 'Accueil' : 'Home'} - CookUp</title>
 </svelte:head>
 
-<div class="font-['NunitoSans'] text-black dark:text-white max-w-7xl mx-auto">
+<div class="font-['Montserrat'] text-black dark:text-white max-w-7xl mx-auto">
   <!-- Header Component -->
   <Header 
     on:authSuccess={handleAuthSuccess}
@@ -313,7 +310,7 @@
   {/if}
 
   <!-- Hero Section -->
-  <div class="h-screen flex items-center">
+  <div use:scrollReveal={{ once: false }} class="h-screen flex items-center">
     <div class="flex flex-col sm:flex-row items-center mx-auto px-10">
       <div class="w-full sm:w-1/2 text-center sm:text-left">
         <h1 class="font-['Permanent_Marker'] text-4xl sm:text-5xl md:text-7xl font-extrabold">
@@ -349,7 +346,7 @@
   </div>
 
   <!-- Features Section -->
-  <section class="py-28 md:py-36">
+  <section use:scrollReveal={{ once: false }} class="py-28 md:py-36">
     <div class="max-w-7xl mx-auto px-10">
       <div class="text-center mb-20">
         <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-6">
@@ -411,7 +408,9 @@
           <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-yellow-600/5 dark:bg-yellow-400/5 rounded-full"></div>
         </div>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+
+      <!-- Advanced Features Section -->
+      <div use:scrollReveal={{ once: false }} class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
         <div class="relative order-2 lg:order-1">
           <img
             src="/img/meal-planning.svg"
@@ -454,7 +453,7 @@
   </section>
 
   <!-- Alternative Features Section -->
-  <section class="py-28 md:py-36">
+  <section use:scrollReveal={{ y: 40, delay: 0.1, once: false }} class="py-28 md:py-36">
     <div class="max-w-7xl mx-auto px-10">
       <div class="text-center mb-20">
         <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-6">
@@ -519,7 +518,7 @@
 
   <!-- Recipe Counter Section -->
   <section
-    bind:this={recipeSection}
+    use:scrollReveal={{ y: 40, once: false }}
     class="py-28 md:py-36 flex items-center opacity-0"
   >
     <div class="px-10 w-full text-center">
@@ -560,7 +559,7 @@
   </section>
 
   <!-- Rating Section -->
-  <section class="py-28 md:py-36">
+  <section use:scrollReveal={{ y: 40, once: false }} class="py-28 md:py-36">
     <div class="max-w-7xl mx-auto text-center">
       <div class="flex flex-col md:flex-row items-center justify-center">
         <div class="w-full md:w-1/3 p-4 md:mr-16 mb-8 md:mb-0">
@@ -619,6 +618,7 @@
 </div>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
     @import "tailwindcss";
     @custom-variant dark (&:where(.dark, .dark *));
