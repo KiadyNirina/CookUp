@@ -255,7 +255,7 @@
   <title>{$language === 'fr' ? 'Accueil' : 'Home'} - CookUp</title>
 </svelte:head>
 
-<div class="max-w-7xl mx-auto">
+<div class="font-['Montserrat'] max-w-7xl mx-auto">
   <Header on:authSuccess={handleAuthSuccess} on:authClose={handleAuthClose} />
 </div>
 <div class="font-['Montserrat'] text-gray-900 dark:text-gray-100 max-w-7xl mx-auto px-6 sm:px-10 min-h-screen">
@@ -289,10 +289,10 @@
   <div use:scrollReveal={{ once: false }} class="min-h-[85vh] flex items-center pt-20 pb-10">
     <div class="flex flex-col md:flex-row items-center w-full gap-12">
       <div class="w-full md:w-1/2 text-center md:text-left flex flex-col items-center md:items-start">
-        <h1 class="font-['Permanent_Marker'] text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight text-gray-900 dark:text-white">
+        <h1 class="font-['Unbounded'] text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight text-gray-900 dark:text-white">
           {t?.headline || 'Loading...'}
         </h1>
-        <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-lg">
+        <p class="mt-6 text-sm text-gray-600 dark:text-gray-400 max-w-lg">
           {#if $user}
             {t?.auth.welcomeBack}, {$user.email?.split('@')[0]}
           {:else}
@@ -300,7 +300,7 @@
           {/if}
         </p>
         <button
-          class="mt-10 flex items-center justify-center gap-2 bg-yellow-600 text-white dark:text-gray-950 font-semibold px-8 py-4 rounded-full transition-all duration-300 hover:bg-yellow-500 active:scale-95 w-full sm:w-auto"
+          class="mt-10 text-sm flex items-center justify-center gap-2 bg-yellow-600 text-white dark:text-gray-950 font-semibold px-8 py-4 rounded-full transition-all duration-300 hover:bg-yellow-500 active:scale-95 w-auto"
           on:click={togglePoppup}
         >
           <Icon icon="mdi:timer-outline" class="text-xl" />
@@ -312,7 +312,7 @@
         </button>
       </div>
       <div class="w-full md:w-1/2 flex justify-center md:justify-end">
-        <img src="/img/ramen-96.svg" alt="Breakfast" class="breakfast w-3/4 max-w-md object-contain" />
+        <img src="/img/ramen-96.svg" alt="Breakfast" class="breakfast object-contain" />
       </div>
     </div>
   </div>
@@ -320,7 +320,7 @@
   <!-- Features Section -->
   <section use:scrollReveal={{ once: false }} class="py-24 md:py-32">
     <div class="text-center mb-16">
-      <h2 class="text-3xl sm:text-5xl font-['Permanent_Marker'] font-extrabold mb-4 text-gray-900 dark:text-white">
+      <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.features?.title || 'Comment ça marche'}
       </h2>
       <p class="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
@@ -406,7 +406,7 @@
   <!-- Alternative Features (Why choose us) -->
   <section use:scrollReveal={{ y: 30, delay: 0.1, once: false }} class="py-24">
     <div class="text-center mb-16">
-      <h2 class="text-3xl sm:text-5xl font-['Permanent_Marker'] font-extrabold mb-4 text-gray-900 dark:text-white">
+      <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.featuresAlt?.title || 'Pourquoi nous choisir'}
       </h2>
       <p class="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
@@ -435,7 +435,7 @@
   <!-- Recipe Counter Section -->
   <section bind:this={recipeSection} class="py-24">
     <div class="text-center max-w-4xl mx-auto">
-      <h2 class="text-3xl sm:text-5xl font-['Permanent_Marker'] font-extrabold mb-4 text-gray-900 dark:text-white">
+      <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.recipeCountTitle || 'Toujours plus de recettes'}
       </h2>
       <p class="text-gray-600 dark:text-gray-400 mb-12 text-lg">
@@ -474,7 +474,7 @@
         <img src="img/undraw_reviews_ukai.svg" alt="Reviews" class="max-w-[280px] w-full" />
       </div>
       <div class="w-full md:w-1/2">
-        <h2 class="text-3xl sm:text-4xl font-['Permanent_Marker'] font-extrabold mb-4 text-gray-900 dark:text-white">
+        <h2 class="text-3xl sm:text-4xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
           {t?.rating?.title || 'Donnez votre avis'}
         </h2>
         <p class="text-gray-600 dark:text-gray-400 mb-8 text-lg">
@@ -528,6 +528,7 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
     @import "tailwindcss";
     @custom-variant dark (&:where(.dark, .dark *));
     @font-face {
