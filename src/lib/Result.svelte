@@ -34,8 +34,23 @@ export let onBack;
 
 const dispatch = createEventDispatcher();
 
-$: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => ing.original || '') : [];
-$: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => step.step || '') : [];
+$: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => decodeHtmlEntities(ing.original || '')) : [];
+
+$: rawSteps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps)
+  ? recipeData.analyzedInstructions[0].steps.map(step => {
+      const original = decodeHtmlEntities(step.step || '');
+      const isTooLong = /QUERY LENGTH LIMIT EXCEEDED|MAX ALLOWED QUERY/i.test(original);
+      return {
+        text: isTooLong
+          ? (t.instructionTooLong || 'Cette instruction est trop longue pour être affichée.')
+          : original,
+        isTooLong
+      };
+    })
+  : [];
+$: uiSteps = rawSteps;
+$: steps = rawSteps.map(item => item.text);
+
 $: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.minutes}` : ($language === 'en' ? 'Not specified' : 'Non spécifié');
 $: cuisine = Array.isArray(recipeData?.cuisines) && recipeData.cuisines.length > 0 ? recipeData.cuisines.join(', ') : ($language === 'en' ? 'Not specified' : 'Non spécifié');
 $: formattedExcludedIngredients = allExcludedIngredients.length > 0 ? allExcludedIngredients.map(ing => t.ingredients[ing.replace(' ', '_')] || ing).join(', ') : ($language === 'en' ? 'None' : 'Aucun');
@@ -402,29 +417,50 @@ async function exportToPDF() {
 function closeInstagramModal() {
     showInstagramModal = false;
 }
+
+function decodeHtmlEntities(text) {
+  if (!text) return '';
+
+  if (browser) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = text;
+    return txt.value;
+  }
+
+  // Fallback minimal côté serveur
+  return text
+    .replace(/&#xA0;/gi, '\u00A0')
+    .replace(/&nbsp;/gi, '\u00A0')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/g, "'");
+}
 </script>
 
-<div class="mt-8">
+<div class="">
     {#if loading}
         <div
             transition:scale={{ duration: 300, start: 0.9 }}
             class="flex justify-center items-center h-96"
         >
             <div class="flex flex-col items-center">
-                <Icon icon="mdi:loading" class="text-yellow-600 text-6xl animate-spin" />
-                <p class="text-yellow-600 font-semibold mt-4 text-lg">{t.loadingIdea}</p>
+                <Icon icon="mdi:loading" class="text-yellow-500 text-6xl animate-spin" />
+                <p class="text-yellow-600 dark:text-yellow-400 font-semibold mt-4 text-lg">{t.loadingIdea}</p>
             </div>
         </div>
     {:else if recipeData}
-        <div transition:scale={{ duration: 300, start: 0.95 }} class="dark:font-light">
-            <p class="text-xl font-semibold text-gray-800 dark:text-gray-200">
+        <div transition:scale={{ duration: 300, start: 0.95 }} class="text-zinc-900 dark:text-zinc-100 dark:font-light">
+            <p class="text-sm text-zinc-900 dark:text-zinc-100">
                 {t.suggestion} {mealDescription}
             </p>
             {#if pdfLoadError}
                 <div
-                    class="mt-3 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-300 p-3 rounded-lg"
+                    class="mt-3 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 p-3 rounded-2xl flex items-center gap-2"
                     role="alert"
                 >
+                    <Icon icon="mdi:alert-circle-outline" class="text-xl shrink-0" />
                     <p class="font-medium">
                         {t.pdfLoadError || 'Failed to load PDF library. PDF export is unavailable.'}
                     </p>
@@ -434,25 +470,25 @@ function closeInstagramModal() {
                 {#if recipeData.image}
                     <img
                         src={recipeData.image}
-                        class="rounded-xl w-full h-auto shadow-sm"
+                        class="rounded-2xl w-full h-auto shadow-sm border border-zinc-200/80 dark:border-zinc-800/80"
                         alt={recipeData.title || t.recipeImageAlt}
                     />
                 {/if}
                 <div class="mt-4">
                     <div class="mb-4 flex items-center">
                         <div class="flex flex-wrap gap-2">
-                            <span class="bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300 px-3 py-1 rounded-full text-sm font-medium">
+                            <span class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-medium border bg-yellow-500/10 border-yellow-500/30 text-yellow-600 dark:text-yellow-400">
                                 {formattedMealType}
                             </span>
                             {#each diets as diet}
                                 {#if diet}
-                                    <span class="bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm font-medium">
+                                    <span class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-medium border bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-zinc-600 dark:text-zinc-300">
                                         #{t.diets[diet] || diet}
                                     </span>
                                 {/if}
                             {/each}
                             {#if cuisine && cuisine !== ($language === 'en' ? 'Not specified' : 'Non spécifié')}
-                                <span class="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-sm font-medium">
+                                <span class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-medium border bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400">
                                     {cuisine}
                                 </span>
                             {/if}
@@ -461,23 +497,23 @@ function closeInstagramModal() {
                         <div class="flex justify-end gap-2 ml-auto">
                             <div class="relative group">
                                 <button
-                                    class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
+                                    class="p-2 text-zinc-400 rounded-full hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                     on:click={toggleFavorite}
                                     aria-label={isFavorite ? (t.removeFavorite || 'Remove from favorites') : (t.addFavorite || 'Add to favorites')}
                                 >
                                     {#if isFavorite}
-                                        <Icon icon="basil:heart-solid" class="text-yellow-600 text-xl" />
+                                        <Icon icon="basil:heart-solid" class="text-yellow-600 dark:text-yellow-400 text-xl" />
                                     {:else}
-                                        <Icon icon="basil:heart-outline" class="text-gray-600 dark:text-gray-300 text-xl" />
+                                        <Icon icon="basil:heart-outline" class="text-xl" />
                                     {/if}
                                 </button>
-                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-zinc-900 dark:bg-zinc-800 text-white text-xs rounded-lg py-1 px-2 shadow-lg">
                                     {isFavorite ? (t.removeFavorite || 'Remove from favorites') : (t.addFavorite || 'Add to favorites')}
                                 </span>
                             </div>
                             <div class="relative group">
                                 <button
-                                    class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative cursor-pointer"
+                                    class="p-2 text-zinc-400 rounded-full hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors relative cursor-pointer"
                                     on:click={copyRecipeLink}
                                     disabled={loading || !recipeUrl}
                                     aria-label={t.copyLink || 'Copy Link'}
@@ -487,32 +523,32 @@ function closeInstagramModal() {
                                         <span
                                             in:fade={{ duration: 300 }}
                                             out:fade={{ duration: 300 }}
-                                            class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded"
+                                            class="absolute -top-9 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white text-xs font-semibold px-2.5 py-1 rounded-lg shadow-lg"
                                         >
                                             {t.copySuccess || 'Copied!'}
                                         </span>
                                     {/if}
                                 </button>
-                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-zinc-900 dark:bg-zinc-800 text-white text-xs rounded-lg py-1 px-2 shadow-lg">
                                     {t.copyLink || 'Copy recipe link'}
                                 </span>
                             </div>
                             <div class="relative group">
                                 <button
-                                    class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer"
+                                    class="p-2 text-zinc-400 rounded-full hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                     on:click={() => showShareOptions = !showShareOptions}
                                     disabled={loading || !recipeUrl}
                                     aria-label={t.share || 'Share'}
                                 >
                                     <Icon icon="mdi:share-variant" class="text-xl" />
                                 </button>
-                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                <span class="absolute bottom-full mb-2 hidden group-hover:block bg-zinc-900 dark:bg-zinc-800 text-white text-xs rounded-lg py-1 px-2 shadow-lg">
                                     {t.share || 'Share recipe'}
                                 </span>
                                 {#if showShareOptions}
-                                    <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-10">
+                                    <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-2xl shadow-xl border border-zinc-100 dark:border-zinc-700/80 overflow-hidden py-1 z-10">
                                         <button
-                                            class="w-full text-left px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer"
+                                            class="text-xs w-full text-left px-4 py-2.5 text-zinc-600 dark:text-zinc-300 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400 flex items-center transition-colors cursor-pointer"
                                             on:click={() => shareToSocial('instagram')}
                                             aria-label={t.shareInstagram || 'Share on Instagram'}
                                         >
@@ -520,7 +556,7 @@ function closeInstagramModal() {
                                             {t.shareInstagram || 'Instagram'}
                                         </button>
                                         <button
-                                            class="w-full text-left px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer"
+                                            class="text-xs w-full text-left px-4 py-2.5 text-zinc-600 dark:text-zinc-300 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400 flex items-center transition-colors cursor-pointer"
                                             on:click={() => shareToSocial('facebook')}
                                             aria-label={t.shareFacebook || 'Share on Facebook'}
                                         >
@@ -528,7 +564,7 @@ function closeInstagramModal() {
                                             {t.shareFacebook || 'Facebook'}
                                         </button>
                                         <button
-                                            class="w-full text-left px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center cursor-pointer"
+                                            class="text-xs w-full text-left px-4 py-2.5 text-zinc-600 dark:text-zinc-300 hover:bg-yellow-500/10 hover:text-yellow-600 dark:hover:text-yellow-400 flex items-center transition-colors cursor-pointer"
                                             on:click={() => shareToSocial('whatsapp')}
                                             aria-label={t.shareWhatsApp || 'Share on WhatsApp'}
                                         >
@@ -540,20 +576,20 @@ function closeInstagramModal() {
                             </div>
                         </div>
                     </div>
-                    <p class="font-semibold text-gray-800 dark:text-gray-200 text-center">
-                        <span class="text-lg md:text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-500 text-transparent bg-clip-text py-2">
+                    <p class="font-semibold text-zinc-900 dark:text-zinc-100 text-center">
+                        <span class="text-lg md:text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-600 text-transparent bg-clip-text py-2">
                             {recipeData.title || ''}
                         </span>
                     </p>
                     {#if cuisine && cuisine !== ($language === 'en' ? 'Not specified' : 'Non spécifié')}
-                        <p class="mt-4 text-gray-600 dark:text-gray-400">
-                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.cuisine}</span> {cuisine}
+                        <p class="text-xs mt-4 text-zinc-600 dark:text-zinc-400">
+                            <span class="text-sm font-semibold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">{t.cuisine}</span> {cuisine}
                         </p>
                     {/if}
                     {#if ingredients.length > 0}
-                        <div class="mt-4">
-                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.ingredients}</span>
-                            <ul class="list-disc ml-6 mt-2 text-gray-600 dark:text-gray-400">
+                        <div class="mt-4 p-3.5 bg-zinc-50 dark:bg-zinc-800/40 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                            <span class="text-sm font-semibold tracking-wide uppercase text-zinc-500 dark:text-zinc-400 block">{t.ingredients}</span>
+                            <ul class="text-xs list-disc ml-6 mt-2 text-zinc-600 dark:text-zinc-400 space-y-1">
                                 {#each ingredients as ingredient}
                                     <li>{ingredient}</li>
                                 {/each}
@@ -561,20 +597,27 @@ function closeInstagramModal() {
                         </div>
                     {/if}
                     {#if steps.length > 0}
-                        <div class="mt-4">
-                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.instructions}</span>
-                            <ul class="list-decimal ml-6 mt-2 text-gray-600 dark:text-gray-400">
-                                {#each steps as step}
-                                    <li>{step}</li>
+                        <div class="mt-4 p-3.5 bg-zinc-50 dark:bg-zinc-800/40 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                            <span class="text-sm font-semibold tracking-wide uppercase text-zinc-500 dark:text-zinc-400 block">{t.instructions}</span>
+                            <ul class="text-xs list-decimal ml-6 mt-2 text-zinc-600 dark:text-zinc-400 space-y-1">
+                                {#each uiSteps as step}
+                                    <li class:too-long={step.isTooLong}>
+                                        {#if step.isTooLong}
+                                        <Icon icon="mdi:alert-circle-outline" class="inline-block mr-1 text-red-500" />
+                                        {/if}
+                                        {step.text}
+                                    </li>
                                 {/each}
                             </ul>
                         </div>
                     {/if}
-                    <p class="mt-4 text-gray-600 dark:text-gray-400"><span class="font-semibold text-gray-800 dark:text-gray-200">{t.prepTime}</span> {prepTime}</p>
+                    <p class="mt-4 text-xs text-zinc-600 dark:text-zinc-400">
+                        <span class="text-sm font-semibold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">{t.prepTime}</span> {prepTime}
+                    </p>
                     {#if recipeData.nutrition?.nutrients?.length}
-                        <div class="mt-4">
-                            <span class="font-semibold text-gray-800 dark:text-gray-200">{t.nutrition}</span>
-                            <ul class="list-disc ml-6 mt-2 text-gray-600 dark:text-gray-400">
+                        <div class="mt-4 p-3.5 bg-zinc-50 dark:bg-zinc-800/40 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                            <span class="text-sm font-semibold tracking-wide uppercase text-zinc-500 dark:text-zinc-400 block">{t.nutrition}</span>
+                            <ul class="text-xs list-disc ml-6 mt-2 text-zinc-600 dark:text-zinc-400 space-y-1">
                                 {#each recipeData.nutrition.nutrients as nutrient}
                                     {#if ['Calories', 'Protein', 'Carbohydrates', 'Fat'].includes(nutrient.name)}
                                         <li>{nutrient.name}: {nutrient.amount} {nutrient.unit}</li>
@@ -584,38 +627,38 @@ function closeInstagramModal() {
                         </div>
                     {/if}
                 </div>
-                <div class="mt-6 space-y-3 sm:flex sm:flex-wrap sm:justify-end sm:gap-3 sm:space-y-0">
+                <div class="text-xs mt-6 space-y-3 sm:flex sm:flex-wrap sm:justify-end sm:gap-3 sm:space-y-0">
                     <button
-                        class="w-full sm:w-auto px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 hover:shadow-md transition-all duration-200 font-medium flex items-center justify-center cursor-pointer"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold px-5 py-3 rounded-2xl shadow-lg shadow-yellow-500/20 active:scale-95 transition-all disabled:opacity-60 cursor-pointer"
                         on:click={exportToPDF}
                         disabled={loading || !scriptLoaded || pdfLoading}
                         aria-label={t.exportPDF}
                     >
                         {#if pdfLoading}
-                            <Icon icon="mdi:loading" class="mr-2 text-lg animate-spin" />
+                            <Icon icon="mdi:loading" class="text-lg animate-spin" />
                             {t.exportingPDF || 'Exporting...'}
                         {:else}
-                            <Icon icon="mdi:file-pdf-box" class="mr-2 text-lg" />
+                            <Icon icon="mdi:file-pdf-box" class="text-lg" />
                             {t.exportPDF || 'Export to PDF'}
                         {/if}
                     </button>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <button
-                            class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 hover:shadow-md transition-all duration-200 font-medium flex items-center justify-center cursor-pointer"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/80 text-zinc-700 dark:text-zinc-200 hover:border-zinc-300 dark:hover:border-zinc-600 font-semibold px-5 py-3 rounded-2xl active:scale-95 transition-all disabled:opacity-60 cursor-pointer"
                             on:click={handleFindAnother}
                             disabled={loading}
                             aria-label={t.anotherIdea || 'Find Another Idea'}
                         >
-                            <Icon icon="mdi:puzzle" class="mr-2 text-lg" />
+                            <Icon icon="mdi:puzzle" class="text-lg" />
                             {t.anotherIdea || 'Another Idea'}
                         </button>
                         <button
-                            class="w-full sm:w-auto px-4 py-2 bg-transparent border-2 border-gray-600 text-gray-600 dark:text-gray-300 dark:border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 hover:shadow-md transition-all duration-200 font-medium flex items-center justify-center cursor-pointer"
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-100 font-semibold px-5 py-3 rounded-2xl active:scale-95 transition-all disabled:opacity-60 cursor-pointer"
                             on:click={onBack}
                             disabled={loading}
                             aria-label={t.modifyPrefs || 'Modify Preferences'}
                         >
-                            <Icon icon="mdi:silverware-fork-knife" class="mr-2 text-lg" />
+                            <Icon icon="mdi:silverware-fork-knife" class="text-lg" />
                             {t.modifyPrefs || 'Modify Preferences'}
                         </button>
                     </div>
@@ -626,32 +669,35 @@ function closeInstagramModal() {
 
     {#if showInstagramModal}
         <div
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            class="fixed inset-0 bg-zinc-950/60 backdrop-blur-md flex items-center justify-center z-50 p-4"
             transition:fade={{ duration: 200 }}
         >
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl"
+                class="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-zinc-200/80 dark:border-zinc-800/80"
                 transition:scale={{ duration: 200, start: 0.95 }}
             >
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    <h2 class="text-lg font-bold flex items-center gap-2.5">
+                        <div class="p-2 rounded-xl bg-yellow-500/10 text-yellow-600 dark:text-yellow-400">
+                            <Icon icon="mdi:instagram" class="text-xl" />
+                        </div>
                         {t.shareInstagram || 'Share on Instagram'}
                     </h2>
                     <button
-                        class="text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-200"
+                        class="p-2 rounded-full text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                         on:click={closeInstagramModal}
                         aria-label={t.close || 'Close'}
                     >
                         <Icon icon="mdi:close" class="text-xl" />
                     </button>
                 </div>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                <p class="text-zinc-600 dark:text-zinc-400 mb-4 text-xs">
                     {t.instagramShareInstructions ||
                         'The recipe link has been copied to your clipboard. Paste it into an Instagram Story or message to share with your followers. To share with a specific list of followers, use Instagram\'s "Close Friends" feature or send a direct message to your selected contacts.'}
                 </p>
                 <div class="flex justify-end">
                     <button
-                        class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all duration-200 font-medium"
+                        class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white font-bold px-5 py-2.5 rounded-2xl shadow-lg shadow-yellow-500/20 active:scale-95 transition-all"
                         on:click={closeInstagramModal}
                         aria-label={t.close || 'Close'}
                     >
@@ -666,5 +712,12 @@ function closeInstagramModal() {
 <style>
     .group:hover .group-hover\\:block {
         display: block;
+    }
+    .too-long {
+        font-style: italic;
+        color: #fb3740;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
     }
 </style>

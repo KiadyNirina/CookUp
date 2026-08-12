@@ -11,6 +11,7 @@
   import { user, initAuth, upsertUserProfile } from '../stores/auth';
   import { supabase } from '$lib/supabase';
   import { triggerAuthOpen } from '$lib/stores/ui';
+  import { scrollReveal } from '$lib/actions/scrollReveal.js';
 
   let poppup = false;
   let recipeCount = 0;
@@ -63,7 +64,7 @@
     });
 
     if (browser && recipeSection) {
-      const observer = new IntersectionObserver(
+      const counterObserver = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting) {
             gsap.to({ count: 0 }, {
@@ -82,17 +83,12 @@
                 recipeCountInternational = Math.round(this.targets()[0].count);
               }
             });
-            gsap.fromTo(
-              recipeSection,
-              { opacity: 0, y: 30 },
-              { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
-            );
-            observer.disconnect();
+            counterObserver.disconnect();
           }
         },
         { threshold: 0.5 }
       );
-      observer.observe(recipeSection);
+      counterObserver.observe(recipeSection);
     }
 
     return () => {
@@ -123,7 +119,6 @@
       if ($user) {
         openRecipePopup();
       } else {
-        // Auth modal will be shown via Header
         pendingUrlParams = pendingUrlParams;
       }
     }
@@ -163,7 +158,6 @@
     }
   }
 
-  // Header event handlers
   function handleAuthSuccess() {
     if (pendingUrlParams) {
       setTimeout(openRecipePopup, 500);
@@ -175,12 +169,8 @@
   }
 
   async function submitRating() {
-    if (!$user) {
-      return;
-    }
-    if (rating < 1 || rating > 5) {
-      return;
-    }
+    if (!$user) return;
+    if (rating < 1 || rating > 5) return;
     try {
       ratingLoading = true;
       const { error } = await supabase
@@ -220,7 +210,7 @@
     if (ratingLoading) return;
     hoverRating = star;
     gsap.to(`.star-${star}`, {
-      scale: 1.2,
+      scale: 1.15,
       color: document.documentElement.classList.contains('dark') ? '#facc15' : '#d97706',
       duration: 0.2,
       ease: 'power2.out'
@@ -248,10 +238,10 @@
     hoverRating = 0;
     for (let i = 1; i <= 5; i++) {
       gsap.to(`.star-${i}`, {
-        scale: rating >= i ? 1 : 1,
+        scale: 1,
         color: rating >= i
           ? (document.documentElement.classList.contains('dark') ? '#facc15' : '#d97706')
-          : (document.documentElement.classList.contains('dark') ? '#4b5563' : '#d1d5db'),
+          : (document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'),
         duration: 0.2,
         ease: 'power2.out'
       });
@@ -262,49 +252,32 @@
 </script>
 
 <svelte:head>
-  <title>{$language === 'fr' ? 'Accueil' : 'Home'} - CookUp</title>
+  <title>{$language === 'en' ? 'CookUp — Discover, Share & Cook' : 'CookUp — Découvrez, partagez et cuisinez'}</title>
 </svelte:head>
 
-<div class="font-['NunitoSans'] text-black dark:text-white max-w-7xl mx-auto">
-  <!-- Header Component -->
-  <Header 
-    on:authSuccess={handleAuthSuccess}
-    on:authClose={handleAuthClose}
-  />
+<div class="font-['Montserrat'] max-w-7xl mx-auto">
+  <Header on:authSuccess={handleAuthSuccess} on:authClose={handleAuthClose} />
+</div>
+<div class="font-['Montserrat'] text-gray-900 dark:text-gray-100 max-w-7xl mx-auto px-6 sm:px-10 min-h-screen">
 
-  <!-- Recipe Form Popup -->
+  <!-- Popup Recette -->
   {#if poppup}
     <div transition:fade={{ duration: 150 }}>
       <FormPoppup {urlParams} on:close={closePoppup} />
     </div>
   {/if}
 
-  <!-- Rating Success Modal -->
+  <!-- Modal Succès Note -->
   {#if showRatingSuccess}
-    <div
-      class="fixed inset-0 flex items-center justify-center backdrop-blur-sm backdrop-brightness-50 z-50 p-4"
-      transition:fade={{ duration: 150 }}
-      on:click={closeRatingSuccess}
-    >
-      <div
-        class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700"
-        on:click|stopPropagation
-      >
+    <div class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 p-4" transition:fade={{ duration: 150 }} on:click={closeRatingSuccess}>
+      <div class="bg-white dark:bg-gray-900 p-8 rounded-3xl max-w-md w-full border border-gray-100 dark:border-gray-800 shadow-xl" on:click|stopPropagation>
         <div class="text-center">
-          <div class="flex justify-center mb-4">
-            <div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <Icon icon="mdi:star" class="w-10 h-10 text-green-600 dark:text-green-400" />
-            </div>
+          <div class="mx-auto w-16 h-16 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-6">
+            <Icon icon="mdi:check-circle" class="w-8 h-8 text-green-600 dark:text-green-500" />
           </div>
-          <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-            {$language === 'fr' ? 'Note enregistrée !' : 'Rating saved!'}
-          </h2>
-          <p class="text-green-600 dark:text-green-400 font-semibold mb-4">{ratingSuccessMessage}</p>
-          <button
-            on:click={closeRatingSuccess}
-            class="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-all duration-300 flex items-center justify-center mx-auto"
-          >
-            <Icon icon="mdi:check" class="w-5 h-5 mr-2" />
+          <h2 class="text-2xl font-bold mb-2">{$language === 'fr' ? 'Note enregistrée !' : 'Rating saved!'}</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-8">{ratingSuccessMessage}</p>
+          <button on:click={closeRatingSuccess} class="w-full py-3.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors duration-300">
             {$language === 'fr' ? 'Compris' : 'Got it'}
           </button>
         </div>
@@ -313,13 +286,13 @@
   {/if}
 
   <!-- Hero Section -->
-  <div class="h-screen flex items-center">
-    <div class="flex flex-col sm:flex-row items-center mx-auto px-10">
-      <div class="w-full sm:w-1/2 text-center sm:text-left">
-        <h1 class="font-['Permanent_Marker'] text-4xl sm:text-5xl md:text-7xl font-extrabold">
+  <div use:scrollReveal={{ once: false }} class="min-h-[85vh] flex items-center pt-20 pb-10">
+    <div class="flex flex-col md:flex-row items-center w-full gap-12">
+      <div class="w-full md:w-1/2 text-center md:text-left flex flex-col items-center md:items-start">
+        <h1 class="font-['Unbounded'] text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight text-gray-900 dark:text-white">
           {t?.headline || 'Loading...'}
         </h1>
-        <p class="dark:font-thin mt-5 text-sm sm:text-base">
+        <p class="mt-6 text-sm text-gray-600 dark:text-gray-400 max-w-lg">
           {#if $user}
             {t?.auth.welcomeBack}, {$user.email?.split('@')[0]}
           {:else}
@@ -327,10 +300,10 @@
           {/if}
         </p>
         <button
-          class="button mt-5 flex items-center justify-center sm:justify-start bg-yellow-600 text-white dark:text-black font-bold p-4 rounded-2xl transition-all duration-300 ease-in-out hover:cursor-pointer hover:text-yellow-600 hover:bg-transparent border-2 hover:border-yellow-600 active:scale-70 mx-auto sm:mx-0 text-sm sm:text-base"
+          class="mt-10 text-sm flex items-center justify-center gap-2 bg-yellow-600 text-white dark:text-gray-950 font-semibold px-8 py-4 rounded-full transition-all duration-300 hover:bg-yellow-500 active:scale-95 w-auto"
           on:click={togglePoppup}
         >
-          <Icon icon="mdi:timer-outline" class="mr-1" />
+          <Icon icon="mdi:timer-outline" class="text-xl" />
           {#if $user}
             {t?.getStarted || 'Get Started'}
           {:else}
@@ -338,288 +311,224 @@
           {/if}
         </button>
       </div>
-      <div class="w-full sm:w-1/2 flex items-center mt-5 sm:mt-0">
-        <img
-          src="/img/ramen-96.svg"
-          alt={$language === 'en' ? 'Breakfast' : 'Petit déjeuner'}
-          class="breakfast w-1/2 sm:w-auto mx-auto sm:ml-auto"
-        />
+      <div class="w-full md:w-1/2 flex justify-center md:justify-end">
+        <img src="/img/ramen-96.svg" alt="Breakfast" class="breakfast object-contain" />
       </div>
     </div>
   </div>
 
   <!-- Features Section -->
-  <section class="py-28 md:py-36">
-    <div class="max-w-7xl mx-auto px-10">
-      <div class="text-center mb-20">
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-6">
-          {t?.features?.title || 'Comment ça marche'}
-        </h2>
-        <p class="dark:font-thin text-base sm:text-lg max-w-2xl mx-auto">
-          {t?.features?.subtitle || 'Trois étapes simples pour des repas personnalisés'}
-        </p>
-      </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div class="space-y-12">
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-              <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">1</span>
-            </div>
-            <div>
-              <h3 class="text-xl sm:text-2xl font-bold mb-2">
-                {t?.features?.step1Title || 'Choisissez vos préférences'}
-              </h3>
-              <p class="text-sm sm:text-base dark:font-thin">
-                {t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}
-              </p>
-            </div>
+  <section use:scrollReveal={{ once: false }} class="py-24 md:py-32">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
+        {t?.features?.title || 'Comment ça marche'}
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400 text-sm max-w-2xl mx-auto">
+        {t?.features?.subtitle || 'Trois étapes simples pour des repas personnalisés'}
+      </p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div class="space-y-10">
+        <!-- Étape 1 -->
+        <div class="flex gap-6 items-start">
+          <div class="flex-shrink-0 w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-2xl flex items-center justify-center text-xl font-bold border border-yellow-100 dark:border-yellow-900/30">
+            1
           </div>
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-              <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">2</span>
-            </div>
-            <div>
-              <h3 class="text-xl sm:text-2xl font-bold mb-2">
-                {t?.features?.step2Title || 'Obtenez une recette'}
-              </h3>
-              <p class="text-sm sm:text-base dark:font-thin">
-                {t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}
-              </p>
-            </div>
-          </div>
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-              <span class="text-xl font-bold text-yellow-600 dark:text-yellow-400">3</span>
-            </div>
-            <div>
-              <h3 class="text-xl sm:text-2xl font-bold mb-2">
-                {t?.features?.step3Title || 'Cuisinez et savourez'}
-              </h3>
-              <p class="text-sm sm:text-base dark:font-thin">
-                {t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}
-              </p>
-            </div>
+          <div>
+            <h3 class="text-xl font-bold mb-1">{t?.features?.step1Title || 'Choisissez vos préférences'}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}</p>
           </div>
         </div>
-        <div class="relative">
-          <img
-            src="/img/cooking-process.svg"
-            alt="Cooking process illustration"
-            class="w-full h-auto"
-            on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Illustration'}
-          />
-          <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-yellow-600/5 dark:bg-yellow-400/5 rounded-full"></div>
+        <!-- Étape 2 -->
+        <div class="flex gap-6 items-start">
+          <div class="flex-shrink-0 w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-2xl flex items-center justify-center text-xl font-bold border border-yellow-100 dark:border-yellow-900/30">
+            2
+          </div>
+          <div>
+            <h3 class="text-xl font-bold mb-1">{t?.features?.step2Title || 'Obtenez une recette'}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}</p>
+          </div>
+        </div>
+        <!-- Étape 3 -->
+        <div class="flex gap-6 items-start">
+          <div class="flex-shrink-0 w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-2xl flex items-center justify-center text-xl font-bold border border-yellow-100 dark:border-yellow-900/30">
+            3
+          </div>
+          <div>
+            <h3 class="text-xl font-bold mb-1">{t?.features?.step3Title || 'Cuisinez et savourez'}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}</p>
+          </div>
         </div>
       </div>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
-        <div class="relative order-2 lg:order-1">
-          <img
-            src="/img/meal-planning.svg"
-            alt="Meal planning illustration"
-            class="w-full h-auto"
-            on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Illustration'}
-          />
-        </div>
-        <div class="order-1 lg:order-2">
-          <h3 class="text-2xl sm:text-3xl font-bold mb-6">
-            {t?.features?.advancedTitle || 'Fonctionnalités avancées'}
-          </h3>
-          <ul class="space-y-4">
-            <li class="flex items-start gap-3">
-              <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
-              <span class="text-sm sm:text-base dark:font-thin">
-                {t?.features?.feature1 || 'Filtres nutritionnels avancés'}
-              </span>
-            </li>
-            <li class="flex items-start gap-3">
-              <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
-              <span class="text-sm sm:text-base dark:font-thin">
-                {t?.features?.feature2 || 'Export PDF des recettes'}
-              </span>
-            </li>
-            <li class="flex items-start gap-3">
-              <Icon icon="mdi:check-circle" class="text-yellow-600 text-xl mt-0.5 flex-shrink-0" />
-              <span class="text-sm sm:text-base dark:font-thin">
-                {t?.features?.feature3 || 'Traduction automatique'}
-              </span>
-            </li>
-          </ul>
-          <a href="/features" class="inline-flex items-center mt-8 text-yellow-600 dark:text-yellow-400 font-medium hover:gap-2 transition-all text-sm sm:text-base">
-            {t?.features?.discoverMore || 'Découvrir toutes les fonctionnalités'}
-            <Icon icon="mdi:arrow-right" class="ml-1" />
-          </a>
-        </div>
+      <div class="relative flex justify-center">
+        <div class="absolute inset-0 bg-yellow-600/5 dark:bg-yellow-400/5 rounded-[3rem] -rotate-3 scale-105 -z-10"></div>
+        <img src="/img/cooking-process.svg" alt="Cooking process" class="w-full max-w-md h-auto" />
+      </div>
+    </div>
+
+    <!-- Advanced Features Section -->
+    <div use:scrollReveal={{ once: false }} class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mt-32">
+      <div class="relative order-2 lg:order-1 flex justify-center">
+        <div class="absolute inset-0 bg-gray-50 dark:bg-gray-900/30 rounded-[3rem] rotate-3 scale-105 -z-10"></div>
+        <img src="/img/meal-planning.svg" alt="Meal planning" class="w-full max-w-md h-auto" />
+      </div>
+      <div class="order-1 lg:order-2">
+        <h3 class="text-3xl font-bold mb-8">{t?.features?.advancedTitle || 'Fonctionnalités avancées'}</h3>
+        <ul class="space-y-5">
+          <li class="flex items-center gap-4">
+            <div class="w-5 h-5 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-sm" />
+            </div>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature1 || 'Filtres nutritionnels avancés'}</span>
+          </li>
+          <li class="flex items-center gap-4">
+            <div class="w-5 h-5 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-sm" />
+            </div>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature2 || 'Export PDF des recettes'}</span>
+          </li>
+          <li class="flex items-center gap-4">
+            <div class="w-5 h-5 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-sm" />
+            </div>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature3 || 'Traduction automatique'}</span>
+          </li>
+        </ul>
+        <a href="/features" class="inline-flex items-center mt-10 text-yellow-600 dark:text-yellow-400 font-semibold hover:opacity-80 transition-opacity gap-2 group">
+          {t?.features?.discoverMore || 'Découvrir toutes les fonctionnalités'}
+          <Icon icon="mdi:arrow-right" class="transition-transform group-hover:translate-x-1" />
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- Alternative Features Section -->
-  <section class="py-28 md:py-36">
-    <div class="max-w-7xl mx-auto px-10">
-      <div class="text-center mb-20">
-        <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-6">
-          {t?.featuresAlt?.title || 'Pourquoi nous choisir'}
-        </h2>
-        <p class="text-base sm:text-lg dark:font-thin max-w-2xl mx-auto">
-          {t?.featuresAlt?.subtitle || 'Une expérience culinaire simplifiée'}
-        </p>
+  <!-- Alternative Features (Why choose us) -->
+  <section use:scrollReveal={{ y: 30, delay: 0.1, once: false }} class="py-24">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
+        {t?.featuresAlt?.title || 'Pourquoi nous choisir'}
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400 text-sm max-w-2xl mx-auto">
+        {t?.featuresAlt?.subtitle || 'Une expérience culinaire simplifiée'}
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 transition-transform duration-300 hover:-translate-y-1">
+        <img src="/img/personalized.svg" alt="Personalized" class="w-32 h-32 mx-auto object-contain mb-6" />
+        <h3 class="text-xl font-bold mb-3">{t?.featuresAlt?.personalized || 'Personnalisé'}</h3>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">{t?.featuresAlt?.personalizedDesc || 'Des recettes adaptées à vos goûts et restrictions'}</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-        <div class="text-center mb-8 md:mb-0">
-          <div class="mb-8">
-            <img
-              src="/img/personalized.svg"
-              alt="Personalized recipes"
-              class="w-48 h-48 sm:w-64 sm:h-64 mx-auto object-contain"
-              on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=🎯'}
-            />
-          </div>
-          <h3 class="text-xl sm:text-2xl font-bold mb-3">
-            {t?.featuresAlt?.personalized || 'Personnalisé'}
-          </h3>
-          <p class="text-sm sm:text-base dark:font-thin">
-            {t?.featuresAlt?.personalizedDesc || 'Des recettes adaptées à vos goûts et restrictions'}
-          </p>
-        </div>
-        <div class="text-center mb-8 md:mb-0">
-          <div class="mb-8">
-            <img
-              src="/img/quick.svg"
-              alt="Quick & easy"
-              class="w-48 h-48 sm:w-64 sm:h-64 mx-auto object-contain"
-              on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=⚡'}
-            />
-          </div>
-          <h3 class="text-xl sm:text-2xl font-bold mb-3">
-            {t?.featuresAlt?.quick || 'Rapide & simple'}
-          </h3>
-          <p class="text-sm sm:text-base dark:font-thin">
-            {t?.featuresAlt?.quickDesc || 'Obtenez une idée de recette en un clic'}
-          </p>
-        </div>
-        <div class="text-center">
-          <div class="mb-8">
-            <img
-              src="/img/nutritious.svg"
-              alt="Nutritious"
-              class="w-48 h-48 sm:w-64 sm:h-64 mx-auto object-contain"
-              on:error={(e) => e.currentTarget.src = 'https://via.placeholder.com/256?text=🥗'}
-            />
-          </div>
-          <h3 class="text-xl sm:text-2xl font-bold mb-3">
-            {t?.featuresAlt?.nutritious || 'Équilibré'}
-          </h3>
-          <p class="text-sm sm:text-base dark:font-thin">
-            {t?.featuresAlt?.nutritiousDesc || 'Suivez vos apports nutritionnels'}
-          </p>
-        </div>
+      <div class="text-center p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 transition-transform duration-300 hover:-translate-y-1">
+        <img src="/img/quick.svg" alt="Quick" class="w-32 h-32 mx-auto object-contain mb-6" />
+        <h3 class="text-xl font-bold mb-3">{t?.featuresAlt?.quick || 'Rapide & simple'}</h3>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">{t?.featuresAlt?.quickDesc || 'Obtenez une idée de recette en un clic'}</p>
+      </div>
+      <div class="text-center p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 transition-transform duration-300 hover:-translate-y-1">
+        <img src="/img/nutritious.svg" alt="Nutritious" class="w-32 h-32 mx-auto object-contain mb-6" />
+        <h3 class="text-xl font-bold mb-3">{t?.featuresAlt?.nutritious || 'Équilibré'}</h3>
+        <p class="text-gray-600 dark:text-gray-400 text-sm">{t?.featuresAlt?.nutritiousDesc || 'Suivez vos apports nutritionnels'}</p>
       </div>
     </div>
   </section>
 
   <!-- Recipe Counter Section -->
-  <section
-    bind:this={recipeSection}
-    class="py-28 md:py-36 flex items-center opacity-0"
-  >
-    <div class="px-10 w-full text-center">
-      <h2 class="text-4xl sm:text-5xl md:text-6xl font-['Permanent_Marker'] font-extrabold mb-4">
-        {t?.recipeCountTitle || 'Loading...'}
+  <section bind:this={recipeSection} class="py-24">
+    <div class="text-center max-w-4xl mx-auto">
+      <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
+        {t?.recipeCountTitle || 'Toujours plus de recettes'}
       </h2>
-      <p class="dark:font-thin mb-12 max-w-2xl mx-auto text-sm sm:text-base">
-        {t?.recipeCountSubtitle || 'Loading...'}
+      <p class="text-gray-600 dark:text-gray-400 mb-12 text-sm">
+        {t?.recipeCountSubtitle || 'Découvrez une infinité de possibilités.'}
       </p>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 px-5 sm:px-10">
-        <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
-          <Icon icon="mdi:food-fork-drink" class="text-3xl sm:text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
-          <p class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">
-            {recipeCount.toLocaleString()} +
-          </p>
-          <p class="dark:font-thin mt-2 text-xs sm:text-sm">
-            {t?.recipeCountTotal || 'Loading...'}
-          </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="p-8 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl flex flex-col items-center">
+          <div class="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mb-4">
+            <Icon icon="mdi:food-fork-drink" class="text-2xl text-yellow-600 dark:text-yellow-400" />
+          </div>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white mb-1">{recipeCount.toLocaleString()} +</p>
+          <p class="text-sm text-gray-500">{t?.recipeCountTotal || 'Total Recipes'}</p>
         </div>
-        <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
-          <Icon icon="mdi:earth" class="text-3xl sm:text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
-          <p class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">
-            {recipeCountInternational.toLocaleString()} +
-          </p>
-          <p class="dark:font-thin mt-2 text-xs sm:text-sm">
-            {t?.recipeCountInternational || 'Loading...'}
-          </p>
+        <div class="p-8 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl flex flex-col items-center">
+          <div class="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mb-4">
+            <Icon icon="mdi:earth" class="text-2xl text-yellow-600 dark:text-yellow-400" />
+          </div>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white mb-1">{recipeCountInternational.toLocaleString()} +</p>
+          <p class="text-sm text-gray-500">{t?.recipeCountInternational || 'Cuisines'}</p>
         </div>
-        <div class="p-6 bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 hover:shadow-xl transform transition-all duration-500 hover:scale-105">
-          <Icon icon="mdi:calendar-refresh" class="text-3xl sm:text-4xl text-yellow-600 dark:text-yellow-400 mx-auto mb-4" />
-          <p class="text-2xl sm:text-3xl font-bold text-yellow-600 dark:text-yellow-400">Daily</p>
-          <p class="dark:font-thin mt-2 text-xs sm:text-sm">
-            {t?.recipeCountUpdates || 'Loading...'}
-          </p>
+        <div class="p-8 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl flex flex-col items-center">
+          <div class="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mb-4">
+            <Icon icon="mdi:calendar-refresh" class="text-2xl text-yellow-600 dark:text-yellow-400" />
+          </div>
+          <p class="text-3xl font-bold text-gray-900 dark:text-white mb-1">Daily</p>
+          <p class="text-sm text-gray-500">{t?.recipeCountUpdates || 'Updates'}</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Rating Section -->
-  <section class="py-28 md:py-36">
-    <div class="max-w-7xl mx-auto text-center">
-      <div class="flex flex-col md:flex-row items-center justify-center">
-        <div class="w-full md:w-1/3 p-4 md:mr-16 mb-8 md:mb-0">
-          <img src="img/undraw_reviews_ukai.svg" alt="" class="max-w-xs mx-auto">
-        </div>
-        <div class="w-full md:w-1/3">
-          <h2 class="text-3xl sm:text-4xl font-['Permanent_Marker'] font-extrabold mb-4">
-            {t?.rating?.title || 'Donnez votre avis'}
-          </h2>
-          <p class="dark:font-thin mb-12 max-w-2xl mx-auto text-sm sm:text-base">
-            {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
-          </p>
-          <div class="bg-white dark:bg-black rounded-lg shadow-lg dark:shadow-gray-900 p-6 max-w-md mx-auto">
-            <div class="flex justify-center mb-4">
-              {#each [1, 2, 3, 4, 5] as star}
-                <button
-                  on:click={() => setRating(star)}
-                  on:mouseenter={(event) => handleStarHover(star, event)}
-                  on:mouseleave={handleStarLeave}
-                  class="star-{star} text-2xl sm:text-3xl mx-1 cursor-pointer transition-all duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-300 dark:text-gray-600'}"
-                  disabled={ratingLoading}
-                >
-                  <Icon icon="mdi:star" />
-                </button>
-              {/each}
-            </div>
-            <textarea
-              bind:value={comment}
-              placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
-              class="w-full h-24 p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 transition-all duration-300 resize-none text-sm sm:text-base"
-              disabled={ratingLoading}
-            ></textarea>
-            <button
-              on:click={submitRating}
-              disabled={ratingLoading || rating < 1}
-              class="mt-4 w-full bg-yellow-600 cursor-pointer text-white dark:text-black px-4 py-3 rounded-xl font-semibold hover:bg-yellow-500 transition-all duration-300 disabled:opacity-50 flex items-center justify-center text-sm sm:text-base"
-            >
-              {#if ratingLoading}
-                <Icon icon="mdi:loading" class="w-5 h-5 animate-spin mr-2" />
-                {t?.loading || 'Chargement...'}
-              {:else}
-                <Icon icon="mdi:send" class="w-5 h-5 mr-2" />
-                {t?.rating?.submit || 'Envoyer'}
-              {/if}
-            </button>
+  <section use:scrollReveal={{ y: 30, once: false }} class="py-24">
+    <div class="bg-gray-50 dark:bg-gray-900/50 rounded-[3rem] border border-gray-100 dark:border-gray-800 p-8 sm:p-16 flex flex-col md:flex-row items-center gap-12">
+      <div class="w-full md:w-1/2 flex justify-center">
+        <img src="img/undraw_reviews_ukai.svg" alt="Reviews" class="max-w-[280px] w-full" />
+      </div>
+      <div class="w-full md:w-1/2">
+        <h2 class="text-3xl sm:text-4xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
+          {t?.rating?.title || 'Donnez votre avis'}
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-8 text-sm">
+          {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
+        </p>
+        
+        <div class="bg-white dark:bg-[#0a0a0a] rounded-3xl p-6 border border-gray-100 dark:border-gray-800">
+          <div class="flex justify-center mb-6 gap-2">
+            {#each [1, 2, 3, 4, 5] as star}
+              <button
+                on:click={() => setRating(star)}
+                on:mouseenter={(event) => handleStarHover(star, event)}
+                on:mouseleave={handleStarLeave}
+                class="star-{star} text-3xl cursor-pointer transition-transform duration-200 {rating >= star || hoverRating >= star ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-200 dark:text-gray-700'}"
+                disabled={ratingLoading}
+              >
+                <Icon icon="mdi:star" />
+              </button>
+            {/each}
           </div>
+          <textarea
+            bind:value={comment}
+            placeholder={t?.rating?.commentPlaceholder || 'Laissez un commentaire...'}
+            class="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-900 border-none outline-none focus:ring-2 focus:ring-yellow-500/50 text-gray-900 dark:text-white placeholder-gray-400 resize-none h-28 mb-4 transition-all"
+            disabled={ratingLoading}
+          ></textarea>
+          <button
+            on:click={submitRating}
+            disabled={ratingLoading || rating < 1}
+            class="w-full bg-yellow-600 text-white dark:text-gray-950 py-3.5 rounded-2xl font-semibold hover:bg-yellow-500 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {#if ratingLoading}
+              <Icon icon="mdi:loading" class="animate-spin text-xl" />
+              {t?.loading || 'Chargement...'}
+            {:else}
+              <Icon icon="mdi:send" class="text-xl" />
+              {t?.rating?.submit || 'Envoyer'}
+            {/if}
+          </button>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="w-full py-4 text-center text-sm text-gray-500 dark:text-gray-600">
-    {t?.footer}
+  <footer class="w-full py-8 text-center text-xs text-gray-500 border-t border-gray-100 dark:border-gray-800/50 mt-10">
+    {t?.footer || '© 2026 CookUp. Tous droits réservés.'}
   </footer>
 </div>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
     @import "tailwindcss";
     @custom-variant dark (&:where(.dark, .dark *));
     @font-face {
