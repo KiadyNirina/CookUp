@@ -468,7 +468,7 @@ function removePredefinedIngredient(ingredient) {
         <!-- Body Scrollable Content -->
         <div class="p-6 md:p-8 overflow-y-auto space-y-6 flex-1 scrollbar-thin">
             {#if !idea}
-                <p class="text-sm text-zinc-500 dark:text-zinc-400 -mt-2">
+                <p class="text-xs text-black dark:text-white -mt-2">
                     {t.choose}
                 </p>
 
@@ -481,7 +481,7 @@ function removePredefinedIngredient(ingredient) {
                         <select
                             bind:value={selectedType}
                             id="type"
-                            class="w-full appearance-none bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/80 rounded-2xl px-4 py-3.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all cursor-pointer font-medium"
+                            class="w-full appearance-none bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/80 rounded-2xl px-4 py-3.5 pr-10 text-xs focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 transition-all cursor-pointer"
                         >
                             <option value="" disabled selected>{t.mealTypePlaceholder}</option>
                             <option value="main course">{t.mealTypes['main_course']}</option>
@@ -517,7 +517,7 @@ function removePredefinedIngredient(ingredient) {
                                 value=""
                                 bind:group={diet}
                             />
-                            <span class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-zinc-600 dark:text-zinc-300 peer-checked:bg-yellow-500/10 peer-checked:border-yellow-500 peer-checked:text-yellow-600 dark:peer-checked:text-yellow-400">
+                            <span class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs border transition-all duration-200 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-zinc-600 dark:text-zinc-300 peer-checked:bg-yellow-500/10 peer-checked:border-yellow-500 peer-checked:text-yellow-600 dark:peer-checked:text-yellow-400">
                                 {t.dietPlaceholder || 'Any Diet'}
                             </span>
                         </label>
@@ -530,7 +530,7 @@ function removePredefinedIngredient(ingredient) {
                                     value={dietOption}
                                     bind:group={diet}
                                 />
-                                <span class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-zinc-600 dark:text-zinc-300 peer-checked:bg-yellow-500/10 peer-checked:border-yellow-500 peer-checked:text-yellow-600 dark:peer-checked:text-yellow-400">
+                                <span class="inline-flex items-center px-3.5 py-2 rounded-xl text-xs border transition-all duration-200 bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-black dark:text-white peer-checked:bg-yellow-500/10 peer-checked:border-yellow-500 peer-checked:text-yellow-600 dark:peer-checked:text-yellow-400">
                                     {t.diets[dietOption.replace(' ', '_')] || dietOption}
                                 </span>
                             </label>
@@ -555,10 +555,10 @@ function removePredefinedIngredient(ingredient) {
                                         excludedIngredients = [...excludedIngredients, ingredient];
                                     }
                                 }}
-                                class={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 ${
+                                class={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs border transition-all duration-200 ${
                                     isChecked
                                         ? 'bg-rose-500/10 border-rose-500 text-rose-600 dark:text-rose-400'
-                                        : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-zinc-600 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
+                                        : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-black dark:text-white hover:border-zinc-300 dark:hover:border-zinc-600'
                                 }`}
                             >
                                 <Icon icon={isChecked ? 'mdi:check' : 'mdi:plus'} class="text-sm" />
@@ -569,10 +569,10 @@ function removePredefinedIngredient(ingredient) {
                         <button
                             type="button"
                             on:click={() => (showOtherInput = !showOtherInput)}
-                            class={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all duration-200 ${
+                            class={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs border transition-all duration-200 ${
                                 showOtherInput
                                     ? 'bg-yellow-500/10 border-yellow-500 text-yellow-600 dark:text-yellow-400'
-                                    : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-zinc-600 dark:text-zinc-300'
+                                    : 'bg-zinc-50 dark:bg-zinc-800/50 border-zinc-200 dark:border-zinc-700/80 text-black dark:text-white'
                             }`}
                         >
                             <Icon icon="mdi:dots-horizontal" class="text-sm" />
@@ -588,13 +588,13 @@ function removePredefinedIngredient(ingredient) {
                                     type="text"
                                     bind:value={otherIngredient}
                                     on:input={handleOtherIngredientChange}
-                                    class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/80 rounded-2xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
+                                    class="w-full bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/80 rounded-2xl px-4 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
                                     placeholder={t.otherIngredientPlaceholder || 'Enter ingredient to exclude...'}
                                 />
                                 <button
                                     on:click={addOtherIngredient}
                                     disabled={!otherIngredient.trim() || !validSuggestion}
-                                    class="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-semibold px-4 py-2.5 rounded-2xl transition-all text-sm flex items-center gap-1 shrink-0"
+                                    class="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-semibold px-4 py-2.5 rounded-2xl transition-all text-xs flex items-center gap-1 shrink-0"
                                 >
                                     <span>{t.add || 'Add'}</span>
                                     <Icon icon="mdi:plus" />
