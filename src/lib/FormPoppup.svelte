@@ -52,6 +52,7 @@ let showErrorPopup = false;
 $: if (showOtherInput) {
         otherIngredient = '';
         ingredientSuggestions = [];
+        selectedSuggestion = null;
     }
 
 let otherIngredient = '';
@@ -59,8 +60,13 @@ let showOtherInput = false;
 let ingredientSuggestions = [];
 let loadingSuggestions = false;
 let manualIngredients = []; 
+let selectedSuggestion = null;
 
 $: allExcludedIngredients = [...excludedIngredients, ...manualIngredients];
+$: validSuggestion = otherIngredient.trim().length > 0 && (
+    ingredientSuggestions.some(s => s.toLowerCase() === otherIngredient.trim().toLowerCase()) ||
+    (selectedSuggestion && selectedSuggestion.toLowerCase() === otherIngredient.trim().toLowerCase())
+);
 $: t = translations[$language] || translations.en;
 
 const commonIngredients = [
@@ -381,18 +387,31 @@ const debouncedFetchSuggestions = debounce(fetchIngredientSuggestions, 300);
 
 function handleOtherIngredientChange(e) {
     otherIngredient = e.target.value;
+    selectedSuggestion = null;
     debouncedFetchSuggestions(otherIngredient);
 }
 
 function selectSuggestion(suggestion) {
     otherIngredient = suggestion;
+    selectedSuggestion = suggestion;
     ingredientSuggestions = [];
 }
 
 function addOtherIngredient() {
-    if (otherIngredient.trim() && ![...excludedIngredients, ...manualIngredients].includes(otherIngredient.trim().toLowerCase())) {
-        manualIngredients = [...manualIngredients, otherIngredient.trim().toLowerCase()];
+    const trimmed = otherIngredient.trim().toLowerCase();
+
+    if (!validSuggestion) {
+        errorMessage = t.suggestionRequired || 'Veuillez sélectionner un ingrédient dans les suggestions';
+        showErrorPopup = true;
+        setTimeout(() => (showErrorPopup = false), 3000);
+        return;
+    }
+
+    if (trimmed && ![...excludedIngredients, ...manualIngredients].includes(trimmed)) {
+        manualIngredients = [...manualIngredients, trimmed];
         otherIngredient = '';
+        selectedSuggestion = null;
+        ingredientSuggestions = [];
         showOtherInput = false;
     }
 }
@@ -574,7 +593,7 @@ function removePredefinedIngredient(ingredient) {
                                 />
                                 <button
                                     on:click={addOtherIngredient}
-                                    disabled={!otherIngredient.trim()}
+                                    disabled={!otherIngredient.trim() || !validSuggestion}
                                     class="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-semibold px-4 py-2.5 rounded-2xl transition-all text-sm flex items-center gap-1 shrink-0"
                                 >
                                     <span>{t.add || 'Add'}</span>
