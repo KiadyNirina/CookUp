@@ -323,7 +323,7 @@
       <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.features?.title || 'Comment ça marche'}
       </h2>
-      <p class="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+      <p class="text-gray-600 dark:text-gray-400 text-sm max-w-2xl mx-auto">
         {t?.features?.subtitle || 'Trois étapes simples pour des repas personnalisés'}
       </p>
     </div>
@@ -336,8 +336,8 @@
             1
           </div>
           <div>
-            <h3 class="text-xl font-bold mb-2">{t?.features?.step1Title || 'Choisissez vos préférences'}</h3>
-            <p class="text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}</p>
+            <h3 class="text-xl font-bold mb-1">{t?.features?.step1Title || 'Choisissez vos préférences'}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}</p>
           </div>
         </div>
         <!-- Étape 2 -->
@@ -346,8 +346,8 @@
             2
           </div>
           <div>
-            <h3 class="text-xl font-bold mb-2">{t?.features?.step2Title || 'Obtenez une recette'}</h3>
-            <p class="text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}</p>
+            <h3 class="text-xl font-bold mb-1">{t?.features?.step2Title || 'Obtenez une recette'}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}</p>
           </div>
         </div>
         <!-- Étape 3 -->
@@ -356,8 +356,8 @@
             3
           </div>
           <div>
-            <h3 class="text-xl font-bold mb-2">{t?.features?.step3Title || 'Cuisinez et savourez'}</h3>
-            <p class="text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}</p>
+            <h3 class="text-xl font-bold mb-1">{t?.features?.step3Title || 'Cuisinez et savourez'}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}</p>
           </div>
         </div>
       </div>
@@ -377,22 +377,22 @@
         <h3 class="text-3xl font-bold mb-8">{t?.features?.advancedTitle || 'Fonctionnalités avancées'}</h3>
         <ul class="space-y-5">
           <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
-              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-xl" />
+            <div class="w-5 h-5 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-sm" />
             </div>
-            <span class="text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature1 || 'Filtres nutritionnels avancés'}</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature1 || 'Filtres nutritionnels avancés'}</span>
           </li>
           <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
-              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-xl" />
+            <div class="w-5 h-5 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-sm" />
             </div>
-            <span class="text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature2 || 'Export PDF des recettes'}</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature2 || 'Export PDF des recettes'}</span>
           </li>
           <li class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
-              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-xl" />
+            <div class="w-5 h-5 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center border border-gray-100 dark:border-gray-800 flex-shrink-0">
+              <Icon icon="mdi:check" class="text-yellow-600 dark:text-yellow-400 text-sm" />
             </div>
-            <span class="text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature3 || 'Traduction automatique'}</span>
+            <span class="text-sm text-gray-700 dark:text-gray-300 font-medium">{t?.features?.feature3 || 'Traduction automatique'}</span>
           </li>
         </ul>
         <a href="/features" class="inline-flex items-center mt-10 text-yellow-600 dark:text-yellow-400 font-semibold hover:opacity-80 transition-opacity gap-2 group">
@@ -409,7 +409,7 @@
       <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.featuresAlt?.title || 'Pourquoi nous choisir'}
       </h2>
-      <p class="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+      <p class="text-gray-600 dark:text-gray-400 text-sm max-w-2xl mx-auto">
         {t?.featuresAlt?.subtitle || 'Une expérience culinaire simplifiée'}
       </p>
     </div>
@@ -438,7 +438,7 @@
       <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.recipeCountTitle || 'Toujours plus de recettes'}
       </h2>
-      <p class="text-gray-600 dark:text-gray-400 mb-12 text-lg">
+      <p class="text-gray-600 dark:text-gray-400 mb-12 text-sm">
         {t?.recipeCountSubtitle || 'Découvrez une infinité de possibilités.'}
       </p>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -477,7 +477,7 @@
         <h2 class="text-3xl sm:text-4xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
           {t?.rating?.title || 'Donnez votre avis'}
         </h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-8 text-lg">
+        <p class="text-gray-600 dark:text-gray-400 mb-8 text-sm">
           {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
         </p>
         
