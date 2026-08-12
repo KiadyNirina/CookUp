@@ -252,7 +252,7 @@
 </script>
 
 <svelte:head>
-  <title>{$language === 'fr' ? 'Accueil' : 'Home'} - CookUp</title>
+  <title>{$language === 'en' ? 'CookUp — Discover, Share & Cook' : 'CookUp — Découvrez, partagez et cuisinez'}</title>
 </svelte:head>
 
 <div class="font-['Montserrat'] max-w-7xl mx-auto">
