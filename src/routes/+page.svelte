@@ -520,7 +520,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="w-full py-8 text-center text-sm text-gray-500 border-t border-gray-100 dark:border-gray-800/50 mt-10">
+  <footer class="w-full py-8 text-center text-xs text-gray-500 border-t border-gray-100 dark:border-gray-800/50 mt-10">
     {t?.footer || '© 2026 CookUp. Tous droits réservés.'}
   </footer>
 </div>

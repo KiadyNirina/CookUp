@@ -23,7 +23,7 @@
   <title>{$language === 'fr' ? 'Page non trouvée' : 'Page not found'} - CookUp</title>
 </svelte:head>
 
-<div class="font-['NunitoSans'] text-black dark:text-white min-h-screen flex flex-col max-w-7xl mx-auto">
+<div class="font-['Montserrat'] text-black dark:text-white min-h-screen flex flex-col max-w-7xl mx-auto">
   
   <!-- Header Component -->
   <Header 
@@ -51,12 +51,12 @@
       </div>
       
       <!-- Titre principal -->
-      <h1 class="text-3xl sm:text-4xl font-['Permanent_Marker'] font-extrabold text-yellow-600 mb-4">
+      <h1 class="text-3xl sm:text-4xl font-['Unbounded'] font-extrabold text-yellow-600 mb-4">
         {$language === 'fr' ? 'Oups ! Page introuvable' : 'Oops! Page not found'}
       </h1>
       
       <!-- Message descriptif -->
-      <p class="dark:font-thin mt-5 text-sm sm:text-base mb-3">
+      <p class="dark:font-thin mt-5 text-sm mb-3">
           {$language === 'fr' 
             ? 'La page que vous recherchez n\'existe pas ou a été déplacée.' 
             : 'The page you\'re looking for doesn\'t exist or has been moved.'}
@@ -81,7 +81,7 @@
         on:click={goHome}
         class="group px-8 py-3 bg-yellow-600 text-white dark:text-black rounded-xl font-semibold hover:bg-yellow-700 transition-colors cursor-pointer inline-flex items-center gap-2"
       >
-        <Icon icon="mdi:home" class="text-lg group-hover:-translate-y-0.5 transition-transform" />
+        <Icon icon="mdi:home" class="text-sm group-hover:-translate-y-0.5 transition-transform" />
         {$language === 'fr' ? 'Retour à l\'accueil' : 'Back to home'}
       </button>
       
@@ -89,14 +89,16 @@
   </main>
   
   <!-- Footer -->
-  <footer class="w-full py-4 text-center text-sm text-gray-500 dark:text-gray-600">
+  <footer class="w-full py-4 text-center text-xs text-gray-500 dark:text-gray-600">
     {t?.footer}
   </footer>
   
 </div>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
   @import "tailwindcss";
   @custom-variant dark (&:where(.dark, .dark *));
   
