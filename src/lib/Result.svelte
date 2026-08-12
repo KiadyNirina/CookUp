@@ -34,8 +34,8 @@ export let onBack;
 
 const dispatch = createEventDispatcher();
 
-$: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => ing.original || '') : [];
-$: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => step.step || '') : [];
+$: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => decodeHtmlEntities(ing.original || '')) : [];
+$: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => decodeHtmlEntities(step.step || '')) : [];
 $: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.minutes}` : ($language === 'en' ? 'Not specified' : 'Non spécifié');
 $: cuisine = Array.isArray(recipeData?.cuisines) && recipeData.cuisines.length > 0 ? recipeData.cuisines.join(', ') : ($language === 'en' ? 'Not specified' : 'Non spécifié');
 $: formattedExcludedIngredients = allExcludedIngredients.length > 0 ? allExcludedIngredients.map(ing => t.ingredients[ing.replace(' ', '_')] || ing).join(', ') : ($language === 'en' ? 'None' : 'Aucun');
@@ -401,6 +401,26 @@ async function exportToPDF() {
 
 function closeInstagramModal() {
     showInstagramModal = false;
+}
+
+function decodeHtmlEntities(text) {
+  if (!text) return '';
+
+  if (browser) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = text;
+    return txt.value;
+  }
+
+  // Fallback minimal côté serveur
+  return text
+    .replace(/&#xA0;/gi, '\u00A0')
+    .replace(/&nbsp;/gi, '\u00A0')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/g, "'");
 }
 </script>
 
