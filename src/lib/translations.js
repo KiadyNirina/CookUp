@@ -214,7 +214,8 @@ export const translations = {
             subtitle: 'Let us know your experience!',
             commentPlaceholder: 'Leave a comment...',
             submit: 'Submit'
-        }
+        },
+        instructionTooLong: 'This instruction is too long to be displayed.'
     },
     
     fr: {
@@ -432,6 +433,7 @@ export const translations = {
             subtitle: 'Partagez votre expérience avec nous !',
             commentPlaceholder: 'Laissez un commentaire...',
             submit: 'Envoyer'
-        }
+        },
+        instructionTooLong: 'Cette instruction est trop longue pour être affichée.'
     }
 };

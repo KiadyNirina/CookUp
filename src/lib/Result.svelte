@@ -35,7 +35,22 @@ export let onBack;
 const dispatch = createEventDispatcher();
 
 $: ingredients = Array.isArray(recipeData?.extendedIngredients) ? recipeData.extendedIngredients.map(ing => decodeHtmlEntities(ing.original || '')) : [];
-$: steps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps) ? recipeData.analyzedInstructions[0].steps.map(step => decodeHtmlEntities(step.step || '')) : [];
+
+$: rawSteps = Array.isArray(recipeData?.analyzedInstructions?.[0]?.steps)
+  ? recipeData.analyzedInstructions[0].steps.map(step => {
+      const original = decodeHtmlEntities(step.step || '');
+      const isTooLong = /QUERY LENGTH LIMIT EXCEEDED|MAX ALLOWED QUERY/i.test(original);
+      return {
+        text: isTooLong
+          ? (t.instructionTooLong || 'Cette instruction est trop longue pour être affichée.')
+          : original,
+        isTooLong
+      };
+    })
+  : [];
+$: uiSteps = rawSteps;
+$: steps = rawSteps.map(item => item.text);
+
 $: prepTime = recipeData?.readyInMinutes ? `${recipeData.readyInMinutes} ${t.minutes}` : ($language === 'en' ? 'Not specified' : 'Non spécifié');
 $: cuisine = Array.isArray(recipeData?.cuisines) && recipeData.cuisines.length > 0 ? recipeData.cuisines.join(', ') : ($language === 'en' ? 'Not specified' : 'Non spécifié');
 $: formattedExcludedIngredients = allExcludedIngredients.length > 0 ? allExcludedIngredients.map(ing => t.ingredients[ing.replace(' ', '_')] || ing).join(', ') : ($language === 'en' ? 'None' : 'Aucun');
@@ -585,8 +600,13 @@ function decodeHtmlEntities(text) {
                         <div class="mt-4 p-3.5 bg-zinc-50 dark:bg-zinc-800/40 rounded-2xl border border-zinc-100 dark:border-zinc-800">
                             <span class="text-sm font-semibold tracking-wide uppercase text-zinc-500 dark:text-zinc-400 block">{t.instructions}</span>
                             <ul class="text-xs list-decimal ml-6 mt-2 text-zinc-600 dark:text-zinc-400 space-y-1">
-                                {#each steps as step}
-                                    <li>{step}</li>
+                                {#each uiSteps as step}
+                                    <li class:too-long={step.isTooLong}>
+                                        {#if step.isTooLong}
+                                        <Icon icon="mdi:alert-circle-outline" class="inline-block mr-1 text-red-500" />
+                                        {/if}
+                                        {step.text}
+                                    </li>
                                 {/each}
                             </ul>
                         </div>
@@ -692,5 +712,12 @@ function decodeHtmlEntities(text) {
 <style>
     .group:hover .group-hover\\:block {
         display: block;
+    }
+    .too-long {
+        font-style: italic;
+        color: #fb3740;
+        background: rgba(245, 158, 11, 0.1);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
     }
 </style>
