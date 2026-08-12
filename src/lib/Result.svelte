@@ -582,7 +582,7 @@ function decodeHtmlEntities(text) {
                         </span>
                     </p>
                     {#if cuisine && cuisine !== ($language === 'en' ? 'Not specified' : 'Non spécifié')}
-                        <p class="mt-4 text-zinc-600 dark:text-zinc-400">
+                        <p class="text-xs mt-4 text-zinc-600 dark:text-zinc-400">
                             <span class="text-sm font-semibold tracking-wide uppercase text-zinc-500 dark:text-zinc-400">{t.cuisine}</span> {cuisine}
                         </p>
                     {/if}
