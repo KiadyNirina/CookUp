@@ -292,7 +292,7 @@
         <h1 class="font-['Unbounded'] text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-tight text-gray-900 dark:text-white">
           {t?.headline || 'Loading...'}
         </h1>
-        <p class="mt-6 text-sm text-gray-600 dark:text-gray-400 max-w-lg">
+        <p class="mt-6 text-sm text-gray-600 dark:text-gray-400 font-medium max-w-lg">
           {#if $user}
             {t?.auth.welcomeBack}, {$user.email?.split('@')[0]}
           {:else}
@@ -323,7 +323,7 @@
       <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.features?.title || 'Comment ça marche'}
       </h2>
-      <p class="text-gray-600 dark:text-gray-400 text-sm max-w-2xl mx-auto">
+      <p class="text-gray-600 dark:text-gray-400 font-medium text-sm max-w-2xl mx-auto">
         {t?.features?.subtitle || 'Trois étapes simples pour des repas personnalisés'}
       </p>
     </div>
@@ -337,7 +337,7 @@
           </div>
           <div>
             <h3 class="text-xl font-bold mb-1">{t?.features?.step1Title || 'Choisissez vos préférences'}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 font-medium leading-relaxed">{t?.features?.step1Desc || 'Type de repas, régime alimentaire, ingrédients à exclure'}</p>
           </div>
         </div>
         <!-- Étape 2 -->
@@ -347,7 +347,7 @@
           </div>
           <div>
             <h3 class="text-xl font-bold mb-1">{t?.features?.step2Title || 'Obtenez une recette'}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 font-medium leading-relaxed">{t?.features?.step2Desc || 'Notre IA génère une recette adaptée à vos besoins'}</p>
           </div>
         </div>
         <!-- Étape 3 -->
@@ -357,7 +357,7 @@
           </div>
           <div>
             <h3 class="text-xl font-bold mb-1">{t?.features?.step3Title || 'Cuisinez et savourez'}</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400 font-medium leading-relaxed">{t?.features?.step3Desc || 'Instructions détaillées, temps de préparation, valeurs nutritionnelles'}</p>
           </div>
         </div>
       </div>
@@ -409,7 +409,7 @@
       <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.featuresAlt?.title || 'Pourquoi nous choisir'}
       </h2>
-      <p class="text-gray-600 dark:text-gray-400 text-sm max-w-2xl mx-auto">
+      <p class="text-gray-600 dark:text-gray-400 font-medium text-sm max-w-2xl mx-auto">
         {t?.featuresAlt?.subtitle || 'Une expérience culinaire simplifiée'}
       </p>
     </div>
@@ -417,17 +417,17 @@
       <div class="text-center p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 transition-transform duration-300 hover:-translate-y-1">
         <img src="/img/personalized.svg" alt="Personalized" class="w-32 h-32 mx-auto object-contain mb-6" />
         <h3 class="text-xl font-bold mb-3">{t?.featuresAlt?.personalized || 'Personnalisé'}</h3>
-        <p class="text-gray-600 dark:text-gray-400 text-sm">{t?.featuresAlt?.personalizedDesc || 'Des recettes adaptées à vos goûts et restrictions'}</p>
+        <p class="text-gray-600 dark:text-gray-400 font-medium text-sm">{t?.featuresAlt?.personalizedDesc || 'Des recettes adaptées à vos goûts et restrictions'}</p>
       </div>
       <div class="text-center p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 transition-transform duration-300 hover:-translate-y-1">
         <img src="/img/quick.svg" alt="Quick" class="w-32 h-32 mx-auto object-contain mb-6" />
         <h3 class="text-xl font-bold mb-3">{t?.featuresAlt?.quick || 'Rapide & simple'}</h3>
-        <p class="text-gray-600 dark:text-gray-400 text-sm">{t?.featuresAlt?.quickDesc || 'Obtenez une idée de recette en un clic'}</p>
+        <p class="text-gray-600 dark:text-gray-400 font-medium text-sm">{t?.featuresAlt?.quickDesc || 'Obtenez une idée de recette en un clic'}</p>
       </div>
       <div class="text-center p-8 rounded-3xl bg-gray-50 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 transition-transform duration-300 hover:-translate-y-1">
         <img src="/img/nutritious.svg" alt="Nutritious" class="w-32 h-32 mx-auto object-contain mb-6" />
         <h3 class="text-xl font-bold mb-3">{t?.featuresAlt?.nutritious || 'Équilibré'}</h3>
-        <p class="text-gray-600 dark:text-gray-400 text-sm">{t?.featuresAlt?.nutritiousDesc || 'Suivez vos apports nutritionnels'}</p>
+        <p class="text-gray-600 dark:text-gray-400 font-medium text-sm">{t?.featuresAlt?.nutritiousDesc || 'Suivez vos apports nutritionnels'}</p>
       </div>
     </div>
   </section>
@@ -438,7 +438,7 @@
       <h2 class="text-3xl sm:text-5xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
         {t?.recipeCountTitle || 'Toujours plus de recettes'}
       </h2>
-      <p class="text-gray-600 dark:text-gray-400 mb-12 text-sm">
+      <p class="text-gray-600 dark:text-gray-400 font-medium mb-12 text-sm">
         {t?.recipeCountSubtitle || 'Découvrez une infinité de possibilités.'}
       </p>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -447,21 +447,21 @@
             <Icon icon="mdi:food-fork-drink" class="text-2xl text-yellow-600 dark:text-yellow-400" />
           </div>
           <p class="text-3xl font-bold text-gray-900 dark:text-white mb-1">{recipeCount.toLocaleString()} +</p>
-          <p class="text-sm text-gray-500">{t?.recipeCountTotal || 'Total Recipes'}</p>
+          <p class="text-sm text-gray-500 font-medium">{t?.recipeCountTotal || 'Total Recipes'}</p>
         </div>
         <div class="p-8 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl flex flex-col items-center">
           <div class="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mb-4">
             <Icon icon="mdi:earth" class="text-2xl text-yellow-600 dark:text-yellow-400" />
           </div>
           <p class="text-3xl font-bold text-gray-900 dark:text-white mb-1">{recipeCountInternational.toLocaleString()} +</p>
-          <p class="text-sm text-gray-500">{t?.recipeCountInternational || 'Cuisines'}</p>
+          <p class="text-sm text-gray-500 font-medium">{t?.recipeCountInternational || 'Cuisines'}</p>
         </div>
         <div class="p-8 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl flex flex-col items-center">
           <div class="w-14 h-14 bg-yellow-50 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mb-4">
             <Icon icon="mdi:calendar-refresh" class="text-2xl text-yellow-600 dark:text-yellow-400" />
           </div>
           <p class="text-3xl font-bold text-gray-900 dark:text-white mb-1">Daily</p>
-          <p class="text-sm text-gray-500">{t?.recipeCountUpdates || 'Updates'}</p>
+          <p class="text-sm text-gray-500 font-medium">{t?.recipeCountUpdates || 'Updates'}</p>
         </div>
       </div>
     </div>
@@ -477,7 +477,7 @@
         <h2 class="text-3xl sm:text-4xl font-['Unbounded'] font-extrabold mb-4 text-gray-900 dark:text-white">
           {t?.rating?.title || 'Donnez votre avis'}
         </h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-8 text-sm">
+        <p class="text-gray-600 dark:text-gray-400 font-medium mb-8 text-sm">
           {t?.rating?.subtitle || 'Partagez votre expérience avec nous !'}
         </p>
         
@@ -520,7 +520,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="w-full py-8 text-center text-xs text-gray-500 border-t border-gray-100 dark:border-gray-800/50 mt-10">
+  <footer class="w-full py-8 text-center text-xs text-gray-500 font-medium border-t border-gray-100 dark:border-gray-800/50 mt-10">
     {t?.footer || '© 2026 CookUp. Tous droits réservés.'}
   </footer>
 </div>
